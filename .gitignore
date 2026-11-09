@@ -1,1 +1,17 @@
+# Project folders kept out of the repo
 metode-numerice-pentru-ecuatii-operatoriale/
+
+# AI tooling / agent configuration
+_bmad/
+.agents/
+.claude/
+
+# Dependencies and build output
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+
+docs/.memlog.md
