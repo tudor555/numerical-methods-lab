@@ -1,0 +1,24 @@
+{
+  "name": "numerical-methods-lab",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "simple-git-hooks",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged"
+  },
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
+  },
+  "prettier": {
+    "printWidth": 100
+  },
+  "devDependencies": {
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10",
+    "simple-git-hooks": "2.14.0"
+  }
+}

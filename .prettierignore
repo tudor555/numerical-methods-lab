@@ -1,0 +1,18 @@
+# Dependencies, build and test output
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+bun.lock
+
+# Not project source
+_bmad/
+.agents/
+.claude/
+metode-numerice-pentru-ecuatii-operatoriale/
+
+# Append-only log managed by bmad-spec's memlog script
+docs/.memlog.md
