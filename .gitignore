@@ -10,8 +10,17 @@ _bmad/
 node_modules/
 .next/
 out/
+build/
 coverage/
-playwright-report/
-test-results/
+
+# Next.js / TypeScript generated files
+next-env.d.ts
+*.tsbuildinfo
+
+# Environment and local files
+.env*
+.vercel
+*.pem
+.DS_Store
 
 docs/.memlog.md
