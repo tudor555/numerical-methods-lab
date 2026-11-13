@@ -73,7 +73,7 @@ A **vision plus a mandate**. The course _Numerical Methods for Operator Equation
 
 ## Success signal
 
-- Each of the 13 lab pages can load and run every worked example in `labs-catalog.md`, in English and Romanian, and the results match the lab: for example, Lab 6 ex. 1 converges to ≈ (3.487, 2.262), Lab 5 ex. 2 converges to (1, 3) and (3, 1), and the ODE/BVP presets show small errors against the exact solutions. A Vitest suite reproduces every preset for every algorithm, and a Playwright smoke test runs one preset per lab page.
+- Each of the 13 lab pages can load and run every worked example in `labs-catalog.md`, in English and Romanian, and the results match the lab: for example, Lab 6 ex. 1 converges to ≈ (3.487, 2.262), Lab 5 ex. 2 converges to (1, 3) and (3, 1), and the ODE/BVP presets show small errors against the exact solutions. A Vitest suite reproduces every preset for every algorithm.
 
 ## Assumptions
 
@@ -82,3 +82,5 @@ A **vision plus a mandate**. The course _Numerical Methods for Operator Equation
 - The Lab 12 Green kernels are scaled by (b − a)³ so the method works on any [a, b]. On the lab's own interval, [0, 1], the results are identical.
 - Lab 1 ex. 1 gives no interval, so the app uses [1, 2], as Labs 2–4 do. Lab 6 examples that give no ε use 10⁻⁴.
 - "Compare with successive approximations" in Labs 1–2 means scalar fixed-point iteration xₙ₊₁ = φ(xₙ), with φ entered by the user. It lives in Lab 1.
+- Lab 1 ex. 2 asks for the root in (−1, 1), but f″ changes sign inside that interval, so rule R0 picks x₀ = 1, where f′(1) = 0. The preset keeps the lab's interval and shows that error; a second preset starts from x₀ = 0 and converges to ≈ 0.20006.
+- Lab 1 ex. 4 compares √2, √3 and √5 with successive approximations but gives neither φ nor ε. The app uses φ(x) = (x + c)/(x + 1) from x₀ = c, and the three ε values of ex. 1–2. The ∛ examples are approximated only, as the lab asks; they have no comparison.
