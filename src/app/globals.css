@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Ember is the only theme, and it is dark. `dark:` variants always apply. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  /* Ember roles that shadcn has no variable for. */
+  --color-surface: var(--ember-surface);
+  --color-raised: var(--ember-raised);
+  --color-sky: var(--ember-secondary);
+  --color-success: var(--ember-success);
+  --color-warning: var(--ember-warning);
+  --color-error: var(--ember-error);
+  /* 8px grid: line heights and radii are multiples of 8, with 4px as a half-step. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 2.5rem;
+  --text-4xl: 2.5rem;
+  --text-4xl--line-height: 3rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 3.5rem;
+}
+
+/* Ember palette (docs/stack.md) mapped onto the shadcn/ui variables. */
+:root {
+  --ember-bg: #121110;
+  --ember-surface: #1a1816;
+  --ember-raised: #24211e;
+  --ember-border: #3a342e;
+  --ember-text: #f3eee9;
+  --ember-muted: #aba298;
+  --ember-accent: #ff6a1a;
+  --ember-on-accent: #2a0e00;
+  --ember-secondary: #7fd1ff;
+  --ember-success: #6bdb8f;
+  --ember-warning: #ffc145;
+  --ember-error: #ff4d6a;
+
+  --background: var(--ember-bg);
+  --foreground: var(--ember-text);
+  --card: var(--ember-surface);
+  --card-foreground: var(--ember-text);
+  --popover: var(--ember-raised);
+  --popover-foreground: var(--ember-text);
+  --primary: var(--ember-accent);
+  --primary-foreground: var(--ember-on-accent);
+  --secondary: var(--ember-raised);
+  --secondary-foreground: var(--ember-text);
+  --muted: var(--ember-raised);
+  --muted-foreground: var(--ember-muted);
+  --accent: var(--ember-raised);
+  --accent-foreground: var(--ember-text);
+  --destructive: var(--ember-error);
+  --border: var(--ember-border);
+  --input: var(--ember-border);
+  --ring: var(--ember-accent);
+  --chart-1: var(--ember-accent);
+  --chart-2: var(--ember-secondary);
+  --chart-3: var(--ember-success);
+  --chart-4: var(--ember-warning);
+  --chart-5: var(--ember-error);
+  --radius: 0.5rem;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    /* The page background stays the flat Ember bg; the glow is a separate, fixed layer. */
+    background-color: var(--ember-bg);
+    @apply text-foreground;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      60rem 28rem at 50% -8rem,
+      color-mix(in srgb, var(--ember-accent) 9%, transparent),
+      transparent 70%
+    );
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Long display formulas scroll inside their block instead of widening the page. */
+.katex {
+  font-size: 1.05em;
+}
+.katex-display {
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.5rem;
+}
