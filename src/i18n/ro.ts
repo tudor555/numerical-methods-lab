@@ -81,6 +81,7 @@ export const ro: Record<MessageKey, string> = {
   "field.x0Mode.manual": "Introdusă manual",
   "field.dda": "Valoarea derivatei a doua în a",
   "field.x0": "Iterația inițială",
+  "field.x1": "A doua iterație inițială",
   "field.eps": "Precizia dorită",
   "field.maxIter": "Numărul maxim de iterații",
   "field.c": "Numărul de sub radical",
@@ -100,6 +101,7 @@ export const ro: Record<MessageKey, string> = {
   "field.error.integer-min": "Valoarea trebuie să fie un număr întreg, cel puțin {min}.",
   "field.error.integer-range": "Valoarea trebuie să fie un număr întreg între {min} și {max}.",
   "field.error.greater-than": "Valoarea trebuie să fie mai mare decât {other}.",
+  "field.error.different-from": "Valoarea trebuie să fie diferită de {other}.",
   "field.error.derive-failed":
     "Corectează mai întâi funcția (și capătul a) sau introdu valoarea manual.",
   "field.error.derive-undefined":
@@ -122,6 +124,8 @@ export const ro: Record<MessageKey, string> = {
 
   "run.error.zero-derivative":
     "Derivata se anulează la n = {n}, în xₙ = {x}: tangenta este orizontală, deci xₙ₊₁ nu poate fi calculat.",
+  "run.error.zero-denominator":
+    "Numitorul se anulează la n = {n}, în xₙ = {x}: f ia aceeași valoare în ambele puncte, deci xₙ₊₁ nu poate fi calculat.",
   "run.error.undefined-value":
     "La pasul care pornește din n = {n}, xₙ = {x}, o valoare nu este definită (NaN). Verifică domeniul de definiție al funcțiilor (radical dintr-un număr negativ, logaritm dintr-un număr nepozitiv).",
   "run.error.overflow":
@@ -133,6 +137,8 @@ export const ro: Record<MessageKey, string> = {
   "table.showAll": "Arată toate",
 
   "chart.tangent": "Graficul lui f și tangentele succesive",
+  "chart.secant": "Graficul lui f și secantele succesive",
+  "chart.steffensen": "Graficul lui f și pașii metodei lui Steffensen",
   "chart.cobweb": "Graficul lui φ, dreapta y = x și traseul iterațiilor",
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
@@ -145,6 +151,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.f": "f(x)",
   "chart.trace.iterates": "Iterații",
   "chart.trace.tangents": "Tangente",
+  "chart.trace.secants": "Secante",
+  "chart.trace.steffensenSteps": "Pașii metodei lui Steffensen",
   "chart.trace.phi": "φ(x)",
   "chart.trace.identity": "y = x",
   "chart.trace.path": "Traseul iterațiilor",
@@ -213,4 +221,44 @@ export const ro: Record<MessageKey, string> = {
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 pe (−1; 1)",
   "lab1.compare.kepler": "Ex. 3: ecuația lui Kepler, x = sin x + 0,25",
   "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
+
+  "lab2.intro":
+    "Rezolvă ecuația f(x) = 0 fără să folosești derivata: metoda secantei înlocuiește tangenta cu coarda prin ultimele două iterații, iar metoda lui Steffensen obține panta doar din valorile lui f. Apoi vezi cum se descurcă amândouă în fața metodei tangentei.",
+  "lab2.method.secant.tab": "2a · Metoda secantei",
+  "lab2.method.secant.title": "Metoda secantei",
+  "lab2.method.secant.name": "Metoda secantei",
+  "lab2.method.secant.idea":
+    "În vecinătatea rădăcinii, graficul lui $f$ se înlocuiește cu secanta care trece prin ultimele două puncte, $(x_{n-1}, f(x_{n-1}))$ și $(x_n, f(x_n))$. Fiecare pas cere o singură valoare nouă a lui $f$, iar convergența este superliniară, de ordin $(1 + \\sqrt{5})/2 \\approx 1{,}618$: mai rapidă decât la metoda aproximațiilor succesive, dar mai lentă decât la metoda tangentei. Punctul în care secanta intersectează axa $Ox$ este următoarea iterație:",
+  "lab2.method.secant.start":
+    "Metoda pornește din două iterații inițiale: introduci atât $x_0$, cât și $x_1$, iar ele trebuie să fie diferite. Intervalul $[a; b]$ stabilește doar porțiunea afișată pe grafic.",
+  "lab2.method.secant.stopping":
+    "Criteriul de oprire: $x_1$ este dat, așa că, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+  "lab2.method.secant.failure":
+    "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f(x_n) = f(x_{n-1})$, secanta este paralelă cu axa $Ox$ și metoda se oprește cu eroare.",
+
+  "lab2.method.steffensen.tab": "2b · Metoda lui Steffensen",
+  "lab2.method.steffensen.title": "Metoda lui Steffensen",
+  "lab2.method.steffensen.name": "Metoda lui Steffensen",
+  "lab2.method.steffensen.idea":
+    "Este metoda tangentei fără derivată: $f'(x_n)$ se înlocuiește cu panta secantei prin punctele $(x_n, f(x_n))$ și $(x_n + f(x_n), f(x_n + f(x_n)))$. Fiecare pas folosește două valori ale lui $f$, iar în apropierea rădăcinii metoda converge pătratic, ca metoda tangentei:",
+  "lab2.method.steffensen.start":
+    "Iterația inițială se alege după regula R0, în funcție de semnul produsului $f(a)\\,f''(a)$. Valoarea $f''(a)$, adică derivata a doua în capătul stâng $a$, se introduce în câmpul dda sau se calculează din f.",
+  "lab2.method.steffensen.failure":
+    "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f(x_n + f(x_n)) = f(x_n)$, numitorul se anulează și metoda se oprește cu eroare. Funcția $f$ trebuie să fie definită și în punctul auxiliar $x_n + f(x_n)$: o eroare de domeniu sau o depășire poate apărea și acolo, nu doar în $x_n$.",
+  "lab2.method.steffensen.chart":
+    "Departe de rădăcină, punctul auxiliar $x_n + f(x_n)$ poate ieși mult din intervalul $[a; b]$ (la ex. 3, din $x_0 = 2$ se ajunge în 7). Atunci panta este aproximată prost și primii pași sunt lenți, de aceea la ex. 3 sunt necesare mai multe iterații decât la metoda tangentei. Graficul unește direct punctul $(x_n, f(x_n))$ cu $(x_{n+1}, 0)$.",
+
+  "lab2.preset.ex1": "Ex. 1: x² − 2 = 0, x₀ = 2, x₁ = 1,4",
+  "lab2.preset.ex2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2, x₁ = 1,5",
+  "lab2.preset.ex3": "Ex. 3: x³ − x − 1 = 0 pe [1; 2]",
+
+  "lab2.compare.ex1": "Ex. 1: x² − 2 = 0, metoda secantei",
+  "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0, metoda secantei",
+  "lab2.compare.ex3": "Ex. 3: x³ − x − 1 = 0, metoda lui Steffensen",
+  "lab2.compare.ex1.task":
+    "Aproximează rădăcina ecuației x² − 2 = 0 prin metoda secantei, pornind din x₀ = 2 și x₁ = 1,4, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu metoda tangentei. Laboratorul nu precizează datele de intrare pentru metoda tangentei, așa că se folosesc aceeași funcție și același interval [1; 2], derivata calculată din f și iterația inițială x₀ = 2, aleasă prin regula R0.",
+  "lab2.compare.ex2.task":
+    "Aproximează rădăcina ecuației x³ − x − 1 = 0 prin metoda secantei, pornind din x₀ = 2 și x₁ = 1,5, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu metoda tangentei. Laboratorul nu precizează datele de intrare pentru metoda tangentei, așa că se folosesc aceeași funcție și același interval [1; 2], derivata calculată din f și iterația inițială x₀ = 2, aleasă prin regula R0.",
+  "lab2.compare.ex3.task":
+    "Aproximează rădăcina ecuației x³ − x − 1 = 0 prin metoda lui Steffensen, pornind din x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu metoda tangentei. Laboratorul nu precizează datele de intrare pentru metoda tangentei, așa că se folosesc aceeași funcție și același interval [1; 2], derivata calculată din f și iterația inițială x₀ = 2, aleasă prin regula R0, la fel ca pentru metoda lui Steffensen.",
 };

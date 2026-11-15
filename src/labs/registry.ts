@@ -1,7 +1,8 @@
 import { lab1 } from "./lab-1";
+import { lab2 } from "./lab-2";
 import type { LabDefinition, ReadyLab } from "./types";
 
-type PlannedNumber = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+type PlannedNumber = 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 
 const planned = <N extends PlannedNumber>(number: N, slug: string): LabDefinition => ({
   number,
@@ -11,10 +12,10 @@ const planned = <N extends PlannedNumber>(number: N, slug: string): LabDefinitio
   topicKey: `lab${number}.topic`,
 });
 
-/** All 13 labs in course order. Labs 2–13 are listed as "coming soon" until they ship. */
+/** All 13 labs in course order. Labs that are not built yet are listed as "coming soon". */
 export const labs: readonly LabDefinition[] = [
   lab1,
-  planned(2, "secant-steffensen"),
+  lab2,
   planned(3, "halley-chebyshev"),
   planned(4, "third-order"),
   planned(5, "newton-systems"),

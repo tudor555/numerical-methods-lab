@@ -77,6 +77,7 @@ export const en = {
   "field.x0Mode.manual": "Enter x₀",
   "field.dda": "Second derivative at a",
   "field.x0": "Starting value",
+  "field.x1": "Second starting value",
   "field.eps": "Tolerance",
   "field.maxIter": "Maximum number of iterations",
   "field.c": "Radicand",
@@ -96,6 +97,7 @@ export const en = {
   "field.error.integer-min": "Must be a whole number, at least {min}.",
   "field.error.integer-range": "Must be a whole number between {min} and {max}.",
   "field.error.greater-than": "Must be greater than {other}.",
+  "field.error.different-from": "Must differ from {other}.",
   "field.error.derive-failed":
     "Fix the function (and the point) first, or enter the value by hand.",
   "field.error.derive-undefined":
@@ -118,6 +120,8 @@ export const en = {
 
   "run.error.zero-derivative":
     "The derivative is zero at n = {n}, xₙ = {x}. The step divides by zero, so xₙ₊₁ is undefined.",
+  "run.error.zero-denominator":
+    "The denominator is zero at n = {n}, xₙ = {x}: f takes the same value at both points, so xₙ₊₁ is undefined.",
   "run.error.undefined-value":
     "A value is undefined (NaN) in the step from n = {n}, xₙ = {x}. Check the domain of the functions (√ of a negative number, ln of a non-positive one).",
   "run.error.overflow": "A value overflowed to ±∞ in the step from n = {n}, xₙ = {x}.",
@@ -128,6 +132,8 @@ export const en = {
   "table.showAll": "Show all",
 
   "chart.tangent": "f(x) with the tangent steps",
+  "chart.secant": "f(x) with the secant lines",
+  "chart.steffensen": "f(x) with the Steffensen steps",
   "chart.cobweb": "φ(x), y = x and the iteration path",
   "chart.convergence": "Convergence: |xₙ − xₙ₋₁| on a log scale",
   "chart.toolbar": "Chart tools",
@@ -140,6 +146,8 @@ export const en = {
   "chart.trace.f": "f(x)",
   "chart.trace.iterates": "Iterates",
   "chart.trace.tangents": "Tangent steps",
+  "chart.trace.secants": "Secant lines",
+  "chart.trace.steffensenSteps": "Steffensen steps",
   "chart.trace.phi": "φ(x)",
   "chart.trace.identity": "y = x",
   "chart.trace.path": "Iteration path",
@@ -208,6 +216,46 @@ export const en = {
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 on (−1, 1)",
   "lab1.compare.kepler": "Ex. 3: Kepler's equation, x = sin x + 0.25",
   "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
+
+  "lab2.intro":
+    "Solve f(x) = 0 without a derivative: the secant method swaps the tangent for a chord through the last two iterates, and Steffensen's method reads the slope off f itself. Both race the tangent method.",
+  "lab2.method.secant.tab": "2a · Secant",
+  "lab2.method.secant.title": "Secant method",
+  "lab2.method.secant.name": "Secant method",
+  "lab2.method.secant.idea":
+    "Near the root, $f$ is replaced by the chord through the last two points of its graph, $(x_{n-1}, f(x_{n-1}))$ and $(x_n, f(x_n))$. Each step needs just one new value of $f$, and convergence is superlinear, of order $(1 + \\sqrt{5})/2 \\approx 1.618$: faster than successive approximations, slower than the tangent method. The point where the chord crosses the x-axis is the next iterate:",
+  "lab2.method.secant.start":
+    "The method starts from two values: you enter both $x_0$ and $x_1$, and they must differ. The interval $[a, b]$ only sets the range of the chart.",
+  "lab2.method.secant.stopping":
+    "Stopping rule: $x_1$ is given, so the iteration starts from $n = 1$ and continues while $|x_n - x_{n-1}| \\ge \\varepsilon$. The output is $n$ and $x_n$.",
+  "lab2.method.secant.failure":
+    "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f(x_n) = f(x_{n-1})$, the chord is parallel to the x-axis and the method stops with an error.",
+
+  "lab2.method.steffensen.tab": "2b · Steffensen",
+  "lab2.method.steffensen.title": "Steffensen's method",
+  "lab2.method.steffensen.name": "Steffensen's method",
+  "lab2.method.steffensen.idea":
+    "The tangent method without a derivative: $f'(x_n)$ is replaced by the slope of the chord through $(x_n, f(x_n))$ and $(x_n + f(x_n), f(x_n + f(x_n)))$. Each step costs two values of $f$, and close to the root it converges quadratically, like the tangent method:",
+  "lab2.method.steffensen.start":
+    "The starting value comes from rule R0, which checks the sign of $f(a)\\,f''(a)$. Enter $f''(a)$, the second derivative at the left end $a$, in the field dda, or derive it from f.",
+  "lab2.method.steffensen.failure":
+    "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f(x_n + f(x_n)) = f(x_n)$, the denominator is zero and the method stops with an error. $f$ must also be defined at the helper point $x_n + f(x_n)$: a domain error or an overflow can come from there, not only from $x_n$.",
+  "lab2.method.steffensen.chart":
+    "Far from the root, the helper point $x_n + f(x_n)$ can land well outside $[a, b]$ (from $x_0 = 2$ in ex. 3 it is 7). The slope estimate is then poor and the first steps are slow, which is why ex. 3 needs more iterations than the tangent method. The chart draws each step straight from $(x_n, f(x_n))$ to $(x_{n+1}, 0)$.",
+
+  "lab2.preset.ex1": "Ex. 1: x² − 2 = 0, x₀ = 2, x₁ = 1.4",
+  "lab2.preset.ex2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2, x₁ = 1.5",
+  "lab2.preset.ex3": "Ex. 3: x³ − x − 1 = 0 on [1, 2]",
+
+  "lab2.compare.ex1": "Ex. 1: x² − 2 = 0, secant method",
+  "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0, secant method",
+  "lab2.compare.ex3": "Ex. 3: x³ − x − 1 = 0, Steffensen's method",
+  "lab2.compare.ex1.task":
+    "Approximate the root of x² − 2 = 0 with the secant method from x₀ = 2 and x₁ = 1.4, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0.",
+  "lab2.compare.ex2.task":
+    "Approximate the root of x³ − x − 1 = 0 with the secant method from x₀ = 2 and x₁ = 1.5, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0.",
+  "lab2.compare.ex3.task":
+    "Approximate the root of x³ − x − 1 = 0 with Steffensen's method from x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0, the same start as Steffensen's.",
 } as const;
 
 export type MessageKey = keyof typeof en;

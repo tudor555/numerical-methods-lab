@@ -1,19 +1,25 @@
 import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
+import { lab2 } from "@/labs/lab-2";
 import type { RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
 import { elements, render, textOf } from "@/test/render";
+import type { ChartSpec } from "./charts";
 import { ResultsPanel } from "./results-panel";
 
-// Plotly needs a browser: the stub renders only the chart title.
+// Plotly needs a browser: the stub renders the chart title, and the trace names as an attribute.
 vi.mock("./plotly-chart", () => ({
-  PlotlyChart: ({ title }: { title: string }) => <figure>{title}</figure>,
+  PlotlyChart: ({ title, spec }: { title: string; spec: ChartSpec }) => (
+    <figure data-traces={spec.traces.map((t) => (t as { name?: string }).name ?? "").join("|")}>
+      {title}
+    </figure>
+  ),
 }));
 
-/** Prepares and runs a Lab 1 method like the page does. */
+/** Prepares and runs a Lab 1 or Lab 2 method like the page does. */
 function view(methodId: string, patch: FieldValues = {}): RunView {
-  const method = lab1.methods.find((m) => m.id === methodId);
+  const method = [...lab1.methods, ...lab2.methods].find((m) => m.id === methodId);
   if (!method) throw new Error(methodId);
   const prepared = method.prepare({ ...method.defaults, ...patch });
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
@@ -37,6 +43,9 @@ const stats = (html: string) =>
   ].map(([, label, value]) => ({ label: textOf(label), value: textOf(value) }));
 
 const figures = (html: string) => elements(html, "figure").map(textOf);
+
+/** Legend names of the first chart's traces. */
+const traceNames = (html: string) => (/data-traces="([^"]*)"/.exec(html)?.[1] ?? "").split("|");
 
 const ex1 = view("1a");
 const capped = view("1a", { eps: "1e-12", maxIter: "3" });
@@ -161,5 +170,43 @@ describe("ResultsPanel with a known exact solution (CAP-5)", () => {
   it("shows no exact-value tiles for methods without a known exact solution", () => {
     const text = textOf(panel(view("1a")));
     expect(text).not.toContain("Exact value");
+  });
+});
+
+describe("ResultsPanel for Lab 2", () => {
+  it.each([
+    ["2a", "en", "f(x) with the secant lines"],
+    ["2b", "en", "f(x) with the Steffensen steps"],
+    ["2a", "ro", "Graficul lui f și secantele succesive"],
+    ["2b", "ro", "Graficul lui f și pașii metodei lui Steffensen"],
+  ] as const)("titles the %s function chart in %s", (methodId, lang, title) => {
+    expect(figures(panel(view(methodId), lang))[0]).toBe(title);
+  });
+
+  it.each([
+    ["2a", "en", "Secant lines"],
+    ["2b", "en", "Steffensen steps"],
+    ["2a", "ro", "Secante"],
+    ["2b", "ro", "Pașii metodei lui Steffensen"],
+  ] as const)("names the %s step trace in %s", (methodId, lang, name) => {
+    expect(traceNames(panel(view(methodId), lang))[1]).toBe(name);
+  });
+
+  it("shows the Steffensen start as chosen by rule R0", () => {
+    const [, n, start] = stats(panel(view("2b")));
+    expect(n.value).toBe("11");
+    expect(start.value).toBe("2");
+    expect(start.label).toContain("chosen by R0 (x₀ = b)");
+  });
+
+  it("explains a zero denominator and keeps the partial table", () => {
+    const failed = view("2a", { f: "x^2", a: "-2", b: "2", x0: "1", x1: "-1" });
+    const html = panel(failed);
+    expect(message(html)).toBe(
+      "The denominator is zero at n = 1, xₙ = -1: f takes the same value at both points, so xₙ₊₁ " +
+        "is undefined. The iterations computed before the error are kept below.",
+    );
+    expect(elements(html.slice(html.indexOf("<tbody")), "tr")).toHaveLength(2);
+    expect(message(panel(failed, "ro"))).toMatch(/^Numitorul se anulează la n = 1, în xₙ = -1/);
   });
 });

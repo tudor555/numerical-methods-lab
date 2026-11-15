@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lab1 } from "@/labs/lab-1";
+import { lab2 } from "@/labs/lab-2";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -103,5 +104,48 @@ describe("ComparisonResults", () => {
     expect(textOf(html)).toContain("Cap reached");
     expect(textOf(html)).toContain("n = 3");
     expect(textOf(html)).toContain("—");
+  });
+});
+
+describe("ComparisonPanel for Lab 2", () => {
+  it("shows the three comparisons with Newton, each with its task", () => {
+    const html = render(<ComparisonPanel lab={lab2} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 1: x² − 2 = 0, metoda secantei",
+      "Ex. 2: x³ − x − 1 = 0, metoda secantei",
+      "Ex. 3: x³ − x − 1 = 0, metoda lui Steffensen",
+    ]);
+    for (const card of cards(html)) {
+      expect(textOf(card)).toContain("Cerința:");
+      expect(textOf(card)).toContain("metoda tangentei");
+    }
+  });
+
+  it.each([
+    ["en", "ex1", ["Secant method", "Tangent method"], ["n = 4", "n = 6", "n = 5"], "x^2 - 2"],
+    [
+      "ro",
+      "ex3",
+      ["Metoda lui Steffensen", "Metoda tangentei"],
+      ["n = 11", "n = 13", "n = 7"],
+      "x^3 - x - 1",
+    ],
+  ] as const)("in %s, %s names both methods and shows n for each ε", (lang, id, names, ns, f) => {
+    const comparison = lab2.comparisons.find((c) => c.id === id);
+    if (!comparison) throw new Error(id);
+    const html = render(
+      <ComparisonResults
+        lab={lab2}
+        comparison={comparison}
+        cells={runComparison(lab2, comparison)}
+      />,
+      lang,
+    );
+    const rows = elements(html, "li");
+    expect(rows).toHaveLength(2);
+    rows.forEach((row, i) => expect(textOf(row)).toContain(names[i]));
+    for (const n of ns) expect(textOf(html)).toContain(n);
+    // Newton's row names its start, which the lab leaves open.
+    expect(texOf(rows[1])[0]).toBe(`${f},\\ x_0 = 2\\ (\\mathrm{R0})`);
   });
 });

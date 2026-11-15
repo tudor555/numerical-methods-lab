@@ -42,9 +42,17 @@ export interface ChoiceField extends FieldBase {
 
 export type FieldDefinition = NumberField | ExpressionField | ChoiceField;
 
-/** What the function chart draws for a run. */
+/**
+ * What the function chart draws for a run: f with each step as a line to (xₙ₊₁, 0), or φ with the
+ * cobweb path. A `tangent` or `steffensen` step starts at (xₙ, f(xₙ)); a `secant` step is the chord
+ * from (xₙ₋₁, f(xₙ₋₁)) through (xₙ, f(xₙ)).
+ */
 export type FunctionPlot =
-  | { kind: "tangent"; f: (x: number) => number; interval?: readonly [number, number] }
+  | {
+      kind: "tangent" | "secant" | "steffensen";
+      f: (x: number) => number;
+      interval?: readonly [number, number];
+    }
   | { kind: "cobweb"; phi: (x: number) => number };
 
 /** A known exact solution, e.g. ᵏ√c for the k-th root. `tex` names it in headers. */
@@ -88,13 +96,18 @@ export interface MethodDefinition {
   prepare: (values: FieldValues) => PrepareResult;
 }
 
-export interface Preset {
+/** The inputs of one comparison row. */
+export interface ComparisonPreset {
   id: string;
   methodId: string;
-  labelKey: MessageKey;
   /** Short TeX tag for comparison rows, e.g. `\sqrt{2}`. */
   tex: string;
   values: FieldValues;
+}
+
+/** A worked example: a comparison preset that also has a button in the form. */
+export interface Preset extends ComparisonPreset {
+  labelKey: MessageKey;
 }
 
 /** A comparison the lab asks for, in the lab's order. */
@@ -120,6 +133,14 @@ export interface ReadyLab extends LabBase {
   methods: readonly MethodDefinition[];
   presets: readonly Preset[];
   comparisons: readonly Comparison[];
+  /**
+   * Methods and inputs that only comparisons use, with no tab or preset button: the lab compares
+   * with them but does not ask to run them on their own (Newton in Lab 2).
+   */
+  comparisonOnly?: {
+    methods: readonly MethodDefinition[];
+    presets: readonly ComparisonPreset[];
+  };
 }
 
 export interface PlannedLab extends LabBase {

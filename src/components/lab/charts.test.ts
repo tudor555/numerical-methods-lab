@@ -14,6 +14,8 @@ const labels: ChartLabels = {
   f: "f",
   iterates: "iterates",
   tangents: "tangents",
+  secants: "secants",
+  steffensenSteps: "steffensen",
   phi: "phi",
   identity: "identity",
   path: "path",
@@ -123,6 +125,66 @@ describe("buildFunctionChart, tangent mode", () => {
     expect(curve.y[0]).toBeNull();
     expect(curve.y[200]).toBeCloseTo(0, 12);
     expect(curve.y[400]).toBeNull();
+  });
+});
+
+describe("buildFunctionChart, secant mode", () => {
+  const plot: FunctionPlot = { kind: "secant", f: (x) => x * x - 2, interval: [1, 2] };
+  // x₀ = 2 and x₁ = 1.4 are given; x₂ and x₃ are secant steps.
+  const rows = [row(0, 2, 2), row(1, 1.4, -0.04), row(2, 1.41, -0.01), row(3, 1.414, -0.0006)];
+
+  it("draws each chord from (xₙ₋₁, f(xₙ₋₁)) through (xₙ, f(xₙ)) to (xₙ₊₁, 0), none to x₁", () => {
+    const chords = trace(buildFunctionChart(plot, rows, labels), "secants");
+    expect(chords.x).toEqual([2, 1.4, 1.41, null, 1.4, 1.41, 1.414, null]);
+    expect(chords.y).toEqual([2, -0.04, 0, null, -0.04, -0.01, 0, null]);
+  });
+
+  it("drops a dotted line to the curve only at computed iterates", () => {
+    const drops = dropLines(buildFunctionChart(plot, rows, labels));
+    expect(drops.x).toEqual([1.41, 1.41, null, 1.414, 1.414, null]);
+  });
+
+  it("marks every iterate, x₀ and x₁ included", () => {
+    expect(trace(buildFunctionChart(plot, rows, labels), "iterates").customdata).toEqual([
+      0, 1, 2, 3,
+    ]);
+  });
+
+  it("skips a chord whose previous point has no f value or sits beyond the plot limit, keeping the drop line", () => {
+    const gaps = [row(0, 2, null), row(1, 1.4, -0.04), row(2, 1.41, -0.01), row(3, 1.414, -0.0006)];
+    expect(trace(buildFunctionChart(plot, gaps, labels), "secants").x).toEqual([
+      1.4,
+      1.41,
+      1.414,
+      null,
+    ]);
+    // The computed iterates keep their drop lines even where the chord is skipped.
+    expect(dropLines(buildFunctionChart(plot, gaps, labels)).x).toEqual([
+      1.41,
+      1.41,
+      null,
+      1.414,
+      1.414,
+      null,
+    ]);
+    const far = [row(0, 1e7, 1e14), row(1, 1.4, -0.04), row(2, 1.41, -0.01)];
+    const farSpec = buildFunctionChart(plot, far, labels);
+    expect(trace(farSpec, "secants").x).toEqual([]);
+    expect(dropLines(farSpec).x).toEqual([1.41, 1.41, null]);
+  });
+});
+
+describe("buildFunctionChart, Steffensen mode", () => {
+  const plot: FunctionPlot = { kind: "steffensen", f: (x) => x ** 3 - x - 1, interval: [1, 2] };
+  const rows = [row(0, 2, 5), row(1, 1.92, 4.16), row(2, 1.84, 3.39)];
+
+  it("draws each step from (xₙ, f(xₙ)) to (xₙ₊₁, 0), leaving out the auxiliary point xₙ + f(xₙ)", () => {
+    const spec = buildFunctionChart(plot, rows, labels);
+    const steps = trace(spec, "steffensen");
+    expect(steps.x).toEqual([2, 1.92, null, 1.92, 1.84, null]);
+    expect(steps.y).toEqual([5, 0, null, 4.16, 0, null]);
+    // x₀ + f(x₀) = 7 would stretch the chart; the curve stays near [a, b].
+    expect(Math.max(...(trace(spec, "f").x as number[]))).toBeLessThan(2.1);
   });
 });
 

@@ -31,16 +31,19 @@ beforeEach(() => {
 });
 
 describe("/labs/[slug]", () => {
-  it("renders the lab page for a ready lab", async () => {
-    const element = await LabRoute(props("newton"));
+  it.each([
+    ["newton", "Newton's method and k-th roots"],
+    ["secant-steffensen", "Secant and Steffensen methods"],
+  ])("renders the lab page for the ready lab /labs/%s", async (slug, title) => {
+    const element = await LabRoute(props(slug));
     const html = render(element);
-    expect(textOf(html)).toContain("Newton's method and k-th roots");
+    expect(textOf(html)).toContain(title);
     expect(html).toContain('id="field-f"');
   });
 
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "secant-steffensen"],
+    ["a lab that is not built yet", "halley-chebyshev"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -57,6 +60,13 @@ describe("/labs/[slug] metadata", () => {
     });
   });
 
+  it("names Lab 2 in its metadata", async () => {
+    await expect(generateMetadata(props("secant-steffensen"))).resolves.toEqual({
+      title: "Lab 2: Secant and Steffensen methods",
+      description: "Derivative-free methods for f(x) = 0",
+    });
+  });
+
   it("is in Romanian when the language cookie is ro", async () => {
     cookieJar.set(LANG_COOKIE, "ro");
     await expect(generateMetadata(props("newton"))).resolves.toEqual({
@@ -66,6 +76,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("secant-steffensen"))).resolves.toEqual({});
+    await expect(generateMetadata(props("halley-chebyshev"))).resolves.toEqual({});
   });
 });

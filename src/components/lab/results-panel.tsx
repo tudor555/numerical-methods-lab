@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
 import type { RunView } from "@/labs/lab-state";
+import type { FunctionPlot } from "@/labs/types";
 import { formatSmall, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { buildConvergenceChart, buildFunctionChart, type ChartLabels } from "./charts";
@@ -13,6 +14,13 @@ import { PlotlyChart } from "./plotly-chart";
 import { STATUS_STYLE, StatusBadge } from "./status";
 
 export type { RunView };
+
+const CHART_TITLE = {
+  tangent: "chart.tangent",
+  secant: "chart.secant",
+  steffensen: "chart.steffensen",
+  cobweb: "chart.cobweb",
+} as const satisfies Record<FunctionPlot["kind"], MessageKey>;
 
 function Stat({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -46,6 +54,8 @@ export function ResultsPanel({ view, valueColumn }: { view: RunView; valueColumn
       f: t("chart.trace.f"),
       iterates: t("chart.trace.iterates"),
       tangents: t("chart.trace.tangents"),
+      secants: t("chart.trace.secants"),
+      steffensenSteps: t("chart.trace.steffensenSteps"),
       phi: t("chart.trace.phi"),
       identity: t("chart.trace.identity"),
       path: t("chart.trace.path"),
@@ -137,10 +147,7 @@ export function ResultsPanel({ view, valueColumn }: { view: RunView; valueColumn
       {(functionChart || convergenceChart) && (
         <div className="grid min-w-0 gap-4">
           {functionChart && plot && (
-            <PlotlyChart
-              title={t(plot.kind === "tangent" ? "chart.tangent" : "chart.cobweb")}
-              spec={functionChart}
-            />
+            <PlotlyChart title={t(CHART_TITLE[plot.kind])} spec={functionChart} />
           )}
           {convergenceChart && (
             <PlotlyChart title={t("chart.convergence")} spec={convergenceChart} />
