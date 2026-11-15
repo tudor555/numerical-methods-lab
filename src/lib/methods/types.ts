@@ -3,11 +3,14 @@ export type RunStatus = "converged" | "max-iterations" | "error";
 /**
  * Why a run stopped without a valid result.
  * - `zero-derivative`: a denominator such as f′(xₙ) is exactly 0.
+ * - `zero-denominator`: a difference of f values in the denominator is exactly 0, as in
+ *   f(xₙ) − f(xₙ₋₁) for the secant method or f(xₙ + f(xₙ)) − f(xₙ) for Steffensen's.
  * - `undefined-value`: a value is NaN (for example √ of a negative number).
  * - `overflow`: a value is ±∞.
  * - `diverged`: |xₙ| exceeded {@link DIVERGENCE_LIMIT}.
  */
-export type MethodErrorCode = "zero-derivative" | "undefined-value" | "overflow" | "diverged";
+export type MethodErrorCode =
+  "zero-derivative" | "zero-denominator" | "undefined-value" | "overflow" | "diverged";
 
 /**
  * |xₙ| above this counts as divergence. It is far past any root the labs look for, and
@@ -18,7 +21,7 @@ export const DIVERGENCE_LIMIT = 1e100;
 export interface MethodError {
   code: MethodErrorCode;
   /**
-   * Index of the iterate the failure is attached to. For `zero-derivative`,
+   * Index of the iterate the failure is attached to. For `zero-derivative`, `zero-denominator`,
    * `undefined-value` and `overflow` it is the last valid iterate xₙ (the step from xₙ
    * failed). For `diverged` it is the first iterate whose size exceeded the limit.
    */

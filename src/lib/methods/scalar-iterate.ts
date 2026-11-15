@@ -7,10 +7,8 @@ import {
   type ScalarRunResult,
 } from "./types";
 
-export interface ScalarIterateInput {
+interface ScalarIterateBase {
   x0: number;
-  /** One step of the method: xₙ ↦ xₙ₊₁. May throw {@link MethodStepError} or {@link EvaluationError}. */
-  step: (x: number) => number;
   /** f for the f(xₙ) column. Omit when the method has no f. */
   f?: (x: number) => number;
   /** Tolerance ε > 0. */
@@ -19,11 +17,27 @@ export interface ScalarIterateInput {
   maxIter: number;
 }
 
+/** A step may throw {@link MethodStepError} or {@link EvaluationError} to stop the run. */
+export type ScalarIterateInput = ScalarIterateBase &
+  (
+    | {
+        /** One step of the method: xₙ ↦ xₙ₊₁. x₁ is its first step. */
+        step: (x: number) => number;
+      }
+    | {
+        /** The given x₁ (the secant method's second start). It is row 1; the loop starts at n = 1. */
+        x1: number;
+        /** One step of a two-point method: (xₙ, xₙ₋₁) ↦ xₙ₊₁. */
+        twoPointStep: (x: number, previous: number) => number;
+      }
+  );
+
 /**
- * Shared driver for scalar iterative methods: x₁ first, then repeat while |xₙ − xₙ₋₁| ≥ ε.
- * A NaN, ±∞ or |xₙ| > 1e100 stops the run with an error; the rows so far are kept.
+ * Shared driver for scalar iterative methods: x₁ first (computed, or given), then repeat while
+ * |xₙ − xₙ₋₁| ≥ ε. A NaN, ±∞ or |xₙ| > 1e100 stops the run with an error; the rows so far are kept.
  */
-export function scalarIterate({ x0, step, f, eps, maxIter }: ScalarIterateInput): ScalarRunResult {
+export function scalarIterate(input: ScalarIterateInput): ScalarRunResult {
+  const { x0, f, eps, maxIter } = input;
   const value = (x: number): number | null => {
     if (!f) return null;
     try {
@@ -52,7 +66,9 @@ export function scalarIterate({ x0, step, f, eps, maxIter }: ScalarIterateInput)
     const last = rows[rows.length - 1];
     let next: number;
     try {
-      next = step(last.x);
+      // With a given x₁, every step starts from n ≥ 1, so xₙ₋₁ exists.
+      next =
+        "step" in input ? input.step(last.x) : input.twoPointStep(last.x, rows[rows.length - 2].x);
     } catch (error) {
       if (error instanceof MethodStepError || error instanceof EvaluationError) {
         return fail(error.code, last.n, last.x);
@@ -74,8 +90,14 @@ export function scalarIterate({ x0, step, f, eps, maxIter }: ScalarIterateInput)
 
   // The lab computes x₁ before the loop, so every run takes at least one step even when
   // x₀ is already a root. The expected iteration counts depend on it.
-  const first = advance();
-  if (first) return first;
+  if ("step" in input) {
+    const first = advance();
+    if (first) return first;
+  } else {
+    const { x1 } = input;
+    rows.push({ n: 1, x: x1, fx: value(x1), diff: Math.abs(x1 - x0) });
+    if (Math.abs(x1) > DIVERGENCE_LIMIT) return fail("diverged", 1, x1);
+  }
 
   while ((rows[rows.length - 1].diff ?? 0) >= eps) {
     if (rows[rows.length - 1].n >= maxIter) {

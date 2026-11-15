@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { formatEpsTex, formatSmall, formatValue } from "./format";
+import { formatEpsTex, formatLimit, formatSmall, formatValue } from "./format";
+
+describe("formatLimit", () => {
+  it("writes large and tiny powers of ten with superscripts", () => {
+    expect(formatLimit(1e6)).toBe("10⁶");
+    expect(formatLimit(-1e6)).toBe("−10⁶");
+    expect(formatLimit(1e-15)).toBe("10⁻¹⁵");
+  });
+
+  it("keeps ordinary limits as they are", () => {
+    expect(formatLimit(1)).toBe("1");
+    expect(formatLimit(100)).toBe("100");
+    expect(formatLimit(2.5e6)).toBe("2500000");
+  });
+});
 
 describe("formatValue", () => {
   it("prints ordinary values in plain decimal form", () => {

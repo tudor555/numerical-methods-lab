@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
+import { lab2 } from "@/labs/lab-2";
 import { elements, render, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
@@ -76,5 +77,45 @@ describe("LabPage", () => {
 
   it("throws for a slug that is not a ready lab", () => {
     expect(() => render(<LabPage slug="euler" />)).toThrow("Unknown lab: euler");
+  });
+});
+
+describe("LabPage, Lab 2", () => {
+  it.each([
+    [
+      "en",
+      "Lab 2",
+      "Secant and Steffensen methods",
+      ["2a · Secant", "2b · Steffensen"],
+      "How it works: Secant method",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2, x₁ = 1.4",
+    ],
+    [
+      "ro",
+      "Laboratorul 2",
+      "Metoda secantei și metoda lui Steffensen",
+      ["2a · Metoda secantei", "2b · Metoda lui Steffensen"],
+      "Cum funcționează: Metoda secantei",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2, x₁ = 1,4",
+    ],
+  ] as const)("first render in %s", (lang, chip, title, methodTabs, heading, preset) => {
+    const html = render(<LabPage slug="secant-steffensen" />, lang);
+    const header = html.slice(0, html.indexOf("</header>"));
+    expect(
+      textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+    ).toBe(chip);
+    expect(textOf(elements(header, "h1")[0])).toBe(title);
+    expect(tabs(html).map(textOf)).toEqual(methodTabs);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    expect(html).toContain('id="field-x0"');
+    expect(html).toContain('id="field-x1"');
+    expect(html).toContain('value="1.4"');
+    const pressed = elements(html, "button").filter(
+      (b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'),
+    );
+    expect(pressed.map(textOf)).toEqual([preset]);
+    expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+      lab2.comparisons.length,
+    );
   });
 });

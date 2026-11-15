@@ -5,7 +5,12 @@ import { useState, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
-import { runComparison, type ComparisonCell as Cell } from "@/labs/compare";
+import {
+  findComparisonMethod,
+  findComparisonPreset,
+  runComparison,
+  type ComparisonCell as Cell,
+} from "@/labs/compare";
 import type { Comparison, ReadyLab } from "@/labs/types";
 import { formatEpsTex, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -99,8 +104,8 @@ export function ComparisonResults({
       </div>
       <ul className="divide-border flex flex-col divide-y">
         {comparison.rows.map((row, i) => {
-          const method = lab.methods.find((m) => m.id === row.methodId);
-          const preset = lab.presets.find((p) => p.id === row.presetId);
+          const method = findComparisonMethod(lab, row.methodId);
+          const preset = findComparisonPreset(lab, row.presetId);
           return (
             <li
               key={`${row.methodId}-${row.presetId}`}

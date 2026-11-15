@@ -105,6 +105,10 @@ describe("parseFields", () => {
       { min: 1, max: 10 },
     ],
     [{ integer: true, max: 10 } as const, "0.5", "field.error.integer-range", { min: 0, max: 10 }],
+    [{ min: -1e6, max: 1e6 }, "1e7", "field.error.range", { min: "−10⁶", max: "10⁶" }],
+    [{ min: 1e-15, max: 1 }, "0", "field.error.range", { min: "10⁻¹⁵", max: "1" }],
+    [{ positive: true, max: 1e6 } as const, "0", "field.error.positive-max", { max: "10⁶" }],
+    [{ positive: true, max: 1e6 } as const, "1e7", "field.error.positive-max", { max: "10⁶" }],
   ])("rule %j rejects %s with %s", (rule, raw, key, params) => {
     expect(parseFields([number("n", rule)], { n: raw }).errors.n).toEqual({ key, params });
   });

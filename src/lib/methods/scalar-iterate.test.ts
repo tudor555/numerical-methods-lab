@@ -114,4 +114,54 @@ describe("scalarIterate", () => {
     expect(r.n).toBe(3);
     expect(r.result).toBe(1 / 8);
   });
+
+  it("takes a given x₁ as row 1 and loops from n = 1, passing xₙ and xₙ₋₁ to the step", () => {
+    const calls: [number, number][] = [];
+    const r = scalarIterate({
+      x0: 1,
+      x1: 0.5,
+      twoPointStep: (x, previous) => {
+        calls.push([x, previous]);
+        return x / 2;
+      },
+      f: (x) => x,
+      eps: 0.1,
+      maxIter: 1000,
+    });
+    expect(r.iterations.map((row) => row.x)).toEqual([1, 0.5, 0.25, 0.125, 0.0625]);
+    expect(r.iterations[1]).toEqual({ n: 1, x: 0.5, fx: 0.5, diff: 0.5 });
+    expect(calls).toEqual([
+      [0.5, 1],
+      [0.25, 0.5],
+      [0.125, 0.25],
+    ]);
+    expect(r.n).toBe(4);
+  });
+
+  it("converges at n = 1 when the given x₁ is already within ε of x₀", () => {
+    const r = scalarIterate({ x0: 1, x1: 1.05, twoPointStep: () => 0, eps: 0.1, maxIter: 1000 });
+    expect(r.status).toBe("converged");
+    expect(r.n).toBe(1);
+    expect(r.result).toBe(1.05);
+  });
+
+  it("reports a given x₁ beyond 1e100 as divergence", () => {
+    const r = scalarIterate({ x0: 1, x1: 1e101, twoPointStep: (x) => x, eps: 0.1, maxIter: 1000 });
+    expect(r.error).toEqual({ code: "diverged", n: 1, x: 1e101 });
+    expect(r.iterations).toHaveLength(2);
+  });
+
+  it("passes two-point step errors through with the current n and xₙ", () => {
+    const r = scalarIterate({
+      x0: 1,
+      x1: 0.5,
+      twoPointStep: () => {
+        throw new MethodStepError("zero-denominator");
+      },
+      eps: 1e-4,
+      maxIter: 10,
+    });
+    expect(r.error).toEqual({ code: "zero-denominator", n: 1, x: 0.5 });
+    expect(r.iterations).toHaveLength(2);
+  });
 });

@@ -6,6 +6,7 @@ import {
   type CompiledFunction,
 } from "@/lib/expressions/compile";
 import type { MessageKey } from "@/i18n/en";
+import { formatLimit } from "@/lib/format";
 import type {
   ExpressionField,
   FieldDefinition,
@@ -37,6 +38,15 @@ function checkRule(field: NumberField, value: number): FieldIssue | undefined {
   }
   if (rule.integer && (!Number.isInteger(value) || outside)) {
     return { key: "field.error.integer-min", params: { min: rule.min ?? 0 } };
+  }
+  if (rule.positive && rule.max !== undefined && !(value > 0 && value <= rule.max)) {
+    return { key: "field.error.positive-max", params: { max: formatLimit(rule.max) } };
+  }
+  if (rule.min !== undefined && rule.max !== undefined && outside) {
+    return {
+      key: "field.error.range",
+      params: { min: formatLimit(rule.min), max: formatLimit(rule.max) },
+    };
   }
   if (rule.min !== undefined && value < rule.min)
     return { key: "field.error.min", params: { min: rule.min } };

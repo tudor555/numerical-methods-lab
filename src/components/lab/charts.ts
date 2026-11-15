@@ -14,6 +14,8 @@ export interface ChartLabels {
   f: string;
   iterates: string;
   tangents: string;
+  secants: string;
+  steffensenSteps: string;
   phi: string;
   identity: string;
   path: string;
@@ -72,7 +74,13 @@ function sample(fn: (x: number) => number, [lo, hi]: [number, number], count = 4
 
 const hoverIterate = "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.6g}<extra></extra>";
 
-/** f with its iterates and Newton's tangent steps, or φ with y = x and the cobweb path. */
+/**
+ * The function chart. For f it shows the iterates and, for each step, the line that produced xₙ₊₁:
+ * Newton's tangent at xₙ, the secant through xₙ₋₁ and xₙ, or Steffensen's step from xₙ straight to
+ * the axis. Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it can land far outside
+ * [a, b] (at 7 in the lab's example) and would squash the rest of the chart. For φ it shows y = x and
+ * the cobweb path.
+ */
 export function buildFunctionChart(
   plot: FunctionPlot,
   rows: readonly ScalarIterationRow[],
@@ -82,27 +90,42 @@ export function buildFunctionChart(
   if (points.length === 0) return null;
   const range = xRange(
     points.map((r) => r.x),
-    plot.kind === "tangent" ? plot.interval : undefined,
+    plot.kind === "cobweb" ? undefined : plot.interval,
   );
 
-  if (plot.kind === "tangent") {
+  if (plot.kind !== "cobweb") {
     const curve = sample(plot.f, range);
     const withValue = points.filter((r): r is ScalarIterationRow & { fx: number } => r.fx !== null);
-    const tangentX: (number | null)[] = [];
-    const tangentY: (number | null)[] = [];
+    const stepX: (number | null)[] = [];
+    const stepY: (number | null)[] = [];
     const dropX: (number | null)[] = [];
     const dropY: (number | null)[] = [];
     for (let i = 0; i + 1 < points.length; i++) {
       const from = points[i];
       const to = points[i + 1];
       if (from.fx === null || to.n !== from.n + 1) continue;
-      tangentX.push(from.x, to.x, null);
-      tangentY.push(from.fx, 0, null);
+      if (plot.kind === "secant") {
+        // x₁ is given, not computed, so the first chord ends at x₂ and x₁ gets no drop line.
+        if (to.n === 1) continue;
+        const before = points[i - 1];
+        if (before && before.fx !== null && before.n === from.n - 1) {
+          stepX.push(before.x, from.x, to.x, null);
+          stepY.push(before.fx, from.fx, 0, null);
+        }
+      } else {
+        stepX.push(from.x, to.x, null);
+        stepY.push(from.fx, 0, null);
+      }
       if (to.fx !== null) {
         dropX.push(to.x, to.x, null);
         dropY.push(0, to.fx, null);
       }
     }
+    const stepName = {
+      tangent: labels.tangents,
+      secant: labels.secants,
+      steffensen: labels.steffensenSteps,
+    }[plot.kind];
     return {
       xTitle: "x",
       yTitle: "y",
@@ -119,9 +142,9 @@ export function buildFunctionChart(
         {
           type: "scatter",
           mode: "lines",
-          name: labels.tangents,
-          x: tangentX,
-          y: tangentY,
+          name: stepName,
+          x: stepX,
+          y: stepY,
           line: { color: COLORS.secondary, width: 1.5 },
           hoverinfo: "skip",
         },

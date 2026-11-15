@@ -24,6 +24,11 @@ describe("Formula", () => {
     expect(html).toContain("katex-display");
     expect(texOf(html)).toEqual(["x = \\varphi(x)"]);
   });
+
+  it("can shrink below its formula's width, so a long formula scrolls instead of widening the page", () => {
+    // Without min-w-0 the Lab 2 secant formula pushed phone pages to 432px wide.
+    expect(renderToStaticMarkup(<Formula tex="x" />)).toMatch(/^<div class="[^"]*\bmin-w-0\b/);
+  });
 });
 
 describe("RichText", () => {
