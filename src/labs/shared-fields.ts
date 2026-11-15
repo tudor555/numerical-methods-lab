@@ -5,6 +5,13 @@ import type { ExplanationBlock, FieldDefinition, FieldValues, NumberField } from
 
 export const X = ["x"] as const;
 
+/**
+ * Bound on interval ends and starting values. The labs work on small intervals; beyond this the
+ * charts and tables stop being readable and double precision leaves few meaningful digits.
+ */
+export const VALUE_LIMIT = 1e6;
+export const valueRule = { min: -VALUE_LIMIT, max: VALUE_LIMIT };
+
 export const functionField: FieldDefinition = {
   id: "f",
   kind: "expression",
@@ -14,11 +21,10 @@ export const functionField: FieldDefinition = {
 };
 
 export const intervalFields: readonly FieldDefinition[] = [
-  { id: "a", kind: "number", symbol: "a", labelKey: "field.a" },
-  { id: "b", kind: "number", symbol: "b", labelKey: "field.b" },
+  { id: "a", kind: "number", symbol: "a", labelKey: "field.a", rule: valueRule },
+  { id: "b", kind: "number", symbol: "b", labelKey: "field.b", rule: valueRule },
 ];
 
-/** Rule R0 as a display formula. */
 export const ruleR0Formula: ExplanationBlock = {
   kind: "formula",
   tex: "x_0 = \\begin{cases} a, & \\text{⟪if⟫}\\ f(a)\\,f''(a) > 0 \\\\ b, & \\text{⟪if⟫}\\ f(a)\\,f''(a) \\le 0 \\end{cases}",
@@ -42,7 +48,8 @@ export const epsField: FieldDefinition = {
   kind: "number",
   symbol: "\\varepsilon",
   labelKey: "field.eps",
-  rule: { positive: true },
+  // Below 10⁻¹⁵ the stopping rule asks for more than double precision can tell apart.
+  rule: { min: 1e-15, max: 1 },
 };
 
 export const maxIterField: FieldDefinition = {

@@ -10,6 +10,7 @@ import {
   intervalFields,
   maxIterField,
   ruleR0Formula,
+  valueRule,
 } from "./shared-fields";
 import type { ComparisonPreset, FieldValues, MethodDefinition, Preset, ReadyLab } from "./types";
 
@@ -31,8 +32,8 @@ const secantMethod: MethodDefinition = {
   fields: [
     functionField,
     ...intervalFields,
-    { id: "x0", kind: "number", symbol: "x_0", labelKey: "field.x0" },
-    { id: "x1", kind: "number", symbol: "x_1", labelKey: "field.x1" },
+    { id: "x0", kind: "number", symbol: "x_0", labelKey: "field.x0", rule: valueRule },
+    { id: "x1", kind: "number", symbol: "x_1", labelKey: "field.x1", rule: valueRule },
     epsField,
     maxIterField,
   ],

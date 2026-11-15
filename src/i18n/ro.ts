@@ -98,6 +98,8 @@ export const ro: Record<MessageKey, string> = {
   "field.error.not-differentiable": "Această expresie nu poate fi derivată automat.",
   "field.error.positive": "Valoarea trebuie să fie strict pozitivă.",
   "field.error.min": "Valoarea trebuie să fie cel puțin {min}.",
+  "field.error.range": "Valoarea trebuie să fie între {min} și {max}.",
+  "field.error.positive-max": "Valoarea trebuie să fie strict pozitivă și cel mult {max}.",
   "field.error.integer-min": "Valoarea trebuie să fie un număr întreg, cel puțin {min}.",
   "field.error.integer-range": "Valoarea trebuie să fie un număr întreg între {min} și {max}.",
   "field.error.greater-than": "Valoarea trebuie să fie mai mare decât {other}.",

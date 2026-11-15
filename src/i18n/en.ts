@@ -94,6 +94,8 @@ export const en = {
   "field.error.not-differentiable": "This expression cannot be differentiated automatically.",
   "field.error.positive": "Must be greater than 0.",
   "field.error.min": "Must be at least {min}.",
+  "field.error.range": "Must be between {min} and {max}.",
+  "field.error.positive-max": "Must be greater than 0 and at most {max}.",
   "field.error.integer-min": "Must be a whole number, at least {min}.",
   "field.error.integer-range": "Must be a whole number between {min} and {max}.",
   "field.error.greater-than": "Must be greater than {other}.",

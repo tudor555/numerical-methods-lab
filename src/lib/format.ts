@@ -19,3 +19,26 @@ export function formatEpsTex(eps: number): string {
   const exponent = Math.log10(eps);
   return Number.isInteger(exponent) ? `10^{${exponent}}` : String(eps);
 }
+
+const SUPERSCRIPT: Record<string, string> = {
+  "-": "⁻",
+  "0": "⁰",
+  "1": "¹",
+  "2": "²",
+  "3": "³",
+  "4": "⁴",
+  "5": "⁵",
+  "6": "⁶",
+  "7": "⁷",
+  "8": "⁸",
+  "9": "⁹",
+};
+
+/** A field limit for a message: large or tiny powers of ten as 10⁶ or −10⁶ or 10⁻¹⁵, anything else as it is. */
+export function formatLimit(x: number): string {
+  const abs = Math.abs(x);
+  const exponent = Math.log10(abs);
+  if (!Number.isInteger(exponent) || (abs < 1e6 && abs > 1e-3)) return String(x);
+  const power = `10${[...String(exponent)].map((d) => SUPERSCRIPT[d]).join("")}`;
+  return x < 0 ? `−${power}` : power;
+}

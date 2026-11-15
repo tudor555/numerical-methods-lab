@@ -9,6 +9,7 @@ The methods, inputs, algorithm steps and worked examples for each of the 13 labs
 - **Rule R0 (choosing x₀):** x₀ = a if f(a)·f″(a) > 0, otherwise x₀ = b. Here f″(a) is either the input value `dda` or the expression `ddf` evaluated at a.
 - **Cauchy problem nodes (Labs 7–9):** inputs x₀, y₀, T, n; h = T/n; xᵢ = x₀ + i·h; output yᵢ for i = 1..n.
 - **ε presets:** "ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}" means run once per value and compare the iteration counts (CAP-7).
+- **Input limits:** interval ends and starting values lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. The limits live in `src/labs/shared-fields.ts`.
 
 ---
 

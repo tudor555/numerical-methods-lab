@@ -10,6 +10,8 @@ import {
   intervalFields,
   maxIterField,
   ruleR0Formula,
+  VALUE_LIMIT,
+  valueRule,
   X,
 } from "./shared-fields";
 import type { MethodDefinition, Preset, ReadyLab } from "./types";
@@ -60,6 +62,7 @@ export const newtonMethod: MethodDefinition = {
       kind: "number",
       symbol: "x_0",
       labelKey: "field.x0",
+      rule: valueRule,
       visibleWhen: (v) => !usesRuleR0(v),
     },
     epsField,
@@ -114,8 +117,20 @@ const kthRootMethod: MethodDefinition = {
     { kind: "text", key: "common.stopping" },
   ],
   fields: [
-    { id: "c", kind: "number", symbol: "c", labelKey: "field.c", rule: { positive: true } },
-    { id: "k", kind: "number", symbol: "k", labelKey: "field.k", rule: { integer: true, min: 2 } },
+    {
+      id: "c",
+      kind: "number",
+      symbol: "c",
+      labelKey: "field.c",
+      rule: { positive: true, max: VALUE_LIMIT },
+    },
+    {
+      id: "k",
+      kind: "number",
+      symbol: "k",
+      labelKey: "field.k",
+      rule: { integer: true, min: 2, max: 100 },
+    },
     epsField,
     maxIterField,
   ],
@@ -150,7 +165,7 @@ const fixedPointMethod: MethodDefinition = {
   ],
   fields: [
     { id: "phi", kind: "expression", symbol: "\\varphi(x)", labelKey: "field.phi", variables: X },
-    { id: "x0", kind: "number", symbol: "x_0", labelKey: "field.x0" },
+    { id: "x0", kind: "number", symbol: "x_0", labelKey: "field.x0", rule: valueRule },
     epsField,
     maxIterField,
   ],
