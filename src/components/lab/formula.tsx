@@ -13,7 +13,8 @@ export function Tex({ tex, className }: { tex: string; className?: string }) {
 export function Formula({ tex, className }: { tex: string; className?: string }) {
   return (
     <div
-      className={cn("border-border bg-raised rounded-lg border px-4 py-4", className)}
+      // min-w-0 lets a long formula scroll inside its block instead of widening a grid column.
+      className={cn("border-border bg-raised min-w-0 rounded-lg border px-4 py-4", className)}
       dangerouslySetInnerHTML={{ __html: render(tex, true) }}
     />
   );
