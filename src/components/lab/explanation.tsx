@@ -5,7 +5,7 @@ import { localizeTex, toRows } from "@/labs/explanation";
 import type { ExplanationBlock } from "@/labs/types";
 import { Formula, RichText } from "./formula";
 
-/** Method explanation. On wide screens a paragraph sits beside its formula, and plain paragraphs share a row. */
+/** Method explanation. On wide screens a paragraph sits beside its formula; plain paragraphs stack in one column. */
 export function Explanation({ blocks }: { blocks: readonly ExplanationBlock[] }) {
   const { t } = useI18n();
   return (
@@ -21,7 +21,8 @@ export function Explanation({ blocks }: { blocks: readonly ExplanationBlock[] })
             </div>
           )}
           {row.kind === "texts" && (
-            <div className="grid gap-4 lg:grid-cols-2 lg:gap-8">
+            // One column, so consecutive paragraphs read top to bottom in order.
+            <div className="flex max-w-3xl flex-col gap-4">
               {row.texts.map((text) => (
                 <p key={text.key}>
                   <RichText text={t(text.key)} />
