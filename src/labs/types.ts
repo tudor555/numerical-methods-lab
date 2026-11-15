@@ -42,11 +42,7 @@ export interface ChoiceField extends FieldBase {
 
 export type FieldDefinition = NumberField | ExpressionField | ChoiceField;
 
-/**
- * What the function chart draws for a run: f with each step as a line to (xₙ₊₁, 0), or φ with the
- * cobweb path. A `tangent` or `steffensen` step starts at (xₙ, f(xₙ)); a `secant` step is the chord
- * from (xₙ₋₁, f(xₙ₋₁)) through (xₙ, f(xₙ)).
- */
+/** What the function chart draws: f with each method's steps (see `buildFunctionChart`), or φ with the cobweb path. */
 export type FunctionPlot =
   | {
       kind: "tangent" | "secant" | "steffensen";

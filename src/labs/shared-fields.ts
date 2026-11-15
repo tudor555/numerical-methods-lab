@@ -1,7 +1,7 @@
 import type { ParsedFields } from "./fields";
 import type { ExplanationBlock, FieldDefinition, FieldValues, NumberField } from "./types";
 
-/** Form fields and checks shared by the root-finding labs. */
+// Form fields and checks shared by the labs that solve f(x) = 0.
 
 export const X = ["x"] as const;
 
@@ -31,7 +31,7 @@ export const ruleR0Formula: ExplanationBlock = {
   words: { if: "math.if" },
 };
 
-/** dda = f″(a) for rule R0, with "derive from f". */
+/** The R0 input dda = f″(a). Lab 1 hides it when the user types x₀ in directly. */
 export function ddaField(visibleWhen?: (values: FieldValues) => boolean): NumberField {
   return {
     id: "dda",

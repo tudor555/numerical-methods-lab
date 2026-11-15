@@ -29,8 +29,8 @@ export function secant({ f, x0, x1, eps, maxIter }: SecantInput): ScalarRunResul
       return x - (fx * (x - prev)) / denominator;
     },
   });
-  // f(x₀) is first needed in the step from x₁. When f(x₁) is defined but f(x₀) is not, the
-  // failure belongs to x₀, not to the valid x₁.
+  // The driver only meets f(x₀) inside the step from x₁, so it would blame x₁. When x₁ is fine and
+  // x₀ is outside f's domain, point the user at x₀ instead.
   const [start, given] = result.iterations;
   if (result.error?.n === 1 && start.fx === null && given.fx !== null) {
     return { ...result, error: { ...result.error, n: 0, x: start.x } };

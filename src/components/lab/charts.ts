@@ -75,9 +75,11 @@ function sample(fn: (x: number) => number, [lo, hi]: [number, number], count = 4
 const hoverIterate = "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.6g}<extra></extra>";
 
 /**
- * f with its iterates and each step drawn as a line to (xₙ₊₁, 0): Newton's tangent and Steffensen's
- * step start at (xₙ, f(xₙ)), the secant's chord at (xₙ₋₁, f(xₙ₋₁)) through (xₙ, f(xₙ)).
- * Or φ with y = x and the cobweb path.
+ * The function chart. For f it shows the iterates and, for each step, the line that produced xₙ₊₁:
+ * Newton's tangent at xₙ, the secant through xₙ₋₁ and xₙ, or Steffensen's step from xₙ straight to
+ * the axis. Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it can land far outside
+ * [a, b] (at 7 in the lab's example) and would squash the rest of the chart. For φ it shows y = x and
+ * the cobweb path.
  */
 export function buildFunctionChart(
   plot: FunctionPlot,

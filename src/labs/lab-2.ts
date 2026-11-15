@@ -51,7 +51,7 @@ const secantMethod: MethodDefinition = {
     const parsed = parseFields(secantMethod.fields, values);
     checkInterval(parsed);
     const { numbers, functions, errors } = parsed;
-    // x₁ = x₀ would make the first chord 0/0.
+    // Equal starting values give no chord to follow: the very first step would be 0/0.
     if (numbers.x0 !== undefined && numbers.x1 !== undefined && numbers.x0 === numbers.x1) {
       errors.x1 = { key: "field.error.different-from", params: { other: "x₀" } };
     }
@@ -101,7 +101,6 @@ const steffensenMethod: MethodDefinition = {
       prepared: {
         eps,
         run: () => steffensen({ f, a, b, dda, eps, maxIter }),
-        // The auxiliary point xₙ + f(xₙ) can sit far outside [a, b], so it is not drawn.
         plot: { kind: "steffensen", f, interval: [a, b] },
       },
     };
@@ -135,8 +134,9 @@ const presets: readonly Preset[] = [
 ];
 
 /**
- * Newton's inputs for a comparison. The lab leaves them open, so they follow its examples: the
- * same f and [a, b], f′ and dda = f″(a) derived from f as "Derive from f" does, and rule R0.
+ * Newton's inputs for one comparison. The lab doesn't say how to run Newton here, so it gets the
+ * example's own f and [a, b], f′ and dda derived from f exactly as the "Derive from f" button would,
+ * and rule R0. Deriving them (instead of typing them in) keeps them right if an example changes.
  */
 function newtonPreset(id: string, f: string, tex: string): ComparisonPreset {
   const values: FieldValues = { f, df: "", x0Mode: "r0", dda: "", x0: "", ...base };

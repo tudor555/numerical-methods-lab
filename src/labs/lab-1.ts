@@ -18,7 +18,7 @@ import type { MethodDefinition, Preset, ReadyLab } from "./types";
 
 const usesRuleR0 = (v: Record<string, string>) => v.x0Mode !== "manual";
 
-/** Also used, outside the tabs, by the Lab 2 comparisons with Newton. */
+/** Lab 2 reuses this definition to run Newton next to its own methods in the comparisons. */
 export const newtonMethod: MethodDefinition = {
   id: "1a",
   tabKey: "lab1.method.newton.tab",
