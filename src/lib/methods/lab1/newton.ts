@@ -1,5 +1,4 @@
-import { EvaluationError } from "@/lib/expressions/compile";
-import { chooseStartingValue } from "../starting-value";
+import { startByRuleR0 } from "../starting-value";
 import { scalarIterate } from "../scalar-iterate";
 import { MethodStepError, type ScalarRunResult } from "../types";
 
@@ -30,23 +29,9 @@ export function newton({ f, df, a, b, start, eps, maxIter }: NewtonInput): Newto
   let x0: number;
   let x0Rule: "a" | "b" | undefined;
   if (start.mode === "r0") {
-    let fAtA: number;
-    try {
-      fAtA = f(a);
-    } catch (error) {
-      if (error instanceof EvaluationError) {
-        return {
-          status: "error",
-          result: null,
-          n: 0,
-          iterations: [],
-          error: { code: error.code, n: 0, x: a },
-        };
-      }
-      throw error;
-    }
-    x0 = chooseStartingValue(fAtA, start.dda, a, b);
-    x0Rule = x0 === a ? "a" : "b";
+    const ruleR0 = startByRuleR0(f, a, b, start.dda);
+    if (!ruleR0.ok) return ruleR0.failure;
+    ({ x0, x0Rule } = ruleR0);
   } else {
     x0 = start.x0;
   }

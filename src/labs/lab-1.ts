@@ -2,30 +2,22 @@ import { fixedPoint } from "@/lib/methods/lab1/fixed-point";
 import { kthRoot } from "@/lib/methods/lab1/kth-root";
 import { newton } from "@/lib/methods/lab1/newton";
 import { parseFields } from "./fields";
-import type { FieldDefinition, MethodDefinition, Preset, ReadyLab } from "./types";
-
-const X = ["x"] as const;
-
-const epsField: FieldDefinition = {
-  id: "eps",
-  kind: "number",
-  symbol: "\\varepsilon",
-  labelKey: "field.eps",
-  rule: { positive: true },
-};
-
-const maxIterField: FieldDefinition = {
-  id: "maxIter",
-  kind: "number",
-  symbol: "N_{\\max}",
-  labelKey: "field.maxIter",
-  // Runs are synchronous, so the cap bounds how long a run that never converges can block the page.
-  rule: { integer: true, min: 1, max: 100000 },
-};
+import {
+  checkInterval,
+  ddaField,
+  epsField,
+  functionField,
+  intervalFields,
+  maxIterField,
+  ruleR0Formula,
+  X,
+} from "./shared-fields";
+import type { MethodDefinition, Preset, ReadyLab } from "./types";
 
 const usesRuleR0 = (v: Record<string, string>) => v.x0Mode !== "manual";
 
-const newtonMethod: MethodDefinition = {
+/** Also used, outside the tabs, by the Lab 2 comparisons with Newton. */
+export const newtonMethod: MethodDefinition = {
   id: "1a",
   tabKey: "lab1.method.newton.tab",
   titleKey: "lab1.method.newton.title",
@@ -37,16 +29,12 @@ const newtonMethod: MethodDefinition = {
       tex: "x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}, \\qquad n = 0, 1, 2, \\dots",
     },
     { kind: "text", key: "lab1.method.newton.start" },
-    {
-      kind: "formula",
-      tex: "x_0 = \\begin{cases} a, & \\text{⟪if⟫}\\ f(a)\\,f''(a) > 0 \\\\ b, & \\text{⟪if⟫}\\ f(a)\\,f''(a) \\le 0 \\end{cases}",
-      words: { if: "math.if" },
-    },
+    ruleR0Formula,
     { kind: "text", key: "common.stopping" },
     { kind: "text", key: "lab1.method.newton.failure" },
   ],
   fields: [
-    { id: "f", kind: "expression", symbol: "f(x)", labelKey: "field.f", variables: X },
+    functionField,
     {
       id: "df",
       kind: "expression",
@@ -55,8 +43,7 @@ const newtonMethod: MethodDefinition = {
       variables: X,
       derive: { from: "f" },
     },
-    { id: "a", kind: "number", symbol: "a", labelKey: "field.a" },
-    { id: "b", kind: "number", symbol: "b", labelKey: "field.b" },
+    ...intervalFields,
     {
       id: "x0Mode",
       kind: "choice",
@@ -67,14 +54,7 @@ const newtonMethod: MethodDefinition = {
         { value: "manual", labelKey: "field.x0Mode.manual" },
       ],
     },
-    {
-      id: "dda",
-      kind: "number",
-      symbol: "\\mathrm{dda} = f''(a)",
-      labelKey: "field.dda",
-      visibleWhen: usesRuleR0,
-      derive: { from: "f", order: 2, at: "a" },
-    },
+    ddaField(usesRuleR0),
     {
       id: "x0",
       kind: "number",
@@ -98,11 +78,9 @@ const newtonMethod: MethodDefinition = {
     maxIter: "1000",
   },
   prepare(values) {
-    const fields = newtonMethod.fields;
-    const { numbers, functions, choices, errors } = parseFields(fields, values);
-    if (numbers.a !== undefined && numbers.b !== undefined && !(numbers.a < numbers.b)) {
-      errors.b = { key: "field.error.greater-than", params: { other: "a" } };
-    }
+    const parsed = parseFields(newtonMethod.fields, values);
+    checkInterval(parsed);
+    const { numbers, functions, choices, errors } = parsed;
     if (Object.keys(errors).length > 0) return { ok: false, errors };
     const { f, df } = functions;
     const { a, b, eps, maxIter } = numbers;
