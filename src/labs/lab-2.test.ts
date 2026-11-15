@@ -5,6 +5,7 @@ import { findComparisonMethod, findComparisonPreset, runComparison } from "./com
 import { deriveField } from "./fields";
 import { newtonMethod } from "./lab-1";
 import { lab2 } from "./lab-2";
+import { initialLabState, labReducer } from "./lab-state";
 import { findReadyLab } from "./registry";
 import type { FieldValues, NumberField } from "./types";
 
@@ -201,6 +202,21 @@ describe("Lab 2 validation", () => {
 });
 
 describe("Lab 2 runs", () => {
+  it.each(lab2.presets.map((p) => [p.id, p] as const))(
+    "preset %s, picked on its method's tab, fills the form, which then runs to convergence",
+    (_id, preset) => {
+      const onTab = labReducer(initialLabState(lab2), {
+        type: "select",
+        methodId: preset.methodId,
+      });
+      const state = labReducer(onTab, { type: "preset", preset });
+      expect(state.presetIds[preset.methodId]).toBe(preset.id);
+      const prepared = method(preset.methodId).prepare(state.values[preset.methodId]);
+      if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
+      expect(prepared.prepared.run().status).toBe("converged");
+    },
+  );
+
   it("stops the secant with zero-denominator and keeps the rows (f = x², 1, −1)", () => {
     const r = prepare("2a", { f: "x^2", a: "-2", b: "2", x0: "1", x1: "-1" }).run();
     expect(r.error).toEqual({ code: "zero-denominator", n: 1, x: -1 });
