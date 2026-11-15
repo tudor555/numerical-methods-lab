@@ -126,9 +126,9 @@ const presets: readonly Preset[] = [
     values: { f: "x^3 - x - 1", x0: "2", x1: "1.5", ...base },
   },
   {
-    id: "ex3",
+    id: "steffensen",
     methodId: "2b",
-    labelKey: "lab2.preset.ex3",
+    labelKey: "lab2.preset.steffensen",
     tex: "x^3 - x - 1,\\ x_0 = 2\\ (\\mathrm{R0})",
     values: { ...steffensenMethod.defaults },
   },
@@ -183,13 +183,13 @@ export const lab2: ReadyLab = {
       ],
     },
     {
-      id: "ex3",
-      titleKey: "lab2.compare.ex3",
-      taskKey: "lab2.compare.ex3.task",
+      id: "steffensen",
+      titleKey: "lab2.compare.steffensen",
+      taskKey: "lab2.compare.steffensen.task",
       eps: EPS_SET,
       rows: [
-        { methodId: "2b", presetId: "ex3" },
-        { methodId: "1a", presetId: "ex3-newton" },
+        { methodId: "2b", presetId: "steffensen" },
+        { methodId: "1a", presetId: "steffensen-newton" },
       ],
     },
   ],
@@ -198,7 +198,7 @@ export const lab2: ReadyLab = {
     presets: [
       newtonPreset("ex1-newton", "x^2 - 2", "x^2 - 2,\\ x_0 = 2\\ (\\mathrm{R0})"),
       newtonPreset("ex2-newton", "x^3 - x - 1", "x^3 - x - 1,\\ x_0 = 2\\ (\\mathrm{R0})"),
-      newtonPreset("ex3-newton", "x^3 - x - 1", "x^3 - x - 1,\\ x_0 = 2\\ (\\mathrm{R0})"),
+      newtonPreset("steffensen-newton", "x^3 - x - 1", "x^3 - x - 1,\\ x_0 = 2\\ (\\mathrm{R0})"),
     ],
   },
 };

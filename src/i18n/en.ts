@@ -213,19 +213,19 @@ export const en = {
   "lab1.compare.kepler.task":
     "Start from x₀ = 3π/8 with ε = 10⁻⁴ and compare the tangent method with successive approximations, φ(x) = sin x + 0.25.",
   "lab1.compare.sqrt.task":
-    "Approximate √2, √3 and √5 with the tangent method and compare the results with successive approximations. The lab gives no ε here, so the three precisions of ex. 1–2 are used.",
+    "Approximate √2, √3 and √5 with the tangent method and compare the results with successive approximations. It uses the same three precisions as ex. 1–2.",
   "lab1.compare.ex1": "Ex. 1: x³ − x − 1 = 0",
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 on (−1, 1)",
   "lab1.compare.kepler": "Ex. 3: Kepler's equation, x = sin x + 0.25",
   "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
 
   "lab2.intro":
-    "Solve f(x) = 0 without a derivative: the secant method swaps the tangent for a chord through the last two iterates, and Steffensen's method reads the slope off f itself. Both race the tangent method.",
+    "Solve f(x) = 0 without a derivative: the secant method replaces the tangent with the secant line through the last two iterates, and Steffensen's method approximates the derivative from values of f alone. Then compare the results and iteration counts with the tangent method.",
   "lab2.method.secant.tab": "2a · Secant",
   "lab2.method.secant.title": "Secant method",
   "lab2.method.secant.name": "Secant method",
   "lab2.method.secant.idea":
-    "Near the root, $f$ is replaced by the chord through the last two points of its graph, $(x_{n-1}, f(x_{n-1}))$ and $(x_n, f(x_n))$. Each step needs just one new value of $f$, and convergence is superlinear, of order $(1 + \\sqrt{5})/2 \\approx 1.618$: faster than successive approximations, slower than the tangent method. The point where the chord crosses the x-axis is the next iterate:",
+    "The secant method needs no derivative: each step computes just one new value of $f$, and convergence is superlinear, of order $(1 + \\sqrt{5})/2 \\approx 1.618$, so faster than successive approximations but slower than the tangent method. Near the root, the graph of $f$ is approximated by the secant line through $(x_{n-1}, f(x_{n-1}))$ and $(x_n, f(x_n))$. The next iterate, $x_{n+1}$, is where this line crosses the x-axis:",
   "lab2.method.secant.start":
     "The method starts from two values: you enter both $x_0$ and $x_1$, and they must differ. The interval $[a, b]$ only sets the range of the chart.",
   "lab2.method.secant.stopping":
@@ -239,25 +239,25 @@ export const en = {
   "lab2.method.steffensen.idea":
     "The tangent method without a derivative: $f'(x_n)$ is replaced by the slope of the chord through $(x_n, f(x_n))$ and $(x_n + f(x_n), f(x_n + f(x_n)))$. Each step costs two values of $f$, and close to the root it converges quadratically, like the tangent method:",
   "lab2.method.steffensen.start":
-    "The starting value comes from rule R0, which checks the sign of $f(a)\\,f''(a)$. Enter $f''(a)$, the second derivative at the left end $a$, in the field dda, or derive it from f.",
+    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$. The algorithm picks it with rule R0, from the sign of $f(a)\\,f''(a)$: enter $f''(a)$, the second derivative at the left end $a$, in the field dda, or derive it from f.",
   "lab2.method.steffensen.failure":
     "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f(x_n + f(x_n)) = f(x_n)$, the denominator is zero and the method stops with an error. $f$ must also be defined at the helper point $x_n + f(x_n)$: a domain error or an overflow can come from there, not only from $x_n$.",
   "lab2.method.steffensen.chart":
-    "Far from the root, the helper point $x_n + f(x_n)$ can land well outside $[a, b]$ (from $x_0 = 2$ in ex. 3 it is 7). The slope estimate is then poor and the first steps are slow, which is why ex. 3 needs more iterations than the tangent method. The chart draws each step straight from $(x_n, f(x_n))$ to $(x_{n+1}, 0)$.",
+    "Far from the root, the helper point $x_n + f(x_n)$ can land well outside $[a, b]$ (from $x_0 = 2$ in the numerical example it is 7). The slope estimate is then poor and the first steps are slow, which is why the numerical example needs more iterations than the tangent method. The chart draws each step straight from $(x_n, f(x_n))$ to $(x_{n+1}, 0)$.",
 
-  "lab2.preset.ex1": "Ex. 1: x² − 2 = 0, x₀ = 2, x₁ = 1.4",
+  "lab2.preset.ex1": "Ex. 1: √2, f(x) = x² − 2, x₀ = 2, x₁ = 1.4",
   "lab2.preset.ex2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2, x₁ = 1.5",
-  "lab2.preset.ex3": "Ex. 3: x³ − x − 1 = 0 on [1, 2]",
+  "lab2.preset.steffensen": "Numerical example: x³ − x − 1 = 0, x₀ = 2",
 
-  "lab2.compare.ex1": "Ex. 1: x² − 2 = 0, secant method",
-  "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0, secant method",
-  "lab2.compare.ex3": "Ex. 3: x³ − x − 1 = 0, Steffensen's method",
+  "lab2.compare.ex1": "Ex. 1: √2 with the secant method",
+  "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0 with the secant method",
+  "lab2.compare.steffensen": "Numerical example: x³ − x − 1 = 0 with Steffensen's method",
   "lab2.compare.ex1.task":
-    "Approximate the root of x² − 2 = 0 with the secant method from x₀ = 2 and x₁ = 1.4, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0.",
+    "Approximate the number √2 with the secant method, using f(x) = x² − 2 on [1, 2] with starting values x₀ = 2 and x₁ = 1.4, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f and [1, 2], with f′ derived from f and x₀ = 2 from rule R0.",
   "lab2.compare.ex2.task":
-    "Approximate the root of x³ − x − 1 = 0 with the secant method from x₀ = 2 and x₁ = 1.5, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0.",
-  "lab2.compare.ex3.task":
-    "Approximate the root of x³ − x − 1 = 0 with Steffensen's method from x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. The lab leaves the tangent method's inputs open, so it gets the same f and [1, 2], f′ derived from f, and x₀ = 2 from rule R0, the same start as Steffensen's.",
+    "Approximate the real root of x³ − x − 1 = 0 with the secant method on [1, 2], from x₀ = 2 and x₁ = 1.5, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f and [1, 2], with f′ derived from f and x₀ = 2 from rule R0.",
+  "lab2.compare.steffensen.task":
+    "Approximate the real root of x³ − x − 1 = 0 with Steffensen's method on [1, 2], from x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. Both start from x₀ = 2 from rule R0, and the tangent method uses f′ derived from f.",
 } as const;
 
 export type MessageKey = keyof typeof en;

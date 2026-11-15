@@ -88,7 +88,7 @@ describe("LabPage, Lab 2", () => {
       "Secant and Steffensen methods",
       ["2a · Secant", "2b · Steffensen"],
       "How it works: Secant method",
-      "Ex. 1: x² − 2 = 0, x₀ = 2, x₁ = 1.4",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2, x₁ = 1.4",
     ],
     [
       "ro",
@@ -96,7 +96,7 @@ describe("LabPage, Lab 2", () => {
       "Metoda secantei și metoda lui Steffensen",
       ["2a · Metoda secantei", "2b · Metoda lui Steffensen"],
       "Cum funcționează: Metoda secantei",
-      "Ex. 1: x² − 2 = 0, x₀ = 2, x₁ = 1,4",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2, x₁ = 1,4",
     ],
   ] as const)("first render in %s", (lang, chip, title, methodTabs, heading, preset) => {
     const html = render(<LabPage slug="secant-steffensen" />, lang);

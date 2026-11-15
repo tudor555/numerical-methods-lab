@@ -33,9 +33,9 @@ Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²} unless stated):
 
 Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, compare with Newton):
 
-1. Secant, f = x² − 2, [1, 2], x₀ = 2, x₁ = 1.4.
+1. Secant: approximate √2 with f = x² − 2, [1, 2], x₀ = 2, x₁ = 1.4.
 2. Secant, f = x³ − x − 1, [1, 2], x₀ = 2, x₁ = 1.5.
-3. Steffensen, f = x³ − x − 1, [1, 2], x₀ = 2.
+3. Steffensen (the lab's unnumbered "numerical example"), f = x³ − x − 1, [1, 2], x₀ = 2.
 
 ## Lab 3: Halley and Chebyshev methods
 

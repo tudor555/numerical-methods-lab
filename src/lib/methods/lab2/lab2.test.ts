@@ -8,7 +8,7 @@ const MAX = 1000;
 const digits = (eps: number) => (eps === 1e-4 ? 8 : 12);
 
 describe("2a secant", () => {
-  // Ex. 1: x² − 2 on [1, 2], x₀ = 2, x₁ = 1.4.
+  // Ex. 1: √2 from f = x² − 2 on [1, 2], x₀ = 2, x₁ = 1.4.
   it.each([
     [1e-4, 4],
     [1e-8, 6],
@@ -101,12 +101,12 @@ describe("2a secant", () => {
 describe("2b Steffensen", () => {
   const f = compile("x^3 - x - 1", x);
 
-  // Ex. 3: x³ − x − 1 on [1, 2], dda = f″(1) = 6. Rule R0 gives x₀ = 2.
+  // The lab's numerical example: x³ − x − 1 on [1, 2], dda = f″(1) = 6. Rule R0 gives x₀ = 2.
   it.each([
     [1e-4, 11],
     [1e-8, 12],
     [1e-12, 13],
-  ])("ex. 3 converges with ε = %s in n = %i, from x₀ = b = 2", (eps, n) => {
+  ])("the numerical example converges with ε = %s in n = %i, from x₀ = b = 2", (eps, n) => {
     const r = steffensen({ f, a: 1, b: 2, dda: 6, eps, maxIter: MAX });
     expect(r.status).toBe("converged");
     expect(r.x0Rule).toBe("b");
@@ -159,7 +159,7 @@ describe("2b Steffensen", () => {
     expect(r.x0Rule).toBeUndefined();
   });
 
-  it("stops at the cap: maxIter = 5 on ex. 3", () => {
+  it("stops at the cap: maxIter = 5 on the numerical example", () => {
     const r = steffensen({ f, a: 1, b: 2, dda: 6, eps: 1e-12, maxIter: 5 });
     expect(r.status).toBe("max-iterations");
     expect(r.n).toBe(5);

@@ -111,9 +111,9 @@ describe("ComparisonPanel for Lab 2", () => {
   it("shows the three comparisons with Newton, each with its task", () => {
     const html = render(<ComparisonPanel lab={lab2} />, "ro");
     expect(elements(html, "h3").map(textOf)).toEqual([
-      "Ex. 1: x² − 2 = 0, metoda secantei",
-      "Ex. 2: x³ − x − 1 = 0, metoda secantei",
-      "Ex. 3: x³ − x − 1 = 0, metoda lui Steffensen",
+      "Ex. 1: √2 prin metoda secantei",
+      "Ex. 2: x³ − x − 1 = 0 prin metoda secantei",
+      "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Steffensen",
     ]);
     for (const card of cards(html)) {
       expect(textOf(card)).toContain("Cerința:");
@@ -125,7 +125,7 @@ describe("ComparisonPanel for Lab 2", () => {
     ["en", "ex1", ["Secant method", "Tangent method"], ["n = 4", "n = 6", "n = 5"], "x^2 - 2"],
     [
       "ro",
-      "ex3",
+      "steffensen",
       ["Metoda lui Steffensen", "Metoda tangentei"],
       ["n = 11", "n = 13", "n = 7"],
       "x^3 - x - 1",

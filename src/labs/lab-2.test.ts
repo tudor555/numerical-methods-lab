@@ -36,18 +36,25 @@ describe("Lab 2 registry", () => {
 });
 
 describe("Lab 2 presets", () => {
+  it("refers only to examples the page has: ex. 1, ex. 2 and the unnumbered numerical example", () => {
+    for (const messages of [en, ro]) {
+      const lab2Texts = Object.entries(messages).filter(([key]) => key.startsWith("lab2."));
+      for (const [key, text] of lab2Texts) expect(text, key).not.toMatch(/\bex\. ?[3-9]/i);
+    }
+  });
+
   it("lists the lab's three examples in order", () => {
     expect(lab2.presets.map((p) => [p.id, p.methodId])).toEqual([
       ["ex1", "2a"],
       ["ex2", "2a"],
-      ["ex3", "2b"],
+      ["steffensen", "2b"],
     ]);
   });
 
   it.each([
     ["ex1", 4, Math.SQRT2],
     ["ex2", 6, 1.324717957244746],
-    ["ex3", 11, 1.324717957244746],
+    ["steffensen", 11, 1.324717957244746],
   ])("%s validates and converges in n = %i", (id, n, root) => {
     const p = lab2.presets.find((x) => x.id === id);
     if (!p) throw new Error(id);
@@ -66,7 +73,7 @@ describe("Lab 2 presets", () => {
 
   it("each method's defaults are its first example, so the form opens on it", () => {
     expect(lab2.presets.find((p) => p.id === "ex1")?.values).toEqual(method("2a").defaults);
-    expect(lab2.presets.find((p) => p.id === "ex3")?.values).toEqual(method("2b").defaults);
+    expect(lab2.presets.find((p) => p.id === "steffensen")?.values).toEqual(method("2b").defaults);
   });
 });
 
@@ -78,11 +85,11 @@ describe("Lab 2 comparisons", () => {
   };
 
   it("lists exactly the comparisons the lab asks for, in order, each against Newton", () => {
-    expect(lab2.comparisons.map((c) => c.id)).toEqual(["ex1", "ex2", "ex3"]);
+    expect(lab2.comparisons.map((c) => c.id)).toEqual(["ex1", "ex2", "steffensen"]);
     for (const comparison of lab2.comparisons) {
       expect(comparison.eps).toEqual([1e-4, 1e-8, 1e-12]);
       expect(comparison.rows.map((r) => r.methodId)).toEqual([
-        comparison.id === "ex3" ? "2b" : "2a",
+        comparison.id === "steffensen" ? "2b" : "2a",
         "1a",
       ]);
     }
@@ -97,7 +104,7 @@ describe("Lab 2 comparisons", () => {
       [6, 7, 8],
       [5, 6, 7],
     ]);
-    expect(n("ex3")).toEqual([
+    expect(n("steffensen")).toEqual([
       [11, 12, 13],
       [5, 6, 7],
     ]);
@@ -113,8 +120,8 @@ describe("Lab 2 comparisons", () => {
       x0Mode: "r0",
       dda: "2",
     });
-    const ex3 = findComparisonPreset(lab2, "ex3-newton");
-    expect(ex3?.values).toMatchObject({ f: "x^3 - x - 1", df: "3 * x ^ 2 - 1", dda: "6" });
+    const steffensen = findComparisonPreset(lab2, "steffensen-newton");
+    expect(steffensen?.values).toMatchObject({ f: "x^3 - x - 1", df: "3 * x ^ 2 - 1", dda: "6" });
   });
 
   it("starts Newton at x₀ = 2 in all three", () => {
@@ -126,12 +133,15 @@ describe("Lab 2 comparisons", () => {
     }
   });
 
-  it("explains in every task what the lab leaves open for Newton", () => {
+  it("states in every task which inputs Newton uses", () => {
     for (const { taskKey } of lab2.comparisons) {
       expect(en[taskKey]).toContain("f′ derived from f");
       expect(en[taskKey]).toContain("x₀ = 2 from rule R0");
       expect(ro[taskKey]).toContain("derivata calculată din f");
       expect(ro[taskKey]).toContain("regula R0");
+      // The choice is stated plainly, not as a gap in the lab.
+      expect(en[taskKey]).not.toMatch(/\bthe lab\b/i);
+      expect(ro[taskKey]).not.toContain("Laboratorul");
     }
   });
 });
