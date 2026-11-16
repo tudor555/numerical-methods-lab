@@ -3,7 +3,6 @@
 import { Play } from "lucide-react";
 import { useState, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
-import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
 import {
   findComparisonMethod,
@@ -11,14 +10,22 @@ import {
   runComparison,
   type ComparisonCell as Cell,
 } from "@/labs/compare";
-import type { Comparison, ReadyLab } from "@/labs/types";
+import type { Comparison, MethodDefinition, ReadyLab } from "@/labs/types";
 import { formatEpsTex, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Tex } from "./formula";
-import { STATUS_STYLE } from "./status";
+import { runErrorKey, STATUS_STYLE } from "./status";
 
 /** One ε cell: n and the last iterate, or the error. Wide screens show ε in a shared header instead. */
-function ResultCell({ cell, eps }: { cell: Cell; eps: number }) {
+function ResultCell({
+  cell,
+  eps,
+  errorKeys,
+}: {
+  cell: Cell;
+  eps: number;
+  errorKeys?: MethodDefinition["errorKeys"];
+}) {
   const { t } = useI18n();
   const label = (
     <span className="text-muted-foreground text-sm lg:sr-only">
@@ -39,8 +46,10 @@ function ResultCell({ cell, eps }: { cell: Cell; eps: number }) {
   const Icon = style.icon;
 
   if (cell.status === "error") {
-    const key = `run.error.${cell.error?.code ?? "undefined-value"}` satisfies MessageKey;
-    const detail = t(key, { n: cell.error?.n ?? 0, x: formatValue(cell.error?.x ?? Number.NaN) });
+    const detail = t(runErrorKey(cell.error?.code, errorKeys), {
+      n: cell.error?.n ?? 0,
+      x: formatValue(cell.error?.x ?? Number.NaN),
+    });
     return (
       <div className="bg-error/10 flex min-w-0 flex-col gap-1 rounded-lg px-4 py-2" title={detail}>
         {label}
@@ -117,7 +126,12 @@ export function ComparisonResults({
               </div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:[grid-template-columns:var(--cols)]">
                 {cells[i].map((cell, j) => (
-                  <ResultCell key={comparison.eps[j]} cell={cell} eps={comparison.eps[j]} />
+                  <ResultCell
+                    key={comparison.eps[j]}
+                    cell={cell}
+                    eps={comparison.eps[j]}
+                    errorKeys={method?.errorKeys}
+                  />
                 ))}
               </div>
             </li>

@@ -1,5 +1,5 @@
 import type { MessageKey } from "@/i18n/en";
-import type { ScalarRunResult } from "@/lib/methods/types";
+import type { MethodErrorCode, ScalarRunResult } from "@/lib/methods/types";
 
 /** Raw text of every form field, keyed by field id. */
 export type FieldValues = Record<string, string>;
@@ -49,6 +49,14 @@ export type FunctionPlot =
       f: (x: number) => number;
       interval?: readonly [number, number];
     }
+  | {
+      /** Halley's tangent hyperbola and Chebyshev's tangent parabola both need f′ and f″ at xₙ. */
+      kind: "halley" | "chebyshev";
+      f: (x: number) => number;
+      df: (x: number) => number;
+      ddf: (x: number) => number;
+      interval?: readonly [number, number];
+    }
   | { kind: "cobweb"; phi: (x: number) => number };
 
 /** A known exact solution, e.g. ᵏ√c for the k-th root. `tex` names it in headers. */
@@ -90,6 +98,8 @@ export interface MethodDefinition {
   valueColumn?: string;
   defaults: FieldValues;
   prepare: (values: FieldValues) => PrepareResult;
+  /** Messages for error codes whose shared wording doesn't fit this method (`run.error.*` otherwise). */
+  errorKeys?: Partial<Record<MethodErrorCode, MessageKey>>;
 }
 
 /** The inputs of one comparison row. */

@@ -24,8 +24,8 @@ export const en = {
   "lab1.topic": "Tangent method, k-th root of c, successive approximations",
   "lab2.title": "Secant and Steffensen methods",
   "lab2.topic": "Derivative-free methods for f(x) = 0",
-  "lab3.title": "Halley and Chebyshev methods",
-  "lab3.topic": "Third-order methods using f″",
+  "lab3.title": "Halley's method and Chebyshev-type methods",
+  "lab3.topic": "Generalizations of the tangent method",
   "lab4.title": "Third-order iterative methods",
   "lab4.topic": "Combined tangent method, third-order square root",
   "lab5.title": "Newton's method for 2×2 systems",
@@ -137,6 +137,8 @@ export const en = {
   "chart.tangent": "f(x) with the tangent steps",
   "chart.secant": "f(x) with the secant lines",
   "chart.steffensen": "f(x) with the Steffensen steps",
+  "chart.halley": "f(x) with Halley's tangent hyperbolas",
+  "chart.chebyshev": "f(x) with Chebyshev's tangent parabolas",
   "chart.cobweb": "φ(x), y = x and the iteration path",
   "chart.convergence": "Convergence: |xₙ − xₙ₋₁| on a log scale",
   "chart.toolbar": "Chart tools",
@@ -151,6 +153,8 @@ export const en = {
   "chart.trace.tangents": "Tangent steps",
   "chart.trace.secants": "Secant lines",
   "chart.trace.steffensenSteps": "Steffensen steps",
+  "chart.trace.halleySteps": "Tangent hyperbolas",
+  "chart.trace.chebyshevSteps": "Tangent parabolas",
   "chart.trace.phi": "φ(x)",
   "chart.trace.identity": "y = x",
   "chart.trace.path": "Iteration path",
@@ -259,6 +263,48 @@ export const en = {
     "Approximate the real root of x³ − x − 1 = 0 with the secant method on [1, 2], from x₀ = 2 and x₁ = 1.5, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f and [1, 2], with f′ derived from f and x₀ = 2 from rule R0.",
   "lab2.compare.steffensen.task":
     "Approximate the real root of x³ − x − 1 = 0 with Steffensen's method on [1, 2], from x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. Both start from x₀ = 2 from rule R0, and the tangent method uses f′ derived from f.",
+
+  "lab3.intro":
+    "Solve f(x) = 0 with Halley's method and Chebyshev's method, two generalizations of the tangent method that also use the second derivative. Then compare the results and iteration counts with the tangent method.",
+  "lab3.method.halley.tab": "3a · Halley",
+  "lab3.method.halley.title": "Halley's method",
+  "lab3.method.halley.name": "Halley's method",
+  "lab3.method.halley.idea":
+    "Halley's method also uses the second derivative. Near $x_n$, the graph of $f$ is replaced by the tangent hyperbola: a hyperbola with the same value, slope and curvature as $f$ at $x_n$. The next iterate, $x_{n+1}$, is where this hyperbola crosses the x-axis. Close to a simple root the convergence is cubic, one order faster than the tangent method:",
+  "lab3.method.halley.start":
+    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$. Rule R0 picks it from the sign of $f(a)\\,f''(a)$, with $f''$ taken from the field f″(x). Ex. 1 and ex. 2 give $x_0 = 2$ directly, so their presets use “Enter x₀”. Choose “Rule R0” and the algorithm picks $x_0$ itself (2 here as well).",
+  "lab3.method.halley.failure":
+    "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $2f'(x_n)^2 - f(x_n)\\,f''(x_n) = 0$, the denominator is zero and the method stops with an error. If $f'(x_n) = 0$ while $f(x_n) \\ne 0$, the step would leave $x_n$ unchanged without reaching a root, so the method stops with an error as well.",
+  "lab3.method.halley.chart":
+    "The chart follows each step along its tangent hyperbola, from $(x_n, f(x_n))$ to $(x_{n+1}, 0)$. When $2f'(x_n)^2 - f(x_n)\\,f''(x_n) < 0$, the hyperbola's vertical asymptote lies between these two points, so that step is drawn as a straight segment.",
+  "lab3.method.halley.error.zero-denominator":
+    "The denominator 2f′(xₙ)² − f(xₙ)f″(xₙ) is zero at n = {n}, xₙ = {x}, so xₙ₊₁ is undefined.",
+
+  "lab3.method.chebyshev.tab": "3b · Chebyshev",
+  "lab3.method.chebyshev.title": "Chebyshev's method",
+  "lab3.method.chebyshev.name": "Chebyshev's method",
+  "lab3.method.chebyshev.idea":
+    "Chebyshev's method adds a second-derivative correction to the tangent step. Near $x_n$, the graph of $f$ is replaced by the tangent parabola: a parabola with its axis parallel to the x-axis and the same value, slope and curvature as $f$ at $x_n$. The next iterate, $x_{n+1}$, is where this parabola crosses the x-axis. Close to a simple root the convergence is cubic, like Halley's:",
+  "lab3.method.chebyshev.start":
+    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$, and you enter it directly: this algorithm has no rule R0. The interval $[a, b]$ only sets the range of the chart.",
+  "lab3.method.chebyshev.failure":
+    "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f'(x_n) = 0$, both fractions divide by zero and the method stops with an error.",
+  "lab3.method.chebyshev.chart":
+    "The chart follows each step along its tangent parabola, from $(x_n, f(x_n))$ to $(x_{n+1}, 0)$.",
+
+  "lab3.preset.ex1": "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+  "lab3.preset.ex2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2",
+  "lab3.preset.chebyshev": "Numerical example: x³ − x − 1 = 0, x₀ = 2",
+
+  "lab3.compare.ex1": "Ex. 1: √2 with Halley's method",
+  "lab3.compare.ex2": "Ex. 2: x³ − x − 1 = 0 with Halley's method",
+  "lab3.compare.chebyshev": "Numerical example: x³ − x − 1 = 0 with Chebyshev's method",
+  "lab3.compare.ex1.task":
+    "Approximate the number √2 with Halley's method, using f(x) = x² − 2, f′(x) = 2x and f″(x) = 2 on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 2x and starts from x₀ = 2.",
+  "lab3.compare.ex2.task":
+    "Approximate the real root of x³ − x − 1 = 0 with Halley's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+  "lab3.compare.chebyshev.task":
+    "Approximate the real root of x³ − x − 1 = 0 with Chebyshev's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
 } as const;
 
 export type MessageKey = keyof typeof en;

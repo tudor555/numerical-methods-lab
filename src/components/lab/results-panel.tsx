@@ -4,14 +4,14 @@ import { useMemo } from "react";
 import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
 import type { RunView } from "@/labs/lab-state";
-import type { FunctionPlot } from "@/labs/types";
+import type { FunctionPlot, MethodDefinition } from "@/labs/types";
 import { formatSmall, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { buildConvergenceChart, buildFunctionChart, type ChartLabels } from "./charts";
 import { Tex } from "./formula";
 import { IterationTable } from "./iteration-table";
 import { PlotlyChart } from "./plotly-chart";
-import { STATUS_STYLE, StatusBadge } from "./status";
+import { runErrorKey, STATUS_STYLE, StatusBadge } from "./status";
 
 export type { RunView };
 
@@ -19,6 +19,8 @@ const CHART_TITLE = {
   tangent: "chart.tangent",
   secant: "chart.secant",
   steffensen: "chart.steffensen",
+  halley: "chart.halley",
+  chebyshev: "chart.chebyshev",
   cobweb: "chart.cobweb",
 } as const satisfies Record<FunctionPlot["kind"], MessageKey>;
 
@@ -31,7 +33,15 @@ function Stat({ label, children }: { label: React.ReactNode; children: React.Rea
   );
 }
 
-export function ResultsPanel({ view, valueColumn }: { view: RunView; valueColumn?: string }) {
+export function ResultsPanel({
+  view,
+  valueColumn,
+  errorKeys,
+}: {
+  view: RunView;
+  valueColumn?: string;
+  errorKeys?: MethodDefinition["errorKeys"];
+}) {
   const { t } = useI18n();
   const { result, plot, eps, exact } = view;
   const style = STATUS_STYLE[result.status];
@@ -44,8 +54,10 @@ export function ResultsPanel({ view, valueColumn }: { view: RunView; valueColumn
     message = t("result.maxIterations", { n: result.n });
   } else {
     const error = result.error;
-    const key = `run.error.${error?.code ?? "undefined-value"}` satisfies MessageKey;
-    const detail = t(key, { n: error?.n ?? 0, x: formatValue(error?.x ?? Number.NaN) });
+    const detail = t(runErrorKey(error?.code, errorKeys), {
+      n: error?.n ?? 0,
+      x: formatValue(error?.x ?? Number.NaN),
+    });
     message = result.iterations.length > 0 ? `${detail} ${t("result.partial")}` : detail;
   }
 
@@ -56,6 +68,8 @@ export function ResultsPanel({ view, valueColumn }: { view: RunView; valueColumn
       tangents: t("chart.trace.tangents"),
       secants: t("chart.trace.secants"),
       steffensenSteps: t("chart.trace.steffensenSteps"),
+      halleySteps: t("chart.trace.halleySteps"),
+      chebyshevSteps: t("chart.trace.chebyshevSteps"),
       phi: t("chart.trace.phi"),
       identity: t("chart.trace.identity"),
       path: t("chart.trace.path"),

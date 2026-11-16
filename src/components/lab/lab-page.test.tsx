@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
+import { lab3 } from "@/labs/lab-3";
 import { elements, render, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
@@ -117,5 +118,52 @@ describe("LabPage, Lab 2", () => {
     expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
       lab2.comparisons.length,
     );
+  });
+});
+
+describe("LabPage, Lab 3", () => {
+  it.each([
+    [
+      "en",
+      "Lab 3",
+      "Halley's method and Chebyshev-type methods",
+      ["3a · Halley", "3b · Chebyshev"],
+      "How it works: Halley's method",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+    ],
+    [
+      "ro",
+      "Laboratorul 3",
+      "Metoda lui Halley și metode de tip Cebîșev",
+      ["3a · Metoda lui Halley", "3b · Metoda lui Cebîșev"],
+      "Cum funcționează: Metoda lui Halley",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+    ],
+  ] as const)("first render in %s", (lang, chip, title, methodTabs, heading, preset) => {
+    const html = render(<LabPage slug="halley-chebyshev" />, lang);
+    const header = html.slice(0, html.indexOf("</header>"));
+    expect(
+      textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+    ).toBe(chip);
+    expect(textOf(elements(header, "h1")[0])).toBe(title);
+    expect(textOf(elements(header, "p")[0])).not.toContain(chip);
+    expect(tabs(html).map(textOf)).toEqual(methodTabs);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    for (const id of ["f", "df", "ddf", "a", "b", "x0", "eps", "maxIter"]) {
+      expect(html).toContain(`id="field-${id}"`);
+    }
+    expect(html).not.toContain('id="field-dda"');
+    const pressed = elements(html, "button").filter(
+      (b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'),
+    );
+    expect(pressed.map(textOf)).toEqual([preset]);
+    expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+      lab3.comparisons.length,
+    );
+  });
+
+  it("offers “Derive from f” for both f′ and f″", () => {
+    const html = render(<LabPage slug="halley-chebyshev" />);
+    expect(html.split('aria-label="Derive from f"').length - 1).toBe(2);
   });
 });

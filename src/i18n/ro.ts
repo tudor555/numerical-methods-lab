@@ -28,8 +28,8 @@ export const ro: Record<MessageKey, string> = {
   "lab1.topic": "Metoda lui Newton, rădăcini de ordinul k, aproximații succesive",
   "lab2.title": "Metoda secantei și metoda lui Steffensen",
   "lab2.topic": "Metode fără derivată pentru ecuația f(x) = 0",
-  "lab3.title": "Metodele lui Halley și Cebâșev",
-  "lab3.topic": "Metode de ordinul trei care folosesc și f″",
+  "lab3.title": "Metoda lui Halley și metode de tip Cebîșev",
+  "lab3.topic": "Generalizări ale metodei tangentei",
   "lab4.title": "Metode iterative de ordinul trei",
   "lab4.topic": "Metoda tangentei combinate și o rădăcină pătrată de ordinul trei",
   "lab5.title": "Metoda lui Newton pentru sisteme 2×2",
@@ -142,6 +142,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.tangent": "Graficul lui f și tangentele succesive",
   "chart.secant": "Graficul lui f și secantele succesive",
   "chart.steffensen": "Graficul lui f și pașii metodei lui Steffensen",
+  "chart.halley": "Graficul lui f și hiperbolele tangente",
+  "chart.chebyshev": "Graficul lui f și parabolele tangente",
   "chart.cobweb": "Graficul lui φ, dreapta y = x și traseul iterațiilor",
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
@@ -156,6 +158,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.tangents": "Tangente",
   "chart.trace.secants": "Secante",
   "chart.trace.steffensenSteps": "Pașii metodei lui Steffensen",
+  "chart.trace.halleySteps": "Hiperbole tangente",
+  "chart.trace.chebyshevSteps": "Parabole tangente",
   "chart.trace.phi": "φ(x)",
   "chart.trace.identity": "y = x",
   "chart.trace.path": "Traseul iterațiilor",
@@ -264,4 +268,46 @@ export const ro: Record<MessageKey, string> = {
     "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda secantei, cu intervalul [1; 2] și valorile inițiale x₀ = 2 și x₁ = 1,5, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție și același interval, cu derivata calculată din f și iterația inițială x₀ = 2, dată de regula R0.",
   "lab2.compare.steffensen.task":
     "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Steffensen, cu intervalul [1; 2] și valoarea inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Ambele metode pornesc din x₀ = 2, dată de regula R0, iar metoda tangentei folosește derivata calculată din f.",
+
+  "lab3.intro":
+    "Rezolvă ecuația f(x) = 0 prin metoda lui Halley și prin metoda lui Cebîșev, două generalizări ale metodei tangentei care folosesc și derivata a doua. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
+  "lab3.method.halley.tab": "3a · Metoda lui Halley",
+  "lab3.method.halley.title": "Metoda lui Halley",
+  "lab3.method.halley.name": "Metoda lui Halley",
+  "lab3.method.halley.idea":
+    "Metoda lui Halley folosește și derivata a doua. În vecinătatea lui $x_n$, graficul lui $f$ se înlocuiește cu hiperbola tangentă, adică hiperbola care are în $x_n$ aceeași valoare, aceeași pantă și aceeași curbură ca $f$. Următoarea iterație, $x_{n+1}$, este abscisa punctului în care această hiperbolă intersectează axa $Ox$. În apropierea unei rădăcini simple, convergența este cubică, cu un ordin mai mare decât la metoda tangentei:",
+  "lab3.method.halley.start":
+    "Iterația inițială $x_0$ trebuie aleasă astfel încât $f(x_0)\\,f''(x_0) > 0$. Regula R0 o alege în funcție de semnul produsului $f(a)\\,f''(a)$, unde $f''$ este derivata a doua din câmpul f″(x). Ex. 1 și ex. 2 dau direct $x_0 = 2$, de aceea aceste exemple pornesc cu „Introdusă manual”. Dacă alegi „Regula R0”, algoritmul alege singur iterația inițială $x_0$ (și aici obține tot 2).",
+  "lab3.method.halley.failure":
+    "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $2f'(x_n)^2 - f(x_n)\\,f''(x_n) = 0$, numitorul se anulează și metoda se oprește cu eroare. Dacă $f'(x_n) = 0$, dar $f(x_n) \\ne 0$, pasul ar lăsa $x_n$ neschimbat fără să ajungă la rădăcină, așa că metoda se oprește tot cu eroare.",
+  "lab3.method.halley.chart":
+    "Graficul urmărește fiecare pas pe hiperbola tangentă, de la $(x_n, f(x_n))$ la $(x_{n+1}, 0)$. Când $2f'(x_n)^2 - f(x_n)\\,f''(x_n) < 0$, asimptota verticală a hiperbolei se află între aceste două puncte, așa că pasul respectiv este desenat ca un segment de dreaptă.",
+  "lab3.method.halley.error.zero-denominator":
+    "Numitorul 2f′(xₙ)² − f(xₙ)f″(xₙ) se anulează la n = {n}, în xₙ = {x}, deci xₙ₊₁ nu poate fi calculat.",
+
+  "lab3.method.chebyshev.tab": "3b · Metoda lui Cebîșev",
+  "lab3.method.chebyshev.title": "Metoda lui Cebîșev",
+  "lab3.method.chebyshev.name": "Metoda lui Cebîșev",
+  "lab3.method.chebyshev.idea":
+    "Metoda lui Cebîșev adaugă la pasul metodei tangentei o corecție care folosește derivata a doua. În vecinătatea lui $x_n$, graficul lui $f$ se înlocuiește cu parabola tangentă, adică parabola cu axa paralelă cu $Ox$ care are în $x_n$ aceeași valoare, aceeași pantă și aceeași curbură ca $f$. Următoarea iterație, $x_{n+1}$, este abscisa punctului în care această parabolă intersectează axa $Ox$. În apropierea unei rădăcini simple, convergența este cubică, la fel ca la metoda lui Halley:",
+  "lab3.method.chebyshev.start":
+    "Iterația inițială $x_0$ trebuie aleasă astfel încât $f(x_0)\\,f''(x_0) > 0$ și se introduce direct: acest algoritm nu folosește regula R0. Intervalul $[a; b]$ stabilește doar porțiunea afișată pe grafic.",
+  "lab3.method.chebyshev.failure":
+    "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f'(x_n) = 0$, ambele fracții au numitorul zero și metoda se oprește cu eroare.",
+  "lab3.method.chebyshev.chart":
+    "Graficul urmărește fiecare pas pe parabola tangentă, de la $(x_n, f(x_n))$ la $(x_{n+1}, 0)$.",
+
+  "lab3.preset.ex1": "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+  "lab3.preset.ex2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2",
+  "lab3.preset.chebyshev": "Exemplu numeric: x³ − x − 1 = 0, x₀ = 2",
+
+  "lab3.compare.ex1": "Ex. 1: √2 prin metoda lui Halley",
+  "lab3.compare.ex2": "Ex. 2: x³ − x − 1 = 0 prin metoda lui Halley",
+  "lab3.compare.chebyshev": "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Cebîșev",
+  "lab3.compare.ex1.task":
+    "Aproximează numărul √2 prin metoda lui Halley, folosind f(x) = x² − 2, f′(x) = 2x și f″(x) = 2, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 2x și iterația inițială x₀ = 2.",
+  "lab3.compare.ex2.task":
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Halley, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+  "lab3.compare.chebyshev.task":
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Cebîșev, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
 };

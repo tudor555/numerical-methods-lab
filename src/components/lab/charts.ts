@@ -16,6 +16,8 @@ export interface ChartLabels {
   tangents: string;
   secants: string;
   steffensenSteps: string;
+  halleySteps: string;
+  chebyshevSteps: string;
   phi: string;
   identity: string;
   path: string;
@@ -72,14 +74,68 @@ function sample(fn: (x: number) => number, [lo, hi]: [number, number], count = 4
   return { xs, ys };
 }
 
+/** Points per curved step: enough for a smooth arc between two iterates. */
+const STEP_SAMPLES = 32;
+
+type StepPlot = Extract<FunctionPlot, { kind: "halley" | "chebyshev" }>;
+
+/**
+ * The curve a Halley or Chebyshev step follows from (x, fx) to (next, 0), or null when it can't be
+ * drawn as a curve. Halley: the tangent hyperbola g(x) = (f + B·t)/(1 + C·t), t = x − xₙ, with
+ * C = −f″/(2f′) and B = f′ + f·C, which matches f, f′ and f″ at xₙ. When 2f′² − f f″ < 0 its pole
+ * lies between the two points. Chebyshev: the tangent parabola x(y) = xₙ + (y − f)/f′ −
+ * f″(y − f)²/(2f′³), from y = f(xₙ) down to y = 0.
+ */
+function stepCurve(
+  plot: StepPlot,
+  x: number,
+  fx: number,
+  next: number,
+): { xs: number[]; ys: number[] } | null {
+  let d: number;
+  let dd: number;
+  try {
+    d = plot.df(x);
+    dd = plot.ddf(x);
+  } catch {
+    return null;
+  }
+  if (!Number.isFinite(d) || !Number.isFinite(dd) || d === 0) return null;
+  const xs: number[] = [];
+  const ys: number[] = [];
+  if (plot.kind === "halley") {
+    if (2 * d * d - fx * dd <= 0) return null;
+    const c = -dd / (2 * d);
+    const b = d + fx * c;
+    for (let i = 0; i < STEP_SAMPLES; i++) {
+      const t = ((next - x) * i) / STEP_SAMPLES;
+      xs.push(x + t);
+      ys.push((fx + b * t) / (1 + c * t));
+    }
+  } else {
+    for (let i = 0; i < STEP_SAMPLES; i++) {
+      const u = -fx * (i / STEP_SAMPLES); // y − f(xₙ), from 0 to −f(xₙ)
+      xs.push(x + u / d - (dd * u * u) / (2 * d * d * d));
+      ys.push(fx + u);
+    }
+  }
+  if (!xs.every(Number.isFinite) || !ys.every(Number.isFinite)) return null;
+  // The last point is the iterate itself, so the curve ends exactly on the axis at xₙ₊₁.
+  xs.push(next);
+  ys.push(0);
+  return { xs, ys };
+}
+
 const hoverIterate = "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.6g}<extra></extra>";
 
 /**
  * The function chart. For f it shows the iterates and, for each step, the line that produced xₙ₊₁:
- * Newton's tangent at xₙ, the secant through xₙ₋₁ and xₙ, or Steffensen's step from xₙ straight to
- * the axis. Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it can land far outside
- * [a, b] (at 7 in the lab's example) and would squash the rest of the chart. For φ it shows y = x and
- * the cobweb path.
+ * Newton's tangent at xₙ, the secant through xₙ₋₁ and xₙ, Steffensen's step from xₙ straight to
+ * the axis, or the arc of Halley's tangent hyperbola or Chebyshev's tangent parabola between
+ * (xₙ, f(xₙ)) and (xₙ₊₁, 0); an arc that can't be drawn (a pole in between, f′ = 0 or undefined)
+ * falls back to a straight step. Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it
+ * can land far outside [a, b] (at 7 in the lab's example) and would squash the rest of the chart.
+ * For φ it shows y = x and the cobweb path.
  */
 export function buildFunctionChart(
   plot: FunctionPlot,
@@ -113,8 +169,12 @@ export function buildFunctionChart(
           stepY.push(before.fx, from.fx, 0, null);
         }
       } else {
-        stepX.push(from.x, to.x, null);
-        stepY.push(from.fx, 0, null);
+        const curve =
+          plot.kind === "halley" || plot.kind === "chebyshev"
+            ? stepCurve(plot, from.x, from.fx, to.x)
+            : null;
+        stepX.push(...(curve?.xs ?? [from.x, to.x]), null);
+        stepY.push(...(curve?.ys ?? [from.fx, 0]), null);
       }
       if (to.fx !== null) {
         dropX.push(to.x, to.x, null);
@@ -125,6 +185,8 @@ export function buildFunctionChart(
       tangent: labels.tangents,
       secant: labels.secants,
       steffensen: labels.steffensenSteps,
+      halley: labels.halleySteps,
+      chebyshev: labels.chebyshevSteps,
     }[plot.kind];
     return {
       xTitle: "x",
