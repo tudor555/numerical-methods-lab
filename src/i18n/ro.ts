@@ -80,6 +80,7 @@ export const ro: Record<MessageKey, string> = {
   "field.x0Mode.r0": "Regula R0",
   "field.x0Mode.manual": "Introdusă manual",
   "field.dda": "Valoarea derivatei a doua în a",
+  "field.ddf": "Derivata a doua a funcției",
   "field.x0": "Iterația inițială",
   "field.x1": "A doua iterație inițială",
   "field.eps": "Precizia dorită",

@@ -114,7 +114,7 @@ export function deriveField(
     return { ok: false, issue: { key: "field.error.not-differentiable" } };
   const variable = source.variables[0];
   try {
-    const order = field.kind === "number" ? field.derive.order : 1;
+    const order = field.derive.order ?? 1;
     let expression = values[source.id] ?? "";
     for (let i = 0; i < order; i++) expression = derive(expression, variable, source.variables);
     if (field.kind === "expression") return { ok: true, value: expression };

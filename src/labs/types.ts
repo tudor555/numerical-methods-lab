@@ -31,8 +31,8 @@ export interface NumberField extends FieldBase {
 export interface ExpressionField extends FieldBase {
   kind: "expression";
   variables: readonly string[];
-  /** "Derive from f": the symbolic derivative of field `from`. */
-  derive?: { from: string };
+  /** "Derive from f": the symbolic derivative of field `from`, of the given order (default 1). */
+  derive?: { from: string; order?: 1 | 2 };
 }
 
 export interface ChoiceField extends FieldBase {

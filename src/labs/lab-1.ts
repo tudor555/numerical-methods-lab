@@ -5,20 +5,23 @@ import { parseFields } from "./fields";
 import {
   checkInterval,
   ddaField,
+  derivativeField,
   epsField,
+  EPS_SET,
   functionField,
   intervalFields,
+  manualX0Field,
   maxIterField,
   ruleR0Formula,
+  usesRuleR0,
   VALUE_LIMIT,
   valueRule,
   X,
+  x0ModeField,
 } from "./shared-fields";
 import type { MethodDefinition, Preset, ReadyLab } from "./types";
 
-const usesRuleR0 = (v: Record<string, string>) => v.x0Mode !== "manual";
-
-/** Lab 2 reuses this definition to run Newton next to its own methods in the comparisons. */
+/** Labs 2 and 3 reuse this definition to run Newton next to its own methods in the comparisons. */
 export const newtonMethod: MethodDefinition = {
   id: "1a",
   tabKey: "lab1.method.newton.tab",
@@ -37,34 +40,11 @@ export const newtonMethod: MethodDefinition = {
   ],
   fields: [
     functionField,
-    {
-      id: "df",
-      kind: "expression",
-      symbol: "f'(x)",
-      labelKey: "field.df",
-      variables: X,
-      derive: { from: "f" },
-    },
+    derivativeField,
     ...intervalFields,
-    {
-      id: "x0Mode",
-      kind: "choice",
-      symbol: "x_0",
-      labelKey: "field.x0Mode",
-      options: [
-        { value: "r0", labelKey: "field.x0Mode.r0" },
-        { value: "manual", labelKey: "field.x0Mode.manual" },
-      ],
-    },
+    x0ModeField,
     ddaField(usesRuleR0),
-    {
-      id: "x0",
-      kind: "number",
-      symbol: "x_0",
-      labelKey: "field.x0",
-      rule: valueRule,
-      visibleWhen: (v) => !usesRuleR0(v),
-    },
+    manualX0Field,
     epsField,
     maxIterField,
   ],
@@ -257,8 +237,6 @@ const presets: readonly Preset[] = [
     values: { phi: sqrtPhi(c), x0: String(c), ...newtonBase },
   })),
 ];
-
-const EPS_SET = [1e-4, 1e-8, 1e-12] as const;
 
 export const lab1: ReadyLab = {
   number: 1,

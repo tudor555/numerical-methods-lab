@@ -76,6 +76,7 @@ export const en = {
   "field.x0Mode.r0": "Rule R0",
   "field.x0Mode.manual": "Enter x₀",
   "field.dda": "Second derivative at a",
+  "field.ddf": "Second derivative",
   "field.x0": "Starting value",
   "field.x1": "Second starting value",
   "field.eps": "Tolerance",
