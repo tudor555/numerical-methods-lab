@@ -39,14 +39,15 @@ Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, compare with Newton):
 
 ## Lab 3: Halley and Chebyshev methods
 
-**3a. Halley.** xₙ₊₁ = xₙ − 2f f′ / (2f′² − f f″), all evaluated at xₙ. Inputs: a, b, f, f′, f″, ε. x₀ comes from R0 using f″(a), or the user enters it directly.
-**3b. Chebyshev.** xₙ₊₁ = xₙ − f/f′ − f² f″ / (2f′³). Inputs: a, b, f, f′, f″, ε, x₀.
+**3a. Halley.** xₙ₊₁ = xₙ − 2f f′ / (2f′² − f f″), all evaluated at xₙ. Inputs: a, b, f, df, ddf, ε, where f′ and f″ are both typed expressions (ddf, not the number dda). x₀ comes from R0 using ddf(a), or the user enters it directly.
+**3b. Chebyshev.** xₙ₊₁ = xₙ − f/f′ − f² f″ / (2f′³). Inputs: a, b, f, df, ddf, ε, x₀ (entered directly; there is no R0, and a, b only set the chart range).
 
 Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, compare with Newton):
 
-1. Halley, f = x² − 2, f′ = 2x, f″ = 2, [1, 2], x₀ = 2.
-2. Halley, f = x³ − x − 1, f′ = 3x² − 1, f″ = 6x, [1, 2], x₀ = 2.
-3. Chebyshev, f = x³ − x − 1 (same derivatives), [1, 2], x₀ = 2.
+1. Halley, approximate √2: f = x² − 2, f′ = 2x, f″ = 2, [1, 2], x₀ = 2.
+2. Halley, the real root of x³ − x − 1 = 0: f′ = 3x² − 1, f″ = 6x, [1, 2], x₀ = 2.
+
+Numerical example (Chebyshev, unnumbered in the lab): f = x³ − x − 1 (same derivatives), [1, 2], x₀ = 2.
 
 ## Lab 4: Third-order iterative methods
 
