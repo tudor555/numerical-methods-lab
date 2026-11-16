@@ -2,7 +2,7 @@
 title: "Lab 3 (Halley and Chebyshev methods)"
 type: "feature"
 created: "2026-11-15"
-status: "ready-for-dev"
+status: "done"
 baseline_commit: "b3d5ff9eb12aa3ef41d9d39478d99892acf7c06f"
 route: "dispatch"
 review_loop_iteration: 0
@@ -77,14 +77,14 @@ context:
 
 **Execution:**
 
-- [ ] `src/lib/methods/lab3/{halley,chebyshev}.ts` + `lab3.test.ts` -- methods; lock every matrix row and count
-- [ ] `src/lib/methods/starting-value.ts` -- R0 accepts f″ as a function; Lab 1 and 2 tests stay green
-- [ ] `src/labs/{types,fields,shared-fields}.ts`, `lab-1.ts` -- second-order expression derive, shared df/ddf and x₀-mode fields; Lab 1 tests stay green
-- [ ] `src/labs/lab-3.ts` + `lab-3.test.ts`, `registry.ts`, `lab-2.ts` -- definition, presets, three comparisons with `taskKey` and literal Newton presets; shared `EPS_SET`; lock the n-matrix and comparison ids; Lab 2 tests stay green
-- [ ] `src/components/lab/{charts.ts,results-panel.tsx}` + tests -- `halley` hyperbola and `chebyshev` parabola kinds (curve passes through (xₙ, f(xₙ)) and (xₙ₊₁, 0)), titles, legend names
-- [ ] `src/i18n/{en,ro}.ts` -- all Lab 3 keys, KaTeX formulas with `⟪⟫` words, native RO
-- [ ] hub, route and page tests -- Lab 3 ready, Lab 4 as the unbuilt example
-- [ ] `docs/labs-catalog.md` -- Lab 3 wording fixes
+- [x] `src/lib/methods/lab3/{halley,chebyshev}.ts` + `lab3.test.ts` -- methods; lock every matrix row and count
+- [x] `src/lib/methods/starting-value.ts` -- R0 accepts f″ as a function; Lab 1 and 2 tests stay green
+- [x] `src/labs/{types,fields,shared-fields}.ts`, `lab-1.ts` -- second-order expression derive, shared df/ddf and x₀-mode fields; Lab 1 tests stay green
+- [x] `src/labs/lab-3.ts` + `lab-3.test.ts`, `registry.ts`, `lab-2.ts` -- definition, presets, three comparisons with `taskKey` and literal Newton presets; shared `EPS_SET`; lock the n-matrix and comparison ids; Lab 2 tests stay green
+- [x] `src/components/lab/{charts.ts,results-panel.tsx}` + tests -- `halley` hyperbola and `chebyshev` parabola kinds (curve passes through (xₙ, f(xₙ)) and (xₙ₊₁, 0)), titles, legend names
+- [x] `src/i18n/{en,ro}.ts` -- all Lab 3 keys, KaTeX formulas with `⟪⟫` words, native RO
+- [x] hub, route and page tests -- Lab 3 ready, Lab 4 as the unbuilt example
+- [x] `docs/labs-catalog.md` -- Lab 3 wording fixes
 
 **Acceptance Criteria:**
 
@@ -94,9 +94,33 @@ context:
 
 ## Implementation Notes
 
+- Halley's `zero-denominator` needs its own wording (the shared one talks about f taking the same value at two points). `MethodDefinition.errorKeys` maps an error code to a method-specific message key; `runErrorKey` in `components/lab/status.tsx` resolves it for the results panel and the comparison tiles. No new error codes.
+- Charts: a step whose curve can't be drawn (f′ = 0, f′ or f″ undefined at xₙ, or Halley's 2f′² − f f″ ≤ 0) falls back to the straight segment. Each arc is 32 samples plus the exact end point (xₙ₊₁, 0).
+- `startByRuleR0` takes f″ as a number (dda) or a function (ddf); an undefined f″(a) fails before row 0 at x = a.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Review pass 1 (blind = B, edge-case = E, verification-gap = VG).
+
+| #   | Source | Finding                                                                                                                                            | Verdict | Evidence                                                                                                                                                 | Route                                               |
+| --- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| 1   | E, B   | Halley with f′(xₙ) = 0 and f(xₙ) ≠ 0 returns xₙ₊₁ = xₙ and reports `converged` at a non-root; this case is untested                                | medium  | Reproduced: f = x² − 2, f′ = 2x, f″ = 2, x₀ = 0 converges at x = 0, where f = −2. CAP-9 requires a specific error instead                                | patch (`zero-derivative`, test, one sentence EN/RO) |
+| 2   | VG, B  | `errorKeys` is passed to `ResultsPanel` by hand; no test covers the lab page's wiring, and the error-message block is duplicated in two components | low     | Removing the prop at `lab-page.tsx:137` passes every test. Lab page tests render only the first state, so no test can reach a finished run               | defer (needs DOM testing)                           |
+| 3   | B      | `MethodErrorCode` comment describes `zero-denominator` only as a difference of f values                                                            | low     | `types.ts`: Halley now uses it for 2f′² − f f″                                                                                                           | patch                                               |
+| 4   | B      | RO `lab3.method.halley.start`: "exemplele lor" reads wrong                                                                                         | low     | ex. 1 and ex. 2 are the examples themselves                                                                                                              | patch                                               |
+| 5   | B      | Chebyshev arc is only tested with f(xₙ) > 0                                                                                                        | low     | `charts.test.ts` checks only a falling arc                                                                                                               | patch (one test)                                    |
+| 6   | B      | Message tests sit under `describe("Lab 3 presets")`                                                                                                | low     | They scan all `lab3.*` messages                                                                                                                          | patch (own describe)                                |
+| 7   | E      | Chebyshev: 2f′³ underflows to 0 when \|f′\| < ~10⁻¹⁰⁸                                                                                              | low     | Real, but only for contrived f; the run still stops with an error (`undefined-value`/`overflow`). Fix adds a guard                                       | rejected                                            |
+| 8   | B      | R0 failure on f″(a) shows the shared "step from n = 0" message                                                                                     | low     | Same message and x = a as the existing f(a)-undefined case from Lab 2; a dedicated message adds keys and a branch for a rare input                       | rejected                                            |
+| 9   | B      | Chart explanations don't list every fallback (f′ = 0, undefined f′/f″)                                                                             | false   | After #1, a step with f′(xₙ) = 0 or undefined f′/f″ fails before an iterate exists, so no such step is drawn; the reachable fallback (pole) is explained | rejected                                            |
+| 10  | B      | Curved steps add 33 points each, up to millions at a cap of 100 000                                                                                | low     | Default cap 1000 gives ≤ 33 000 points; only a non-converging run with a hand-raised cap gets large. Fix adds a branch                                   | rejected                                            |
+| 11  | B      | Halley pole test uses a fixture iterate (2.1) that isn't Halley's                                                                                  | low     | The pole branch never reads it; the test checks the fallback shape only                                                                                  | rejected                                            |
+| 12  | B      | f(x₀)·f″(x₀) > 0 is never checked for a typed x₀                                                                                                   | false   | The lab's algorithms don't check it either (Lab 1 Newton's manual x₀ doesn't); the start texts now state the condition                                   | rejected                                            |
+| 13  | B      | Nothing enforces `{n}`/`{x}` in override messages                                                                                                  | low     | Both override messages contain both placeholders in EN and RO; a guard test for one key is more surface than the risk                                    | rejected                                            |
+| 14  | B      | Catalog lists internal field names (df, ddf)                                                                                                       | false   | `labs-catalog.md` Shared rules already name `dda` and `ddf`; Lab 3 follows that                                                                          | rejected                                            |
+| 15  | B      | Spec change missing from the review diff                                                                                                           | false   | The spec is the claims file and was left out of the diff on purpose                                                                                      | rejected                                            |
 
 ## Verification
 
