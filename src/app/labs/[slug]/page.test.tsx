@@ -35,6 +35,7 @@ describe("/labs/[slug]", () => {
     ["newton", "Newton's method and k-th roots"],
     ["secant-steffensen", "Secant and Steffensen methods"],
     ["halley-chebyshev", "Halley's method and Chebyshev-type methods"],
+    ["third-order", "Third-order iterative methods"],
   ])("renders the lab page for the ready lab /labs/%s", async (slug, title) => {
     const element = await LabRoute(props(slug));
     const html = render(element);
@@ -44,7 +45,7 @@ describe("/labs/[slug]", () => {
 
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "third-order"],
+    ["a lab that is not built yet", "newton-systems"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -80,6 +81,18 @@ describe("/labs/[slug] metadata", () => {
     });
   });
 
+  it("names Lab 4 in its metadata, in both languages", async () => {
+    await expect(generateMetadata(props("third-order"))).resolves.toEqual({
+      title: "Lab 4: Third-order iterative methods",
+      description: "Combined tangent method and third-order square roots",
+    });
+    cookieJar.set(LANG_COOKIE, "ro");
+    await expect(generateMetadata(props("third-order"))).resolves.toEqual({
+      title: "Laboratorul 4: Metode iterative de ordinul trei",
+      description: "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
+    });
+  });
+
   it("is in Romanian when the language cookie is ro", async () => {
     cookieJar.set(LANG_COOKIE, "ro");
     await expect(generateMetadata(props("newton"))).resolves.toEqual({
@@ -89,6 +102,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("third-order"))).resolves.toEqual({});
+    await expect(generateMetadata(props("newton-systems"))).resolves.toEqual({});
   });
 });

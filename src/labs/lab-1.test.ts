@@ -17,15 +17,16 @@ const preset = (id: string) => {
 };
 
 describe("registry", () => {
-  it("lists all 13 labs, Labs 1–3 ready, Lab 1 at /labs/newton", () => {
+  it("lists all 13 labs, Labs 1–4 ready, Lab 1 at /labs/newton", () => {
     expect(labs.map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(labs.filter((l) => l.status === "ready").map((l) => l.slug)).toEqual([
       "newton",
       "secant-steffensen",
       "halley-chebyshev",
+      "third-order",
     ]);
     expect(findReadyLab("newton")).toBe(lab1);
-    expect(findReadyLab("third-order")).toBeUndefined();
+    expect(findReadyLab("newton-systems")).toBeUndefined();
     expect(findReadyLab("euler")).toBeUndefined();
     expect(new Set(labs.map((l) => l.slug)).size).toBe(13);
   });

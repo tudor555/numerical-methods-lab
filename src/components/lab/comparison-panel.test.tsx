@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
+import { lab4 } from "@/labs/lab-4";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -212,5 +213,64 @@ describe("ComparisonPanel for Lab 3", () => {
       />,
     );
     expect(textOf(html)).toContain("The denominator 2f′(xₙ)² − f(xₙ)f″(xₙ) is zero at n = 0");
+  });
+});
+
+describe("ComparisonPanel for Lab 4", () => {
+  it("shows the five comparisons in the lab's order, each with its task", () => {
+    const html = render(<ComparisonPanel lab={lab4} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 1: √2 prin metoda combinată a tangentei",
+      "Ex. 2: x³ − x − 1 = 0 prin metoda combinată a tangentei",
+      "Ex. 1: √2 prin metoda de ordinul 3",
+      "Ex. 2: √3 prin metoda de ordinul 3",
+      "Ex. 2: √5 prin metoda de ordinul 3",
+    ]);
+    const all = cards(html);
+    all.forEach((card, i) => {
+      expect(textOf(card)).toContain("Cerința:");
+      if (i < 2) {
+        expect(textOf(card)).toContain("metoda tangentei");
+        expect(textOf(card)).not.toContain("metoda iterativă obținută");
+      } else {
+        expect(textOf(card)).toContain("metoda iterativă obținută din metoda tangentei");
+      }
+    });
+    for (const card of all.slice(3)) {
+      expect(textOf(card)).toContain("Metoda converge către √a, deci a = 3 dă √3, iar a = 5 dă √5");
+    }
+  });
+
+  it.each([
+    [
+      "en",
+      "combined-ex2",
+      ["Combined tangent method", "Tangent method"],
+      ["n = 4", "n = 5", "n = 7"],
+      "x^3 - x - 1,\\ x_0 = 2",
+    ],
+    [
+      "ro",
+      "root-ex2-sqrt5",
+      ["Metoda de ordinul 3", "Metoda tangentei"],
+      ["n = 4", "n = 5", "n = 6"],
+      "\\sqrt{5}",
+    ],
+  ] as const)("in %s, %s names both methods and shows n for each ε", (lang, id, names, ns, tex) => {
+    const comparison = lab4.comparisons.find((c) => c.id === id);
+    if (!comparison) throw new Error(id);
+    const html = render(
+      <ComparisonResults
+        lab={lab4}
+        comparison={comparison}
+        cells={runComparison(lab4, comparison)}
+      />,
+      lang,
+    );
+    const rows = elements(html, "li");
+    expect(rows).toHaveLength(2);
+    rows.forEach((row, i) => expect(textOf(row)).toContain(names[i]));
+    for (const n of ns) expect(textOf(html)).toContain(n);
+    expect(texOf(rows[1])[0]).toBe(tex);
   });
 });

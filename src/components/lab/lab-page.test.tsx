@@ -1,13 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
-import { elements, render, textOf } from "@/test/render";
+import { lab4 } from "@/labs/lab-4";
+import { elements, render, texOf, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
 vi.mock("./plotly-chart", () => ({
   PlotlyChart: ({ title }: { title: string }) => <figure>{title}</figure>,
 }));
+
+// The page always opens on the first tab; a test can open it on another tab through this override.
+const openTab = vi.hoisted(() => ({ id: null as string | null }));
+vi.mock("@/labs/lab-state", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/labs/lab-state")>();
+  return {
+    ...actual,
+    initialLabState: (lab: Parameters<typeof actual.initialLabState>[0]) => {
+      const state = actual.initialLabState(lab);
+      return openTab.id ? { ...state, activeId: openTab.id } : state;
+    },
+  };
+});
+
+afterEach(() => {
+  openTab.id = null;
+});
 
 const tabs = (html: string) => {
   const start = html.indexOf('role="group" aria-label=');
@@ -165,5 +183,70 @@ describe("LabPage, Lab 3", () => {
   it("offers “Derive from f” for both f′ and f″", () => {
     const html = render(<LabPage slug="halley-chebyshev" />);
     expect(html.split('aria-label="Derive from f"').length - 1).toBe(2);
+  });
+});
+
+describe("LabPage, Lab 4", () => {
+  it.each([
+    [
+      "en",
+      "Lab 4",
+      "Third-order iterative methods",
+      "Solve f(x) = 0 with the combined tangent method",
+      ["4a · Combined tangent", "4b · Square roots"],
+      "How it works: Combined tangent method",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+    ],
+    [
+      "ro",
+      "Laboratorul 4",
+      "Metode iterative de ordinul trei",
+      "Rezolvă ecuația f(x) = 0 prin metoda combinată a tangentei",
+      ["4a · Metoda combinată a tangentei", "4b · Calculul radicalilor"],
+      "Cum funcționează: Metoda combinată a tangentei",
+      "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+    ],
+  ] as const)("first render in %s", (lang, chip, title, intro, methodTabs, heading, preset) => {
+    const html = render(<LabPage slug="third-order" />, lang);
+    const header = html.slice(0, html.indexOf("</header>"));
+    expect(
+      textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+    ).toBe(chip);
+    expect(textOf(elements(header, "h1")[0])).toBe(title);
+    expect(textOf(elements(header, "p")[0])).toContain(intro);
+    expect(textOf(elements(header, "p")[0])).not.toContain(chip);
+    expect(tabs(html).map(textOf)).toEqual(methodTabs);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    for (const id of ["f", "df", "a", "b", "x0", "eps", "maxIter"]) {
+      expect(html).toContain(`id="field-${id}"`);
+    }
+    for (const id of ["ddf", "dda", "x0Mode"]) expect(html).not.toContain(`"field-${id}`);
+    const pressed = elements(html, "button").filter(
+      (b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'),
+    );
+    expect(pressed.map(textOf)).toEqual([preset]);
+    expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+      lab4.comparisons.length,
+    );
+  });
+
+  it("offers “Derive from f” for f′ only", () => {
+    const html = render(<LabPage slug="third-order" />);
+    expect(html.split('aria-label="Derive from f"').length - 1).toBe(1);
+  });
+
+  it.each([
+    ["en", "Radicand"],
+    ["ro", "Numărul de sub radical"],
+  ] as const)("on the 4b tab in %s, asks only for a, ε and the cap", (lang, radicand) => {
+    openTab.id = "4b";
+    const html = render(<LabPage slug="third-order" />, lang);
+    const fieldIds = [...html.matchAll(/id="field-([\w]+)"/g)].map((m) => m[1]);
+    expect(fieldIds).toEqual(["a", "eps", "maxIter"]);
+    const label = elements(html, "label").find((l) => l.includes('for="field-a"')) ?? "";
+    expect(texOf(label)).toEqual(["a"]);
+    expect(textOf(label)).toContain(radicand);
+    expect(html).not.toContain('aria-label="Derive from f"');
+    expect(html).not.toContain(lang === "en" ? "Derive from f" : "Calculează din f");
   });
 });

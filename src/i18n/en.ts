@@ -27,7 +27,7 @@ export const en = {
   "lab3.title": "Halley's method and Chebyshev-type methods",
   "lab3.topic": "Generalizations of the tangent method",
   "lab4.title": "Third-order iterative methods",
-  "lab4.topic": "Combined tangent method, third-order square root",
+  "lab4.topic": "Combined tangent method and third-order square roots",
   "lab5.title": "Newton's method for 2×2 systems",
   "lab5.topic": "Newton and modified Newton for nonlinear systems",
   "lab6.title": "Successive approximations and Gauss–Seidel",
@@ -307,6 +307,51 @@ export const en = {
     "Approximate the real root of x³ − x − 1 = 0 with Halley's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
   "lab3.compare.chebyshev.task":
     "Approximate the real root of x³ − x − 1 = 0 with Chebyshev's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+
+  "lab4.intro":
+    "Solve f(x) = 0 with the combined tangent method, which follows each tangent step with a second step of the same slope, and compute square roots with a third-order iteration. Then compare the results and iteration counts with the tangent method.",
+  "lab4.method.combinedTangent.tab": "4a · Combined tangent",
+  "lab4.method.combinedTangent.title": "Combined tangent method",
+  "lab4.method.combinedTangent.name": "Combined tangent method",
+  "lab4.method.combinedTangent.idea":
+    "Each step has two stages with the same slope $f'(x_n)$. The first is a tangent-method step, to $y_n = x_n - f(x_n)/f'(x_n)$. The second starts from $(y_n, f(y_n))$ on a line parallel to that tangent and crosses the x-axis at $x_{n+1}$. The derivative is evaluated once per step, and close to a simple root the convergence is cubic:",
+  "lab4.method.combinedTangent.start":
+    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$, and you enter it directly: this algorithm has no rule R0. The interval $[a, b]$ only sets the range of the chart.",
+  "lab4.method.combinedTangent.failure":
+    "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f'(x_n) = 0$, the tangent is horizontal and the method stops with an error. $f$ must also be defined at the helper point $y_n$: a domain error or an overflow can come from there, not only from $x_n$.",
+  "lab4.method.combinedTangent.chart":
+    "The chart draws both stages of each step: the tangent from $(x_n, f(x_n))$ to $(y_n, 0)$, a dotted line to $(y_n, f(y_n))$, and the parallel line from there to $(x_{n+1}, 0)$.",
+
+  "lab4.method.thirdOrderRoot.tab": "4b · Square roots",
+  "lab4.method.thirdOrderRoot.title": "Square roots with the third-order method",
+  "lab4.method.thirdOrderRoot.name": "Third-order method",
+  "lab4.method.thirdOrderRoot.idea":
+    "To approximate $\\sqrt{a}$, with $a > 0$, the method builds the sequence below, using only arithmetic. It is Halley's method applied to $f(x) = x^2 - a$, which is why it converges cubically close to $\\sqrt{a}$:",
+  "lab4.method.thirdOrderRoot.start": "Starting value: $x_0 = a$.",
+  "lab4.method.thirdOrderRoot.chart":
+    "The chart shows $f(x) = x^2 - a$ and follows each step along Halley's tangent hyperbola, from $(x_n, x_n^2 - a)$ to $(x_{n+1}, 0)$.",
+
+  "lab4.preset.combinedEx1": "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+  "lab4.preset.combinedEx2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2",
+  "lab4.preset.rootEx1": "Ex. 1: √2, a = 2",
+  "lab4.preset.rootEx2Sqrt3": "Ex. 2: √3, a = 3",
+  "lab4.preset.rootEx2Sqrt5": "Ex. 2: √5, a = 5",
+
+  "lab4.compare.combinedEx1": "Ex. 1: √2 with the combined tangent method",
+  "lab4.compare.combinedEx2": "Ex. 2: x³ − x − 1 = 0 with the combined tangent method",
+  "lab4.compare.rootEx1": "Ex. 1: √2 with the third-order method",
+  "lab4.compare.rootEx2Sqrt3": "Ex. 2: √3 with the third-order method",
+  "lab4.compare.rootEx2Sqrt5": "Ex. 2: √5 with the third-order method",
+  "lab4.compare.combinedEx1.task":
+    "Approximate the number √2 with the combined tangent method, using f(x) = x² − 2 and f′(x) = 2x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 2x and starts from x₀ = 2.",
+  "lab4.compare.combinedEx2.task":
+    "Approximate the real root of x³ − x − 1 = 0 with the combined tangent method, using f′(x) = 3x² − 1 on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+  "lab4.compare.rootEx1.task":
+    "Approximate √2 with the third-order method, taking a = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 2 and k = 2 and starts from the same x₀ = 2.",
+  "lab4.compare.rootEx2Sqrt3.task":
+    "Approximate √5 with the third-order method. The method converges to √a, so a = 3 gives √3 and a = 5 gives √5; this card uses a = 3. Run it for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 3 and k = 2 and starts from the same x₀ = 3.",
+  "lab4.compare.rootEx2Sqrt5.task":
+    "Approximate √5 with the third-order method. The method converges to √a, so a = 3 gives √3 and a = 5 gives √5; this card uses a = 5. Run it for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 5 and k = 2 and starts from the same x₀ = 5.",
 } as const;
 
 export type MessageKey = keyof typeof en;
