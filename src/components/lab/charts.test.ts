@@ -254,6 +254,13 @@ describe("buildFunctionChart, Halley mode", () => {
     };
     expect(trace(buildFunctionChart(broken, rows, labels), "halley").x).toEqual([2, x1, null]);
   });
+
+  it("draws a straight step when f′(xₙ) is zero or not finite", () => {
+    for (const df of [() => 0, () => Infinity]) {
+      const flat: FunctionPlot = { ...plot, df };
+      expect(trace(buildFunctionChart(flat, rows, labels), "halley").x).toEqual([2, x1, null]);
+    }
+  });
 });
 
 describe("buildFunctionChart, Chebyshev mode", () => {
@@ -299,6 +306,12 @@ describe("buildFunctionChart, Chebyshev mode", () => {
     expect([steps.x[last], steps.y[last]]).toEqual([next, 0]);
     const ys = steps.y.slice(0, last + 1) as number[];
     for (let i = 1; i < ys.length; i++) expect(ys[i]).toBeGreaterThan(ys[i - 1]);
+  });
+
+  it("draws a straight step when the parabola's points overflow", () => {
+    // f′ = 10⁻¹²⁰ makes 2f′³ underflow to 0, so the curved x values are infinite.
+    const steep: FunctionPlot = { ...plot, df: () => 1e-120 };
+    expect(trace(buildFunctionChart(steep, rows, labels), "chebyshev").x).toEqual([2, x1, null]);
   });
 
   it("names the step trace for the legend", () => {

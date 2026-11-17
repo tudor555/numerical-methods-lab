@@ -60,6 +60,17 @@ describe("Lab 3 messages", () => {
     }
   });
 
+  it("keeps the examples out of the method explanations: the presets name them", () => {
+    for (const messages of [en, ro]) {
+      for (const method of ["halley", "chebyshev"]) {
+        for (const part of ["idea", "start", "failure", "chart"]) {
+          const key = `lab3.method.${method}.${part}` as keyof typeof messages;
+          expect(messages[key], key).not.toMatch(/\bex\.|exempl|example|preset/i);
+        }
+      }
+    }
+  });
+
   it("spells Chebyshev the lab's way in Romanian", () => {
     const lab3Texts = Object.entries(ro).filter(([key]) => key.startsWith("lab3."));
     for (const [key, text] of lab3Texts) expect(text, key).not.toMatch(/Ceb[âa]șev|Chebyshev/);
