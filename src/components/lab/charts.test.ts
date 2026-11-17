@@ -18,6 +18,7 @@ const labels: ChartLabels = {
   steffensenSteps: "steffensen",
   halleySteps: "halley",
   chebyshevSteps: "chebyshev",
+  combinedSteps: "combined",
   phi: "phi",
   identity: "identity",
   path: "path",
@@ -317,6 +318,61 @@ describe("buildFunctionChart, Chebyshev mode", () => {
   it("names the step trace for the legend", () => {
     const spec = buildFunctionChart(plot, rows, labels);
     expect(spec?.traces.map((t) => (t as Trace).name)).toContain("chebyshev");
+  });
+});
+
+describe("buildFunctionChart, combined tangent mode", () => {
+  const f = (x: number) => x * x - 2;
+  const plot: FunctionPlot = { kind: "combined-tangent", f, df: (x) => 2 * x, interval: [1, 2] };
+  // Ex. 1 from x₀ = 2: y₀ = 2 − 2/4 = 1.5, f(1.5) = 0.25, x₁ = 1.5 − 0.25/4.
+  const x1 = 1.5 - 0.25 / 4;
+  const rows = [row(0, 2, 2), row(1, x1, f(x1))];
+
+  it("draws Newton's tangent to (yₙ, 0), then the same slope from (yₙ, f(yₙ)) to (xₙ₊₁, 0)", () => {
+    const steps = trace(buildFunctionChart(plot, rows, labels), "combined");
+    expect(steps.x).toEqual([2, 1.5, null, 1.5, x1, null]);
+    expect(steps.y).toEqual([2, 0, null, 0.25, 0, null]);
+    // Both segments have the slope f′(xₙ) = 4.
+    const slope = (i: number) =>
+      ((steps.y[i] as number) - (steps.y[i + 1] as number)) /
+      ((steps.x[i] as number) - (steps.x[i + 1] as number));
+    expect(slope(0)).toBe(4);
+    expect(slope(3)).toBeCloseTo(4, 12);
+  });
+
+  it("joins (yₙ, 0) to (yₙ, f(yₙ)) in the dotted drop-line trace, before the drop at xₙ₊₁", () => {
+    const drops = dropLines(buildFunctionChart(plot, rows, labels));
+    expect(drops.x).toEqual([1.5, 1.5, null, x1, x1, null]);
+    expect(drops.y).toEqual([0, 0.25, null, 0, f(x1), null]);
+  });
+
+  it("falls back to one straight step when f′(xₙ) is zero, not finite or undefined", () => {
+    const throws = () => {
+      throw new Error("undefined");
+    };
+    for (const df of [() => 0, () => Infinity, () => NaN, throws]) {
+      const spec = buildFunctionChart({ ...plot, df }, rows, labels);
+      expect(trace(spec, "combined").x).toEqual([2, x1, null]);
+      expect(trace(spec, "combined").y).toEqual([2, 0, null]);
+      expect(dropLines(spec).x).toEqual([x1, x1, null]);
+    }
+  });
+
+  it("falls back to one straight step when f(yₙ) is undefined or not finite", () => {
+    const at = (bad: (x: number) => number) => (x: number) => (x === 1.5 ? bad(x) : f(x));
+    const throws = () => {
+      throw new Error("undefined");
+    };
+    for (const broken of [at(() => NaN), at(() => Infinity), at(throws)]) {
+      const spec = buildFunctionChart({ ...plot, f: broken }, rows, labels);
+      expect(trace(spec, "combined").x).toEqual([2, x1, null]);
+      expect(dropLines(spec).x).toEqual([x1, x1, null]);
+    }
+  });
+
+  it("names the step trace for the legend", () => {
+    const spec = buildFunctionChart(plot, rows, labels);
+    expect(spec?.traces.map((t) => (t as Trace).name)).toContain("combined");
   });
 });
 
