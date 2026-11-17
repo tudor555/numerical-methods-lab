@@ -9,7 +9,7 @@ The methods, inputs, algorithm steps and worked examples for each of the 13 labs
 - **Rule R0 (choosing x₀):** x₀ = a if f(a)·f″(a) > 0, otherwise x₀ = b. Here f″(a) is either the input value `dda` or the expression `ddf` evaluated at a.
 - **Cauchy problem nodes (Labs 7–9):** inputs x₀, y₀, T, n; h = T/n; xᵢ = x₀ + i·h; output yᵢ for i = 1..n.
 - **ε presets:** "ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}" means run once per value and compare the iteration counts (CAP-7).
-- **Input limits:** interval ends and starting values lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. The limits live in `src/labs/shared-fields.ts`.
+- **Input limits:** interval ends and starting values lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. In Lab 4, 4b's a is in (0, 10⁶]. The limits live in `src/labs/shared-fields.ts`.
 
 ---
 
@@ -51,15 +51,18 @@ Numerical example (Chebyshev, unnumbered in the lab): f = x³ − x − 1 (same 
 
 ## Lab 4: Third-order iterative methods
 
-**4a. Combined tangent method.** xₙ₊₁ = xₙ − f(xₙ)/f′(xₙ) − f(xₙ − f(xₙ)/f′(xₙ)) / f′(xₙ). Inputs: a, b, f, f′, ε, x₀ (chosen so that f(x₀)f″(x₀) > 0).
+**4a. Combined tangent method.** xₙ₊₁ = xₙ − f(xₙ)/f′(xₙ) − f(xₙ − f(xₙ)/f′(xₙ)) / f′(xₙ). Inputs: a, b, f, f′, ε, x₀ (entered directly, chosen so that f(x₀)f″(x₀) > 0; there is no R0, and a, b only set the chart range).
 **4b. Third-order square root.** xₙ₊₁ = xₙ(xₙ² + 3a) / (3xₙ² + a) → √a. x₀ = a. Inputs: a, ε.
 
-Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}):
+4a examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, compare with Newton):
 
-1. 4a, f = x² − 2, f′ = 2x, [1, 2], x₀ = 2. Compare with Newton.
-2. 4a, f = x³ − x − 1, f′ = 3x² − 1, [1, 2], x₀ = 2. Compare with Newton.
-3. 4b, √2 (a = 2). Compare with 1b.
-4. 4b, √3 (a = 3) and √5 (a = 5). Compare with 1b. See Errata.
+1. Approximate √2: f = x² − 2, f′ = 2x, [1, 2], x₀ = 2.
+2. The real root of x³ − x − 1 = 0: f′ = 3x² − 1, [1, 2], x₀ = 2.
+
+4b examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, compare with 1b):
+
+1. √2 (a = 2).
+2. √3 (a = 3) and √5 (a = 5). See Errata.
 
 ## Lab 5: Newton's method for 2×2 nonlinear systems
 
