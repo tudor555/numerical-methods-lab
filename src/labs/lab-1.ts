@@ -12,16 +12,16 @@ import {
   intervalFields,
   manualX0Field,
   maxIterField,
+  radicandRule,
   ruleR0Formula,
   usesRuleR0,
-  VALUE_LIMIT,
   valueRule,
   X,
   x0ModeField,
 } from "./shared-fields";
 import type { MethodDefinition, Preset, ReadyLab } from "./types";
 
-/** Labs 2 and 3 reuse this definition to run Newton next to its own methods in the comparisons. */
+/** Labs 2–4 reuse this definition to run Newton next to its own methods in the comparisons. */
 export const newtonMethod: MethodDefinition = {
   id: "1a",
   tabKey: "lab1.method.newton.tab",
@@ -82,7 +82,8 @@ export const newtonMethod: MethodDefinition = {
   },
 };
 
-const kthRootMethod: MethodDefinition = {
+/** Lab 4 compares its third-order square root with this method. */
+export const kthRootMethod: MethodDefinition = {
   id: "1b",
   tabKey: "lab1.method.kthRoot.tab",
   titleKey: "lab1.method.kthRoot.title",
@@ -102,7 +103,7 @@ const kthRootMethod: MethodDefinition = {
       kind: "number",
       symbol: "c",
       labelKey: "field.c",
-      rule: { positive: true, max: VALUE_LIMIT },
+      rule: radicandRule,
     },
     {
       id: "k",
