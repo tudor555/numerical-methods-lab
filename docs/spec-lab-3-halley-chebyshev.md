@@ -97,8 +97,16 @@ context:
 - Halley's `zero-denominator` needs its own wording (the shared one talks about f taking the same value at two points). `MethodDefinition.errorKeys` maps an error code to a method-specific message key; `runErrorKey` in `components/lab/status.tsx` resolves it for the results panel and the comparison tiles. No new error codes.
 - Charts: a step whose curve can't be drawn (f′ = 0, f′ or f″ undefined at xₙ, or Halley's 2f′² − f f″ ≤ 0) falls back to the straight segment. Each arc is 32 samples plus the exact end point (xₙ₊₁, 0).
 - `startByRuleR0` takes f″ as a number (dda) or a function (ddf); an undefined f″(a) fails before row 0 at x = a.
+- Safeguards beyond the lab's algorithms: the iteration cap; f(xₙ) = 0 keeps xₙ; Halley stops with `zero-denominator` (2f′² − f f″ = 0) and with `zero-derivative` when f′(xₙ) = 0 but f(xₙ) ≠ 0. The lab's formula would return xₙ₊₁ = xₙ there and report convergence at a non-root (triage #1). Chebyshev stops with `zero-derivative`. None of them changes a result on the lab's examples.
 
 ## Spec Change Log
+
+Dev-time decisions after the review pass. The frozen intent above is unchanged.
+
+- 2026-11-17, explanation copy (user request). The Halley and Chebyshev explanations are shorter and clearer, and they no longer name the examples: the presets do that. `idea` follows the tangent method's idea, then names the curve (tangent hyperbola or tangent parabola) and the order of convergence. `start` gives the condition f(x₀)f″(x₀) > 0 and the two options, R0 or manual. EN and RO in step. Commits 622b01f, 0cf9e5f. A test keeps the examples out of the `idea`, `start`, `failure` and `chart` texts.
+- 2026-11-17, phone-width report. The user saw the page cut at the right in the DevTools iPhone 16 Pro Max view (440 px) after a run. Headless Chrome at 440 × 956 with mobile emulation, in RO and EN, after every preset and all three comparisons, and after running at desktop width and then resizing: `scrollWidth` 440, zoom 1, nothing outside the viewport. The screenshot showed the page at 100% with only the left ~370 px visible (DevTools clipping). No code change. Long display formulas scroll inside their own box by design.
+- 2026-11-17, lab conformance audit. Each step, input and formula of both algorithms was checked against the lab sheet (table in Verification). The sheet's algorithms were transcribed literally into an independent script. All 18 comparison runs (3 comparisons × 2 methods × 3 ε) match the app's n and xₙ to 15 decimals.
+- 2026-11-17, validation pass. Three tests close the remaining Lab 3 gaps: the Halley straight-step fallback when f′(xₙ) is 0 or not finite, the Chebyshev fallback when the parabola's points overflow, and the explanation guard above. All Lab 3 files are at 100% lines, branches and functions.
 
 ## Review Triage Log
 
@@ -134,3 +142,18 @@ Review pass 1 (blind = B, edge-case = E, verification-gap = VG).
 **Manual checks:**
 
 - Run every Lab 3 preset and comparison in EN and RO; chart toolbar works; no horizontal scroll at phone width.
+
+**Results (2026-11-17):**
+
+- typecheck clean; 30 files, 525 tests pass; format clean; production build succeeds (`/labs/[slug]` serves `halley-chebyshev`).
+- Coverage: `lab3/halley.ts`, `lab3/chebyshev.ts`, `lab-3.ts`, `shared-fields.ts`, `fields.ts`, `starting-value.ts`, `registry.ts` and `charts.ts` at 100% lines, branches and functions. The uncovered lines left in `lab-page.tsx` and `comparison-panel.tsx` are click handlers, which need DOM testing (deferred-work entry).
+- No e2e suite: the project uses Vitest only (Never list). Instead, a headless Chrome smoke run at 440 px covered every preset and comparison in RO and EN. The user checked the UI in the browser and approved it.
+- Conformance with the lab sheet:
+
+| Lab sheet                                                                                               | App                                                                                      |
+| ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Halley inputs a, b, f, df, ddf, eps; "eventual se dă direct x[0]"                                       | same fields; x₀ by "Rule R0" or "Enter x₀"                                               |
+| Halley step 1: f(a)·ddf(a) > 0 ⇒ x[0] = a, else b                                                       | `startByRuleR0` with ddf                                                                 |
+| Chebyshev inputs a, b, f, df, ddf, eps, x[0]; no R0                                                     | same; a, b set the chart range                                                           |
+| x[1] computed apart, then from n = 1 while \|x[n] − x[n−1]\| ≥ eps; print n, x[n]                       | `scalarIterate`; stats "n" and "xₙ"                                                      |
+| Ex. 1 √2, ex. 2 x³ − x − 1, Chebyshev's numerical example; [1, 2], x[0] = 2, three ε, vs tangent method | presets and comparisons in that order; 3/4/4, 4/4/5, 4/4/5 vs Newton 4/5/6, 5/6/7, 5/6/7 |
