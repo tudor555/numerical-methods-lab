@@ -16,6 +16,8 @@ const labels: ChartLabels = {
   tangents: "tangents",
   secants: "secants",
   steffensenSteps: "steffensen",
+  halleySteps: "halley",
+  chebyshevSteps: "chebyshev",
   phi: "phi",
   identity: "identity",
   path: "path",
@@ -185,6 +187,136 @@ describe("buildFunctionChart, Steffensen mode", () => {
     expect(steps.y).toEqual([5, 0, null, 4.16, 0, null]);
     // x₀ + f(x₀) = 7 would stretch the chart; the curve stays near [a, b].
     expect(Math.max(...(trace(spec, "f").x as number[]))).toBeLessThan(2.1);
+  });
+});
+
+describe("buildFunctionChart, Halley mode", () => {
+  const f = (x: number) => x * x - 2;
+  const plot: FunctionPlot = {
+    kind: "halley",
+    f,
+    df: (x) => 2 * x,
+    ddf: () => 2,
+    interval: [1, 2],
+  };
+  // Halley's x₁ from x₀ = 2 on ex. 1: 2 − 16/28.
+  const x1 = 2 - 16 / 28;
+  const rows = [row(0, 2, 2), row(1, x1, f(x1))];
+
+  /** The points of each step, split at the nulls between steps. */
+  const arcs = (spec: ChartSpec | null) => {
+    const steps = trace(spec, "halley");
+    const result: [number, number][][] = [[]];
+    steps.x.forEach((x, i) => {
+      if (x === null) result.push([]);
+      else result[result.length - 1].push([x, steps.y[i] as number]);
+    });
+    return result.filter((arc) => arc.length > 0);
+  };
+
+  it("draws the tangent hyperbola from (xₙ, f(xₙ)) to (xₙ₊₁, 0)", () => {
+    const [arc] = arcs(buildFunctionChart(plot, rows, labels));
+    expect(arc.length).toBeGreaterThan(2);
+    expect(arc[0]).toEqual([2, 2]);
+    expect(arc[arc.length - 1]).toEqual([x1, 0]);
+    // g(x) = (f + B·t)/(1 + C·t) with C = −f″/(2f′) = −1/4, B = f′ + f·C = 3.5.
+    for (const [x, y] of arc.slice(0, -1)) {
+      const t = x - 2;
+      expect(y).toBeCloseTo((2 + 3.5 * t) / (1 - t / 4), 12);
+    }
+  });
+
+  it("matches f, f′ and f″ at xₙ, and its last sampled point is already close to the axis", () => {
+    const [arc] = arcs(buildFunctionChart(plot, rows, labels));
+    const [, [xa, ya]] = arc;
+    // One small step along the arc follows f to second order.
+    expect(Math.abs(ya - f(xa))).toBeLessThan(Math.abs(xa - 2) ** 3);
+    expect(Math.abs(arc[arc.length - 2][1])).toBeLessThan(0.1);
+  });
+
+  it("draws a straight step when 2f′² − f f″ < 0: the hyperbola's pole lies in between", () => {
+    // At f = 2, f′ = 1, f″ = 20: 2·1 − 2·20 < 0.
+    const pole: FunctionPlot = { ...plot, df: () => 1, ddf: () => 20 };
+    expect(arcs(buildFunctionChart(pole, [row(0, 2, 2), row(1, 2.1, 2.41)], labels))).toEqual([
+      [
+        [2, 2],
+        [2.1, 0],
+      ],
+    ]);
+  });
+
+  it("draws a straight step when f′ or f″ is undefined at xₙ", () => {
+    const broken: FunctionPlot = {
+      ...plot,
+      ddf: () => {
+        throw new Error("undefined");
+      },
+    };
+    expect(trace(buildFunctionChart(broken, rows, labels), "halley").x).toEqual([2, x1, null]);
+  });
+
+  it("draws a straight step when f′(xₙ) is zero or not finite", () => {
+    for (const df of [() => 0, () => Infinity]) {
+      const flat: FunctionPlot = { ...plot, df };
+      expect(trace(buildFunctionChart(flat, rows, labels), "halley").x).toEqual([2, x1, null]);
+    }
+  });
+});
+
+describe("buildFunctionChart, Chebyshev mode", () => {
+  const f = (x: number) => x ** 3 - x - 1;
+  const plot: FunctionPlot = {
+    kind: "chebyshev",
+    f,
+    df: (x) => 3 * x * x - 1,
+    ddf: (x) => 6 * x,
+    interval: [1, 2],
+  };
+  const x1 = 2 - 5 / 11 - 300 / (2 * 11 ** 3);
+  const rows = [row(0, 2, 5), row(1, x1, f(x1))];
+
+  it("draws the tangent parabola x(y) from (xₙ, f(xₙ)) to (xₙ₊₁, 0)", () => {
+    const steps = trace(buildFunctionChart(plot, rows, labels), "chebyshev");
+    const last = steps.x.length - 2;
+    expect([steps.x[0], steps.y[0]]).toEqual([2, 5]);
+    expect([steps.x[last], steps.y[last]]).toEqual([x1, 0]);
+    expect(steps.x[last + 1]).toBeNull();
+    // x(y) = xₙ + (y − f)/f′ − f″(y − f)²/(2f′³), with f = 5, f′ = 11, f″ = 12.
+    for (let i = 0; i < last; i++) {
+      const u = (steps.y[i] as number) - 5;
+      expect(steps.x[i]).toBeCloseTo(2 + u / 11 - (12 * u * u) / (2 * 11 ** 3), 12);
+    }
+    // The y values run from f(xₙ) down to 0, so the parabola is drawn sideways.
+    expect(steps.y.slice(0, last + 1)).toEqual(
+      [...steps.y.slice(0, last + 1)].sort((a, b) => b! - a!),
+    );
+  });
+
+  it("draws the arc upward from a point below the axis, f(xₙ) < 0", () => {
+    // From x = 1.2: f = −0.472, f′ = 3.32, f″ = 7.2.
+    const x0 = 1.2;
+    const f0 = f(x0);
+    const next = x0 - f0 / 3.32 - (f0 * f0 * 7.2) / (2 * 3.32 ** 3);
+    const steps = trace(
+      buildFunctionChart(plot, [row(0, x0, f0), row(1, next, f(next))], labels),
+      "chebyshev",
+    );
+    const last = steps.x.length - 2;
+    expect([steps.x[0], steps.y[0]]).toEqual([x0, f0]);
+    expect([steps.x[last], steps.y[last]]).toEqual([next, 0]);
+    const ys = steps.y.slice(0, last + 1) as number[];
+    for (let i = 1; i < ys.length; i++) expect(ys[i]).toBeGreaterThan(ys[i - 1]);
+  });
+
+  it("draws a straight step when the parabola's points overflow", () => {
+    // f′ = 10⁻¹²⁰ makes 2f′³ underflow to 0, so the curved x values are infinite.
+    const steep: FunctionPlot = { ...plot, df: () => 1e-120 };
+    expect(trace(buildFunctionChart(steep, rows, labels), "chebyshev").x).toEqual([2, x1, null]);
+  });
+
+  it("names the step trace for the legend", () => {
+    const spec = buildFunctionChart(plot, rows, labels);
+    expect(spec?.traces.map((t) => (t as Trace).name)).toContain("chebyshev");
   });
 });
 

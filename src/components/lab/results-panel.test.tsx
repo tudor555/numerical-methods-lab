@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
+import { lab3 } from "@/labs/lab-3";
 import type { RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
@@ -17,9 +18,11 @@ vi.mock("./plotly-chart", () => ({
   ),
 }));
 
-/** Prepares and runs a Lab 1 or Lab 2 method like the page does. */
+const allMethods = [...lab1.methods, ...lab2.methods, ...lab3.methods];
+
+/** Prepares and runs a Lab 1, 2 or 3 method like the page does. */
 function view(methodId: string, patch: FieldValues = {}): RunView {
-  const method = [...lab1.methods, ...lab2.methods].find((m) => m.id === methodId);
+  const method = allMethods.find((m) => m.id === methodId);
   if (!method) throw new Error(methodId);
   const prepared = method.prepare({ ...method.defaults, ...patch });
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
@@ -208,5 +211,61 @@ describe("ResultsPanel for Lab 2", () => {
     );
     expect(elements(html.slice(html.indexOf("<tbody")), "tr")).toHaveLength(2);
     expect(message(panel(failed, "ro"))).toMatch(/^Numitorul se anulează la n = 1, în xₙ = -1/);
+  });
+});
+
+describe("ResultsPanel for Lab 3", () => {
+  const halley = allMethods.find((m) => m.id === "3a");
+
+  it.each([
+    ["3a", "en", "f(x) with Halley's tangent hyperbolas", "Tangent hyperbolas"],
+    ["3b", "en", "f(x) with Chebyshev's tangent parabolas", "Tangent parabolas"],
+    ["3a", "ro", "Graficul lui f și hiperbolele tangente", "Hiperbole tangente"],
+    ["3b", "ro", "Graficul lui f și parabolele tangente", "Parabole tangente"],
+  ] as const)(
+    "titles the %s function chart in %s and names its steps",
+    (methodId, lang, title, name) => {
+      const html = panel(view(methodId), lang);
+      expect(figures(html)).toEqual([
+        title,
+        lang === "en"
+          ? "Convergence: |xₙ − xₙ₋₁| on a log scale"
+          : "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
+      ]);
+      expect(traceNames(html)[1]).toBe(name);
+    },
+  );
+
+  it("shows the Halley preset's x₀ = 2 as entered, and R0's pick when chosen", () => {
+    const [, n, start] = stats(panel(view("3a")));
+    expect(n.value).toBe("3");
+    expect(start.value).toBe("2");
+    expect(start.label).not.toContain("R0");
+    const [, , byRule] = stats(panel(view("3a", { x0Mode: "r0", x0: "" })));
+    expect(byRule.label).toContain("chosen by R0 (x₀ = b)");
+  });
+
+  it("names Halley's own denominator when it is zero, and keeps row 0", () => {
+    const failed = view("3a", { f: "x - 1", df: "1", ddf: "2", a: "0" });
+    const html = render(
+      <ResultsPanel view={failed} valueColumn="f(x_n)" errorKeys={halley?.errorKeys} />,
+    );
+    expect(message(html)).toBe(
+      "The denominator 2f′(xₙ)² − f(xₙ)f″(xₙ) is zero at n = 0, xₙ = 2, so xₙ₊₁ is undefined. " +
+        "The iterations computed before the error are kept below.",
+    );
+    expect(elements(html.slice(html.indexOf("<tbody")), "tr")).toHaveLength(1);
+    const ro = render(
+      <ResultsPanel view={failed} valueColumn="f(x_n)" errorKeys={halley?.errorKeys} />,
+      "ro",
+    );
+    expect(message(ro)).toMatch(
+      /^Numitorul 2f′\(xₙ\)² − f\(xₙ\)f″\(xₙ\) se anulează la n = 0, în xₙ = 2/,
+    );
+  });
+
+  it("gives Chebyshev's zero derivative the same message as Newton's", () => {
+    const failed = view("3b", { f: "x^2 - 2", df: "2x", ddf: "2", a: "-1", x0: "0" });
+    expect(message(panel(failed))).toMatch(/^The derivative is zero at n = 0, xₙ = 0\./);
   });
 });

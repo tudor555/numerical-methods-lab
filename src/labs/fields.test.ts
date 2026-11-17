@@ -162,6 +162,11 @@ describe("deriveField", () => {
     expect(deriveField(df, fields, { f: "x^2" })).toEqual({ ok: true, value: "2 * x" });
   });
 
+  it("fills an expression field with the second derivative when its order is 2", () => {
+    const ddf: ExpressionField = { ...expression("ddf"), derive: { from: "f", order: 2 } };
+    expect(deriveField(ddf, [f, ddf], { f: "x^3 - x - 1" })).toEqual({ ok: true, value: "6 * x" });
+  });
+
   it("fills a number field with the derivative of the given order, evaluated at another field", () => {
     expect(deriveField(second, fields, { f: "x^3", a: "2" })).toEqual({ ok: true, value: "12" });
   });

@@ -34,6 +34,7 @@ describe("/labs/[slug]", () => {
   it.each([
     ["newton", "Newton's method and k-th roots"],
     ["secant-steffensen", "Secant and Steffensen methods"],
+    ["halley-chebyshev", "Halley's method and Chebyshev-type methods"],
   ])("renders the lab page for the ready lab /labs/%s", async (slug, title) => {
     const element = await LabRoute(props(slug));
     const html = render(element);
@@ -43,7 +44,7 @@ describe("/labs/[slug]", () => {
 
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "halley-chebyshev"],
+    ["a lab that is not built yet", "third-order"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -67,6 +68,18 @@ describe("/labs/[slug] metadata", () => {
     });
   });
 
+  it("names Lab 3 in its metadata, in both languages", async () => {
+    await expect(generateMetadata(props("halley-chebyshev"))).resolves.toEqual({
+      title: "Lab 3: Halley's method and Chebyshev-type methods",
+      description: "Generalizations of the tangent method",
+    });
+    cookieJar.set(LANG_COOKIE, "ro");
+    await expect(generateMetadata(props("halley-chebyshev"))).resolves.toEqual({
+      title: "Laboratorul 3: Metoda lui Halley și metode de tip Cebîșev",
+      description: "Generalizări ale metodei tangentei",
+    });
+  });
+
   it("is in Romanian when the language cookie is ro", async () => {
     cookieJar.set(LANG_COOKIE, "ro");
     await expect(generateMetadata(props("newton"))).resolves.toEqual({
@@ -76,6 +89,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("halley-chebyshev"))).resolves.toEqual({});
+    await expect(generateMetadata(props("third-order"))).resolves.toEqual({});
   });
 });

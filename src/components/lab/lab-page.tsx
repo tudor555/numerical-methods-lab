@@ -131,7 +131,11 @@ function LabView({ lab }: { lab: ReadyLab }) {
 
         <Section id="results" title={t("lab.section.results")}>
           {run ? (
-            <ResultsPanel view={run} valueColumn={method.valueColumn} />
+            <ResultsPanel
+              view={run}
+              valueColumn={method.valueColumn}
+              errorKeys={method.errorKeys}
+            />
           ) : (
             <div className="border-border text-muted-foreground flex items-center gap-4 rounded-xl border border-dashed p-6 text-base lg:min-h-80 lg:flex-col lg:justify-center lg:text-center">
               <ChartLine className="size-6 shrink-0" aria-hidden />

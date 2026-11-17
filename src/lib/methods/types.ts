@@ -4,7 +4,8 @@ export type RunStatus = "converged" | "max-iterations" | "error";
  * Why a run stopped without a valid result.
  * - `zero-derivative`: a denominator such as f′(xₙ) is exactly 0.
  * - `zero-denominator`: a difference of f values in the denominator is exactly 0, as in
- *   f(xₙ) − f(xₙ₋₁) for the secant method or f(xₙ + f(xₙ)) − f(xₙ) for Steffensen's.
+ *   f(xₙ) − f(xₙ₋₁) for the secant method or f(xₙ + f(xₙ)) − f(xₙ) for Steffensen's, or Halley's
+ *   2f′(xₙ)² − f(xₙ)f″(xₙ) is exactly 0.
  * - `undefined-value`: a value is NaN (for example √ of a negative number).
  * - `overflow`: a value is ±∞.
  * - `diverged`: |xₙ| exceeded {@link DIVERGENCE_LIMIT}.

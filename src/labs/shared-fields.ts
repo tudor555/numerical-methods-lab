@@ -20,6 +20,24 @@ export const functionField: FieldDefinition = {
   variables: X,
 };
 
+export const derivativeField: FieldDefinition = {
+  id: "df",
+  kind: "expression",
+  symbol: "f'(x)",
+  labelKey: "field.df",
+  variables: X,
+  derive: { from: "f" },
+};
+
+export const secondDerivativeField: FieldDefinition = {
+  id: "ddf",
+  kind: "expression",
+  symbol: "f''(x)",
+  labelKey: "field.ddf",
+  variables: X,
+  derive: { from: "f", order: 2 },
+};
+
 export const intervalFields: readonly FieldDefinition[] = [
   { id: "a", kind: "number", symbol: "a", labelKey: "field.a", rule: valueRule },
   { id: "b", kind: "number", symbol: "b", labelKey: "field.b", rule: valueRule },
@@ -29,6 +47,31 @@ export const ruleR0Formula: ExplanationBlock = {
   kind: "formula",
   tex: "x_0 = \\begin{cases} a, & \\text{⟪if⟫}\\ f(a)\\,f''(a) > 0 \\\\ b, & \\text{⟪if⟫}\\ f(a)\\,f''(a) \\le 0 \\end{cases}",
   words: { if: "math.if" },
+};
+
+/** True unless the user chose to type x₀ in directly. */
+export const usesRuleR0 = (values: FieldValues) => values.x0Mode !== "manual";
+
+/** The switch between rule R0 and a typed-in x₀. */
+export const x0ModeField: FieldDefinition = {
+  id: "x0Mode",
+  kind: "choice",
+  symbol: "x_0",
+  labelKey: "field.x0Mode",
+  options: [
+    { value: "r0", labelKey: "field.x0Mode.r0" },
+    { value: "manual", labelKey: "field.x0Mode.manual" },
+  ],
+};
+
+/** x₀ typed in directly; shown only when the x₀ switch is on "Enter x₀". */
+export const manualX0Field: FieldDefinition = {
+  id: "x0",
+  kind: "number",
+  symbol: "x_0",
+  labelKey: "field.x0",
+  rule: valueRule,
+  visibleWhen: (values) => !usesRuleR0(values),
 };
 
 /** The R0 input dda = f″(a). Lab 1 hides it when the user types x₀ in directly. */
@@ -60,6 +103,9 @@ export const maxIterField: FieldDefinition = {
   // Runs are synchronous, so the cap bounds how long a run that never converges can block the page.
   rule: { integer: true, min: 1, max: 100000 },
 };
+
+/** The precisions the labs' comparisons run over: ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}. */
+export const EPS_SET = [1e-4, 1e-8, 1e-12] as const;
 
 /** Adds the "b must be greater than a" error when both ends parsed. */
 export function checkInterval({ numbers, errors }: ParsedFields): void {

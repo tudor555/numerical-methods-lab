@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
+import { lab3 } from "@/labs/lab-3";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -147,5 +148,69 @@ describe("ComparisonPanel for Lab 2", () => {
     for (const n of ns) expect(textOf(html)).toContain(n);
     // Newton's row names its start, which the lab leaves open.
     expect(texOf(rows[1])[0]).toBe(`${f},\\ x_0 = 2\\ (\\mathrm{R0})`);
+  });
+});
+
+describe("ComparisonPanel for Lab 3", () => {
+  it("shows the three comparisons with Newton, each with its task", () => {
+    const html = render(<ComparisonPanel lab={lab3} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 1: √2 prin metoda lui Halley",
+      "Ex. 2: x³ − x − 1 = 0 prin metoda lui Halley",
+      "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Cebîșev",
+    ]);
+    for (const card of cards(html)) {
+      expect(textOf(card)).toContain("Cerința:");
+      expect(textOf(card)).toContain("metoda tangentei");
+    }
+  });
+
+  it.each([
+    ["en", "ex1", ["Halley's method", "Tangent method"], ["n = 3", "n = 4", "n = 6"], "x^2 - 2"],
+    [
+      "ro",
+      "chebyshev",
+      ["Metoda lui Cebîșev", "Metoda tangentei"],
+      ["n = 4", "n = 5", "n = 7"],
+      "x^3 - x - 1",
+    ],
+  ] as const)("in %s, %s names both methods and shows n for each ε", (lang, id, names, ns, f) => {
+    const comparison = lab3.comparisons.find((c) => c.id === id);
+    if (!comparison) throw new Error(id);
+    const html = render(
+      <ComparisonResults
+        lab={lab3}
+        comparison={comparison}
+        cells={runComparison(lab3, comparison)}
+      />,
+      lang,
+    );
+    const rows = elements(html, "li");
+    expect(rows).toHaveLength(2);
+    rows.forEach((row, i) => expect(textOf(row)).toContain(names[i]));
+    for (const n of ns) expect(textOf(html)).toContain(n);
+    expect(texOf(rows[1])[0]).toBe(`${f},\\ x_0 = 2`);
+  });
+
+  it("explains a failed Halley tile with Halley's own denominator", () => {
+    const comparison = lab3.comparisons[0];
+    const failed: ScalarRunResult = {
+      status: "error",
+      result: null,
+      n: 0,
+      iterations: [{ n: 0, x: 2, fx: 1, diff: null }],
+      error: { code: "zero-denominator", n: 0, x: 2 },
+    };
+    const html = render(
+      <ComparisonResults
+        lab={lab3}
+        comparison={comparison}
+        cells={[
+          [failed, null, null],
+          [null, null, null],
+        ]}
+      />,
+    );
+    expect(textOf(html)).toContain("The denominator 2f′(xₙ)² − f(xₙ)f″(xₙ) is zero at n = 0");
   });
 });

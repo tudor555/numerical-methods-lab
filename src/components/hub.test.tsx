@@ -23,16 +23,26 @@ describe("Hub", () => {
     expect(second).not.toContain("Coming soon");
   });
 
-  it("shows labs 3–13 as coming soon, without a link", () => {
-    const rest = cards("en").slice(2);
-    expect(rest).toHaveLength(11);
+  it("links Lab 3 to /labs/halley-chebyshev", () => {
+    const third = cards("en")[2];
+    expect(third).toContain('href="/labs/halley-chebyshev"');
+    expect(third).toContain(
+      'aria-label="Lab 3: Halley&#x27;s method and Chebyshev-type methods. Open lab"',
+    );
+    expect(textOf(third)).toContain("Generalizations of the tangent method");
+    expect(third).not.toContain("Coming soon");
+  });
+
+  it("shows labs 4–13 as coming soon, without a link", () => {
+    const rest = cards("en").slice(3);
+    expect(rest).toHaveLength(10);
     rest.forEach((card, i) => {
-      expect(textOf(card)).toContain(`Lab ${i + 3}`);
+      expect(textOf(card)).toContain(`Lab ${i + 4}`);
       expect(card).toContain("Coming soon");
       expect(card).toContain('aria-disabled="true"');
       expect(card).not.toContain("<a ");
     });
-    expect(count(render(<Hub />), "href=")).toBe(2);
+    expect(count(render(<Hub />), "href=")).toBe(3);
   });
 
   it("renders in Romanian", () => {
@@ -41,7 +51,9 @@ describe("Hub", () => {
     expect(textOf(html)).toContain("Laboratorul 1");
     expect(textOf(html)).toContain("Metoda tangentei și rădăcinile de ordinul k");
     expect(textOf(html)).toContain("Metoda secantei și metoda lui Steffensen");
-    expect(count(html, "În curând")).toBe(11);
+    expect(textOf(html)).toContain("Metoda lui Halley și metode de tip Cebîșev");
+    expect(textOf(html)).toContain("Generalizări ale metodei tangentei");
+    expect(count(html, "În curând")).toBe(10);
     expect(html).not.toContain("Coming soon");
   });
 });

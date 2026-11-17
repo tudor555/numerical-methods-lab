@@ -6,6 +6,7 @@ import {
   checkInterval,
   ddaField,
   epsField,
+  EPS_SET,
   functionField,
   intervalFields,
   maxIterField,
@@ -149,8 +150,6 @@ function newtonPreset(id: string, f: string, tex: string): ComparisonPreset {
   }
   return { id, methodId: newtonMethod.id, tex, values };
 }
-
-const EPS_SET = [1e-4, 1e-8, 1e-12] as const;
 
 export const lab2: ReadyLab = {
   number: 2,
