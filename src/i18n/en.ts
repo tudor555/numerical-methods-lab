@@ -270,9 +270,9 @@ export const en = {
   "lab3.method.halley.title": "Halley's method",
   "lab3.method.halley.name": "Halley's method",
   "lab3.method.halley.idea":
-    "Halley's method also uses the second derivative. Near $x_n$, the graph of $f$ is replaced by the tangent hyperbola: a hyperbola with the same value, slope and curvature as $f$ at $x_n$. The next iterate, $x_{n+1}$, is where this hyperbola crosses the x-axis. Close to a simple root the convergence is cubic, one order faster than the tangent method:",
+    "Halley's method starts from the same idea as the tangent method: near $x_n$, the graph of $f$ is replaced by a simpler curve, and the next iterate, $x_{n+1}$, is where that curve crosses the x-axis. The difference is the curve. The tangent line matches the value and slope of $f$ at $x_n$ but ignores how the graph bends. Halley's method uses the tangent hyperbola instead, which also matches the curvature of $f$ at $x_n$, given by the second derivative $f''(x_n)$. Because it follows the graph more closely, each step lands nearer the root: close to a simple root the convergence is cubic (the number of correct digits roughly triples each iteration), while the tangent method's is quadratic (it roughly doubles):",
   "lab3.method.halley.start":
-    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$. Rule R0 picks it from the sign of $f(a)\\,f''(a)$, with $f''$ taken from the field f″(x). Ex. 1 and ex. 2 give $x_0 = 2$ directly, so their presets use “Enter x₀”. Choose “Rule R0” and the algorithm picks $x_0$ itself (2 here as well).",
+    "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$, that is, the function and its second derivative have the same sign at $x_0$. There are two options: with “Rule R0”, the algorithm picks one end of $[a, b]$ from the sign of $f(a)\\,f''(a)$, with $f''$ taken from the field f″(x); with “Enter x₀”, you type $x_0$ directly.",
   "lab3.method.halley.failure":
     "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $2f'(x_n)^2 - f(x_n)\\,f''(x_n) = 0$, the denominator is zero and the method stops with an error. If $f'(x_n) = 0$ while $f(x_n) \\ne 0$, the step would leave $x_n$ unchanged without reaching a root, so the method stops with an error as well.",
   "lab3.method.halley.chart":
@@ -284,7 +284,7 @@ export const en = {
   "lab3.method.chebyshev.title": "Chebyshev's method",
   "lab3.method.chebyshev.name": "Chebyshev's method",
   "lab3.method.chebyshev.idea":
-    "Chebyshev's method adds a second-derivative correction to the tangent step. Near $x_n$, the graph of $f$ is replaced by the tangent parabola: a parabola with its axis parallel to the x-axis and the same value, slope and curvature as $f$ at $x_n$. The next iterate, $x_{n+1}$, is where this parabola crosses the x-axis. Close to a simple root the convergence is cubic, like Halley's:",
+    "Chebyshev's method also starts from the idea of the tangent method: near $x_n$, the graph of $f$ is replaced by a simpler curve, and the next iterate, $x_{n+1}$, is where that curve crosses the x-axis. Here the curve is the tangent parabola: a parabola with its axis parallel to the x-axis and the same value, slope and curvature as $f$ at $x_n$. The formula is the tangent step plus a correction that uses the second derivative. Close to a simple root the convergence is cubic, like Halley's:",
   "lab3.method.chebyshev.start":
     "The starting value $x_0$ must satisfy $f(x_0)\\,f''(x_0) > 0$, and you enter it directly: this algorithm has no rule R0. The interval $[a, b]$ only sets the range of the chart.",
   "lab3.method.chebyshev.failure":
