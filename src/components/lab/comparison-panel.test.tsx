@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
+import { lab4 } from "@/labs/lab-4";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -11,6 +12,19 @@ const cards = (html: string) =>
   html.split('<div class="border-border bg-card flex min-w-0 flex-col gap-4').slice(1);
 
 describe("ComparisonPanel", () => {
+  it("leaves a row out of the inputs when its method or preset is unknown", () => {
+    const comparison = {
+      ...lab1.comparisons[0],
+      rows: [
+        { methodId: "nope", presetId: "ex1" },
+        { methodId: "1a", presetId: "nope" },
+        { methodId: "1a", presetId: "ex1" },
+      ],
+    };
+    const html = render(<ComparisonPanel lab={{ ...lab1, comparisons: [comparison] }} />);
+    expect(elements(html, "dt").map(textOf)).toEqual(["Tangent method", "Precision"]);
+  });
+
   it("shows one card per comparison, in the lab's order", () => {
     const html = render(<ComparisonPanel lab={lab1} />);
     expect(cards(html)).toHaveLength(lab1.comparisons.length);
@@ -40,7 +54,8 @@ describe("ComparisonPanel", () => {
   it("shows no results before a comparison runs", () => {
     const html = render(<ComparisonPanel lab={lab1} />);
     expect(html).not.toContain("<ul");
-    expect(textOf(html)).not.toContain("n = ");
+    // Not "\\varepsilon = …" from the inputs: an n tile starts the word.
+    expect(textOf(html)).not.toMatch(/(^|[^a-z])n = \d/);
     expect(textOf(html)).not.toContain("Each cell shows");
   });
 });
@@ -212,5 +227,98 @@ describe("ComparisonPanel for Lab 3", () => {
       />,
     );
     expect(textOf(html)).toContain("The denominator 2f′(xₙ)² − f(xₙ)f″(xₙ) is zero at n = 0");
+  });
+});
+
+describe("ComparisonPanel for Lab 4", () => {
+  it("shows the four comparisons in the lab's order, each with its task", () => {
+    const html = render(<ComparisonPanel lab={lab4} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 1: √2 prin metoda combinată a tangentei",
+      "Ex. 2: x³ − x − 1 = 0 prin metoda combinată a tangentei",
+      "Ex. 1: √2 prin metoda de ordinul 3",
+      "Ex. 2: √3 și √5 prin metoda de ordinul 3",
+    ]);
+    cards(html).forEach((card, i) => {
+      expect(textOf(card)).toContain("Cerința:");
+      if (i < 2) {
+        expect(textOf(card)).toContain("metoda tangentei");
+        expect(textOf(card)).not.toContain("metoda iterativă adaptată");
+      } else {
+        expect(textOf(card)).toContain(
+          "metoda iterativă adaptată în urma folosirii metodei tangentei",
+        );
+      }
+    });
+  });
+
+  it("lists each row's inputs before the run, so the task text stays short", () => {
+    const [combined, , , roots] = cards(render(<ComparisonPanel lab={lab4} />, "ro"));
+    expect(textOf(combined)).toContain("Date de intrare");
+    expect(elements(combined, "dt").map(textOf)).toEqual([
+      "Metoda combinată a tangentei",
+      "Metoda tangentei",
+      "Precizia",
+    ]);
+    expect(texOf(combined)).toEqual([
+      "f(x) = { x}^{2}-2",
+      "f'(x) = 2 x",
+      "[a;\\ b] = [1;\\ 2]",
+      "x_0 = 2",
+      "f(x) = { x}^{2}-2",
+      "f'(x) = 2 x",
+      "[a;\\ b] = [1;\\ 2]",
+      "x_0 = 2",
+      "\\varepsilon = 10^{-4},\\ 10^{-8},\\ 10^{-12}",
+    ]);
+    // √3 and √5 sit in one card: a = 3 next to c = 3, then a = 5 next to c = 5.
+    expect(texOf(roots).slice(0, -1)).toEqual([
+      "a = 3",
+      "c = 3",
+      "k = 2",
+      "a = 5",
+      "c = 5",
+      "k = 2",
+    ]);
+  });
+
+  it("names rule R0 for Newton's start in Lab 2, in words", () => {
+    const [first] = cards(render(<ComparisonPanel lab={lab2} />));
+    expect(textOf(first)).toContain(": Rule R0");
+    expect(texOf(first)).toContain("\\mathrm{dda} = f''(a) = 2");
+    expect(texOf(first)).toContain("x_1 = 1.4");
+  });
+
+  it.each([
+    [
+      "en",
+      "combined-ex2",
+      ["Combined tangent method", "Tangent method"],
+      ["n = 4", "n = 5", "n = 7"],
+      "x^3 - x - 1,\\ x_0 = 2",
+    ],
+    [
+      "ro",
+      "root-ex1",
+      ["Metoda de ordinul 3", "Metoda tangentei"],
+      ["n = 3", "n = 4", "n = 6"],
+      "\\sqrt{2}",
+    ],
+  ] as const)("in %s, %s names both methods and shows n for each ε", (lang, id, names, ns, tex) => {
+    const comparison = lab4.comparisons.find((c) => c.id === id);
+    if (!comparison) throw new Error(id);
+    const html = render(
+      <ComparisonResults
+        lab={lab4}
+        comparison={comparison}
+        cells={runComparison(lab4, comparison)}
+      />,
+      lang,
+    );
+    const rows = elements(html, "li");
+    expect(rows).toHaveLength(2);
+    rows.forEach((row, i) => expect(textOf(row)).toContain(names[i]));
+    for (const n of ns) expect(textOf(html)).toContain(n);
+    expect(texOf(rows[1])[0]).toBe(tex);
   });
 });

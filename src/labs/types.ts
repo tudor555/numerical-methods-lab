@@ -57,6 +57,13 @@ export type FunctionPlot =
       ddf: (x: number) => number;
       interval?: readonly [number, number];
     }
+  | {
+      /** The combined tangent method needs f′(xₙ) to draw both of its tangent steps. */
+      kind: "combined-tangent";
+      f: (x: number) => number;
+      df: (x: number) => number;
+      interval?: readonly [number, number];
+    }
   | { kind: "cobweb"; phi: (x: number) => number };
 
 /** A known exact solution, e.g. ᵏ√c for the k-th root. `tex` names it in headers. */

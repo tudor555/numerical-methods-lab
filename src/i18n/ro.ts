@@ -31,7 +31,7 @@ export const ro: Record<MessageKey, string> = {
   "lab3.title": "Metoda lui Halley și metode de tip Cebîșev",
   "lab3.topic": "Generalizări ale metodei tangentei",
   "lab4.title": "Metode iterative de ordinul trei",
-  "lab4.topic": "Metoda tangentei combinate și o rădăcină pătrată de ordinul trei",
+  "lab4.topic": "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
   "lab5.title": "Metoda lui Newton pentru sisteme 2×2",
   "lab5.topic": "Metoda lui Newton și metoda Newton modificată pentru sisteme neliniare",
   "lab6.title": "Aproximații succesive și metoda Gauss–Seidel",
@@ -144,6 +144,7 @@ export const ro: Record<MessageKey, string> = {
   "chart.steffensen": "Graficul lui f și pașii metodei lui Steffensen",
   "chart.halley": "Graficul lui f și hiperbolele tangente",
   "chart.chebyshev": "Graficul lui f și parabolele tangente",
+  "chart.combinedTangent": "Graficul lui f și pașii metodei combinate a tangentei",
   "chart.cobweb": "Graficul lui φ, dreapta y = x și traseul iterațiilor",
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
@@ -160,6 +161,7 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.steffensenSteps": "Pașii metodei lui Steffensen",
   "chart.trace.halleySteps": "Hiperbole tangente",
   "chart.trace.chebyshevSteps": "Parabole tangente",
+  "chart.trace.combinedSteps": "Pașii metodei combinate",
   "chart.trace.phi": "φ(x)",
   "chart.trace.identity": "y = x",
   "chart.trace.path": "Traseul iterațiilor",
@@ -172,6 +174,8 @@ export const ro: Record<MessageKey, string> = {
   "compare.hint": "Fiecare celulă arată numărul de iterații n și ultima iterație xₙ.",
   "compare.cell.error": "Eroare",
   "compare.cell.max": "Limită atinsă",
+  "compare.inputs": "Date de intrare",
+  "compare.precisions": "Precizia",
 
   "lab1.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda tangentei a lui Newton, calculează rădăcinile de ordinul k folosind aceeași idee și compară rezultatele cu cele obținute prin metoda aproximațiilor succesive.",
@@ -263,11 +267,11 @@ export const ro: Record<MessageKey, string> = {
   "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0 prin metoda secantei",
   "lab2.compare.steffensen": "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Steffensen",
   "lab2.compare.ex1.task":
-    "Aproximează numărul √2 prin metoda secantei, folosind f(x) = x² − 2, intervalul [1; 2] și valorile inițiale x₀ = 2 și x₁ = 1,4, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție și același interval, cu derivata calculată din f și iterația inițială x₀ = 2, dată de regula R0.",
+    "Aproximează numărul √2 prin metoda secantei și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
   "lab2.compare.ex2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda secantei, cu intervalul [1; 2] și valorile inițiale x₀ = 2 și x₁ = 1,5, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție și același interval, cu derivata calculată din f și iterația inițială x₀ = 2, dată de regula R0.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda secantei și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
   "lab2.compare.steffensen.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Steffensen, cu intervalul [1; 2] și valoarea inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Ambele metode pornesc din x₀ = 2, dată de regula R0, iar metoda tangentei folosește derivata calculată din f.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Steffensen și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
 
   "lab3.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda lui Halley și prin metoda lui Cebîșev, două generalizări ale metodei tangentei care folosesc și derivata a doua. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
@@ -305,9 +309,51 @@ export const ro: Record<MessageKey, string> = {
   "lab3.compare.ex2": "Ex. 2: x³ − x − 1 = 0 prin metoda lui Halley",
   "lab3.compare.chebyshev": "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Cebîșev",
   "lab3.compare.ex1.task":
-    "Aproximează numărul √2 prin metoda lui Halley, folosind f(x) = x² − 2, f′(x) = 2x și f″(x) = 2, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 2x și iterația inițială x₀ = 2.",
+    "Aproximează numărul √2 prin metoda lui Halley și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab3.compare.ex2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Halley, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Halley și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab3.compare.chebyshev.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Cebîșev, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Cebîșev și compară rezultatele cu cele obținute prin metoda tangentei.",
+
+  "lab4.intro":
+    "Rezolvă ecuația f(x) = 0 prin metoda combinată a tangentei, care adaugă fiecărui pas al metodei tangentei un al doilea pas cu aceeași pantă, și calculează radicalii cu o metodă de ordinul 3. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
+  "lab4.method.combinedTangent.tab": "4a · Metoda combinată a tangentei",
+  "lab4.method.combinedTangent.title": "Metoda combinată a tangentei",
+  "lab4.method.combinedTangent.name": "Metoda combinată a tangentei",
+  "lab4.method.combinedTangent.idea":
+    "Fiecare pas are două etape cu aceeași pantă $f'(x_n)$. Prima este un pas al metodei tangentei, până în punctul $y_n = x_n - f(x_n)/f'(x_n)$. A doua pornește din $(y_n, f(y_n))$ pe o dreaptă paralelă cu tangenta și intersectează axa $Ox$ în $x_{n+1}$. Derivata se calculează o singură dată la fiecare pas, iar în apropierea unei rădăcini simple convergența este cubică:",
+  "lab4.method.combinedTangent.start":
+    "Iterația inițială $x_0$ trebuie aleasă astfel încât $f(x_0)\\,f''(x_0) > 0$ și se introduce direct: acest algoritm nu folosește regula R0. Intervalul $[a; b]$ stabilește doar porțiunea afișată pe grafic.",
+  "lab4.method.combinedTangent.failure":
+    "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f'(x_n) = 0$, tangenta este orizontală și metoda se oprește cu eroare. Funcția $f$ trebuie să fie definită și în punctul auxiliar $y_n$: o eroare de domeniu sau o depășire poate apărea și acolo, nu doar în $x_n$.",
+  "lab4.method.combinedTangent.chart":
+    "Graficul arată ambele etape ale fiecărui pas: tangenta de la $(x_n, f(x_n))$ la $(y_n, 0)$, o linie punctată până la $(y_n, f(y_n))$ și paralela de acolo până la $(x_{n+1}, 0)$.",
+
+  "lab4.method.thirdOrderRoot.tab": "4b · Calculul radicalilor",
+  "lab4.method.thirdOrderRoot.title": "Calculul radicalilor cu metoda de ordinul 3",
+  "lab4.method.thirdOrderRoot.name": "Metoda de ordinul 3",
+  "lab4.method.thirdOrderRoot.idea":
+    "Pentru a aproxima $\\sqrt{a}$, cu $a > 0$, se construiește șirul de mai jos, care folosește doar operații aritmetice. Este metoda lui Halley aplicată funcției $f(x) = x^2 - a$, de aceea converge cubic în apropierea lui $\\sqrt{a}$:",
+  "lab4.method.thirdOrderRoot.start": "Iterația inițială: $x_0 = a$.",
+  "lab4.method.thirdOrderRoot.chart":
+    "Graficul arată funcția $f(x) = x^2 - a$ și urmărește fiecare pas pe hiperbola tangentă a metodei lui Halley, de la $(x_n, x_n^2 - a)$ la $(x_{n+1}, 0)$.",
+
+  "lab4.preset.combinedEx1": "Ex. 1: √2, f(x) = x² − 2, x₀ = 2",
+  "lab4.preset.combinedEx2": "Ex. 2: x³ − x − 1 = 0, x₀ = 2",
+  "lab4.preset.rootEx1": "Ex. 1: √2, a = 2",
+  "lab4.preset.rootEx2Sqrt3": "Ex. 2: √3, a = 3",
+  "lab4.preset.rootEx2Sqrt5": "Ex. 2: √5, a = 5",
+
+  "lab4.compare.combinedEx1": "Ex. 1: √2 prin metoda combinată a tangentei",
+  "lab4.compare.combinedEx2": "Ex. 2: x³ − x − 1 = 0 prin metoda combinată a tangentei",
+  "lab4.compare.rootEx1": "Ex. 1: √2 prin metoda de ordinul 3",
+  "lab4.compare.rootEx2": "Ex. 2: √3 și √5 prin metoda de ordinul 3",
+  "lab4.compare.combinedEx1.task":
+    "Aproximează numărul √2 prin metoda combinată a tangentei și compară rezultatele cu cele furnizate de metoda tangentei.",
+  "lab4.compare.combinedEx2.task":
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda combinată a tangentei și compară rezultatele cu cele furnizate de metoda tangentei.",
+  "lab4.compare.rootEx1.task":
+    "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei.",
+  "lab4.compare.rootEx2.task":
+    "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
 };

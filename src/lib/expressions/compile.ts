@@ -250,3 +250,20 @@ export function derive(
     );
   }
 }
+
+/**
+ * The expression as TeX for display: `3x^2 - 1` → `3{x}^{2}-1`. A number times a variable term
+ * prints without a dot, so a derived `2 * x` reads `2x` like the typed form.
+ * @throws {ExpressionError}
+ */
+export function toTex(source: string, variables: readonly string[]): string {
+  const node = parseRestricted(source, variables).transform((child) => {
+    const op = child as unknown as { fn: string; args: MathNode[] };
+    if (child.type !== "OperatorNode" || op.fn !== "multiply" || op.args.length !== 2) return child;
+    const [left, right] = op.args;
+    if (left.type !== "ConstantNode" || right.type === "ConstantNode") return child;
+    return new math.OperatorNode("*", "multiply", [left, right], true);
+  });
+  // math.js joins a hidden implicit product with `~`, a TeX space.
+  return node.toTex({ implicit: "hide", parenthesis: "auto" }).replaceAll("~", "");
+}

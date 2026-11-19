@@ -111,6 +111,8 @@ Changes made during development, after the review pass, each at the user's reque
 
 Kept as is: the Steffensen formula shows n = 0, 1, 2, … where the lab writes n ∈ ℕ*, because the lab's own step 2 computes x₁ with the same formula. Comparison formulas write decimals with a point (x₁ = 1.4) in both languages, as Lab 1 does (0.25), matching what the inputs accept; Romanian prose labels use a comma.
 
+- **Comparison inputs and short tasks (2026-11-19, from Lab 4).** Every comparison card now lists each row's inputs (f, [a, b], x₀, x₁, f′, dda, "x₀: Regula R0") in a "Date de intrare" block built from the presets. The Cerința lines keep only the task plus one sentence on what the lab leaves open and the list can't show: "Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0." This replaces the frozen line's "says what the lab leaves open" by listing the values; the open choices are unchanged.
+
 ## Review Triage Log
 
 Review pass 1 (blind = B, edge-case = E, verification-gap = VG).

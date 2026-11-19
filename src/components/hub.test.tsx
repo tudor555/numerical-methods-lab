@@ -33,16 +33,24 @@ describe("Hub", () => {
     expect(third).not.toContain("Coming soon");
   });
 
-  it("shows labs 4–13 as coming soon, without a link", () => {
-    const rest = cards("en").slice(3);
-    expect(rest).toHaveLength(10);
+  it("links Lab 4 to /labs/third-order", () => {
+    const fourth = cards("en")[3];
+    expect(fourth).toContain('href="/labs/third-order"');
+    expect(fourth).toContain('aria-label="Lab 4: Third-order iterative methods. Open lab"');
+    expect(textOf(fourth)).toContain("Combined tangent method and third-order square roots");
+    expect(fourth).not.toContain("Coming soon");
+  });
+
+  it("shows labs 5–13 as coming soon, without a link", () => {
+    const rest = cards("en").slice(4);
+    expect(rest).toHaveLength(9);
     rest.forEach((card, i) => {
-      expect(textOf(card)).toContain(`Lab ${i + 4}`);
+      expect(textOf(card)).toContain(`Lab ${i + 5}`);
       expect(card).toContain("Coming soon");
       expect(card).toContain('aria-disabled="true"');
       expect(card).not.toContain("<a ");
     });
-    expect(count(render(<Hub />), "href=")).toBe(3);
+    expect(count(render(<Hub />), "href=")).toBe(4);
   });
 
   it("renders in Romanian", () => {
@@ -53,7 +61,11 @@ describe("Hub", () => {
     expect(textOf(html)).toContain("Metoda secantei și metoda lui Steffensen");
     expect(textOf(html)).toContain("Metoda lui Halley și metode de tip Cebîșev");
     expect(textOf(html)).toContain("Generalizări ale metodei tangentei");
-    expect(count(html, "În curând")).toBe(10);
+    expect(textOf(html)).toContain("Metode iterative de ordinul trei");
+    expect(textOf(html)).toContain(
+      "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
+    );
+    expect(count(html, "În curând")).toBe(9);
     expect(html).not.toContain("Coming soon");
   });
 });

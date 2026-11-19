@@ -18,6 +18,7 @@ export interface ChartLabels {
   steffensenSteps: string;
   halleySteps: string;
   chebyshevSteps: string;
+  combinedSteps: string;
   phi: string;
   identity: string;
   path: string;
@@ -126,6 +127,26 @@ function stepCurve(
   return { xs, ys };
 }
 
+/**
+ * The helper point of a combined tangent step: Newton's iterate yₙ = xₙ − f(xₙ)/f′(xₙ) and f(yₙ),
+ * or null when f′(xₙ) is 0 or not finite, or f(yₙ) is undefined or not finite.
+ */
+function combinedHelper(
+  plot: Extract<FunctionPlot, { kind: "combined-tangent" }>,
+  x: number,
+  fx: number,
+): { y: number; fy: number } | null {
+  try {
+    const d = plot.df(x);
+    if (!Number.isFinite(d) || d === 0) return null;
+    const y = x - fx / d;
+    const fy = plot.f(y);
+    return Number.isFinite(y) && Number.isFinite(fy) ? { y, fy } : null;
+  } catch {
+    return null;
+  }
+}
+
 const hoverIterate = "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.6g}<extra></extra>";
 
 /**
@@ -133,8 +154,10 @@ const hoverIterate = "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.6g}<extra><
  * Newton's tangent at xₙ, the secant through xₙ₋₁ and xₙ, Steffensen's step from xₙ straight to
  * the axis, or the arc of Halley's tangent hyperbola or Chebyshev's tangent parabola between
  * (xₙ, f(xₙ)) and (xₙ₊₁, 0); an arc that can't be drawn (a pole in between, f′ = 0 or undefined)
- * falls back to a straight step. Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it
- * can land far outside [a, b] (at 7 in the lab's example) and would squash the rest of the chart.
+ * falls back to a straight step. A combined tangent step is two parallel segments: Newton's tangent
+ * to (yₙ, 0), then the same slope from (yₙ, f(yₙ)) to (xₙ₊₁, 0), with a dotted line between them.
+ * Steffensen's helper point xₙ + f(xₙ) is left out on purpose: it can land far outside [a, b] (at 7
+ * in the lab's example) and would squash the rest of the chart.
  * For φ it shows y = x and the cobweb path.
  */
 export function buildFunctionChart(
@@ -168,6 +191,18 @@ export function buildFunctionChart(
           stepX.push(before.x, from.x, to.x, null);
           stepY.push(before.fx, from.fx, 0, null);
         }
+      } else if (plot.kind === "combined-tangent") {
+        const helper = combinedHelper(plot, from.x, from.fx);
+        if (helper) {
+          // Newton's tangent to (yₙ, 0), up or down to the curve, then the same slope to xₙ₊₁.
+          stepX.push(from.x, helper.y, null, helper.y, to.x, null);
+          stepY.push(from.fx, 0, null, helper.fy, 0, null);
+          dropX.push(helper.y, helper.y, null);
+          dropY.push(0, helper.fy, null);
+        } else {
+          stepX.push(from.x, to.x, null);
+          stepY.push(from.fx, 0, null);
+        }
       } else {
         const curve =
           plot.kind === "halley" || plot.kind === "chebyshev"
@@ -187,6 +222,7 @@ export function buildFunctionChart(
       steffensen: labels.steffensenSteps,
       halley: labels.halleySteps,
       chebyshev: labels.chebyshevSteps,
+      "combined-tangent": labels.combinedSteps,
     }[plot.kind];
     return {
       xTitle: "x",

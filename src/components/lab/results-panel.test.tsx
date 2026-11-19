@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
+import { lab4 } from "@/labs/lab-4";
 import type { RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
@@ -18,9 +19,9 @@ vi.mock("./plotly-chart", () => ({
   ),
 }));
 
-const allMethods = [...lab1.methods, ...lab2.methods, ...lab3.methods];
+const allMethods = [...lab1.methods, ...lab2.methods, ...lab3.methods, ...lab4.methods];
 
-/** Prepares and runs a Lab 1, 2 or 3 method like the page does. */
+/** Prepares and runs a Lab 1–4 method like the page does. */
 function view(methodId: string, patch: FieldValues = {}): RunView {
   const method = allMethods.find((m) => m.id === methodId);
   if (!method) throw new Error(methodId);
@@ -222,6 +223,15 @@ describe("ResultsPanel for Lab 3", () => {
     ["3b", "en", "f(x) with Chebyshev's tangent parabolas", "Tangent parabolas"],
     ["3a", "ro", "Graficul lui f și hiperbolele tangente", "Hiperbole tangente"],
     ["3b", "ro", "Graficul lui f și parabolele tangente", "Parabole tangente"],
+    ["4a", "en", "f(x) with the combined tangent steps", "Combined tangent steps"],
+    [
+      "4a",
+      "ro",
+      "Graficul lui f și pașii metodei combinate a tangentei",
+      "Pașii metodei combinate",
+    ],
+    ["4b", "en", "f(x) with Halley's tangent hyperbolas", "Tangent hyperbolas"],
+    ["4b", "ro", "Graficul lui f și hiperbolele tangente", "Hiperbole tangente"],
   ] as const)(
     "titles the %s function chart in %s and names its steps",
     (methodId, lang, title, name) => {
@@ -267,5 +277,39 @@ describe("ResultsPanel for Lab 3", () => {
   it("gives Chebyshev's zero derivative the same message as Newton's", () => {
     const failed = view("3b", { f: "x^2 - 2", df: "2x", ddf: "2", a: "-1", x0: "0" });
     expect(message(panel(failed))).toMatch(/^The derivative is zero at n = 0, xₙ = 0\./);
+  });
+});
+
+describe("ResultsPanel for Lab 4", () => {
+  it("shows the combined tangent preset's x₀ = 2 as entered, n = 3 and no exact value", () => {
+    const html = panel(view("4a"));
+    const [value, n, start] = stats(html);
+    expect(value.value).toBe(formatValue(Math.SQRT2));
+    expect(n.value).toBe("3");
+    expect(start.value).toBe("2");
+    expect(start.label).not.toContain("R0");
+    expect(textOf(html)).not.toContain("Exact value");
+  });
+
+  it("gives a zero derivative the same message as Newton's, and keeps row 0", () => {
+    const html = panel(view("4a", { a: "-1", x0: "0" }));
+    expect(message(html)).toMatch(/^The derivative is zero at n = 0, xₙ = 0\./);
+    expect(elements(html.slice(html.indexOf("<tbody")), "tr")).toHaveLength(1);
+  });
+
+  it("explains f undefined at the helper point with Lab 1's message", () => {
+    const html = panel(view("4a", { f: "ln(x)", df: "1/x", x0: "3" }));
+    expect(message(html)).toMatch(/^A value is undefined \(NaN\) in the step from n = 0, xₙ = 3\./);
+  });
+
+  it("shows √a as the exact value and the error for the third-order square root", () => {
+    const html = panel(view("4b", { a: "5", eps: "1e-12" }), "en", "x_n^2 - a");
+    const tiles = stats(html);
+    expect(tiles.find((t) => t.label.startsWith("Exact value"))?.value).toBe(
+      formatValue(Math.sqrt(5)),
+    );
+    expect(Number(tiles.find((t) => t.label.startsWith("Error"))?.value)).toBeLessThan(1e-12);
+    const convergenceTraces = [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
+    expect(convergenceTraces).toContain("|xₙ − exact value|");
   });
 });

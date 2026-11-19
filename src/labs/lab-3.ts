@@ -1,5 +1,6 @@
 import { chebyshev } from "@/lib/methods/lab3/chebyshev";
 import { halley } from "@/lib/methods/lab3/halley";
+import { exampleBase, newtonPreset } from "./comparison-presets";
 import { parseFields } from "./fields";
 import { newtonMethod } from "./lab-1";
 import {
@@ -16,7 +17,7 @@ import {
   valueRule,
   x0ModeField,
 } from "./shared-fields";
-import type { ComparisonPreset, MethodDefinition, Preset, ReadyLab } from "./types";
+import type { MethodDefinition, Preset, ReadyLab } from "./types";
 
 const halleyMethod: MethodDefinition = {
   id: "3a",
@@ -135,8 +136,7 @@ const chebyshevMethod: MethodDefinition = {
   },
 };
 
-const base = { a: "1", b: "2", eps: "1e-4", maxIter: "1000" };
-const ex2 = { f: "x^3 - x - 1", df: "3x^2 - 1", ddf: "6x", ...base };
+const ex2 = { f: "x^3 - x - 1", df: "3x^2 - 1", ddf: "6x", ...exampleBase };
 
 const presets: readonly Preset[] = [
   {
@@ -161,16 +161,6 @@ const presets: readonly Preset[] = [
     values: { ...chebyshevMethod.defaults },
   },
 ];
-
-/** Newton's inputs for one comparison: the example's own f and f′ as the lab gives them, x₀ = 2. */
-function newtonPreset(id: string, f: string, df: string): ComparisonPreset {
-  return {
-    id,
-    methodId: newtonMethod.id,
-    tex: `${f},\\ x_0 = 2`,
-    values: { f, df, x0Mode: "manual", dda: "", x0: "2", ...base },
-  };
-}
 
 export const lab3: ReadyLab = {
   number: 3,

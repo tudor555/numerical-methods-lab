@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compile, derive, ExpressionError, EvaluationError, parseConstant } from "./compile";
+import { compile, derive, ExpressionError, EvaluationError, parseConstant, toTex } from "./compile";
 
 function exprErrorCode(fn: () => unknown): string | undefined {
   try {
@@ -124,5 +124,24 @@ describe("derive", () => {
 
   it("rejects invalid sources", () => {
     expect(exprErrorCode(() => derive("y + x", "x"))).toBe("unknown-symbol");
+  });
+});
+
+describe("toTex", () => {
+  it.each([
+    ["x^2 - 2", "{ x}^{2}-2"],
+    ["3x^2 - 1", "3{ x}^{2}-1"],
+    ["3 * x ^ 2 - 1", "3{ x}^{2}-1"],
+    ["2 * x", "2 x"],
+    ["x * 2", " x\\cdot2"],
+    ["3*pi/8", "\\frac{3\\pi}{8}"],
+    ["(x + 3) / (x + 1)", "\\frac{ x+3}{ x+1}"],
+    ["sin(x) + 0.25", "\\sin\\left( x\\right)+0.25"],
+  ])("%s → %s", (source, tex) => {
+    expect(toTex(source, ["x"])).toBe(tex);
+  });
+
+  it("rejects what the parser rejects", () => {
+    expect(() => toTex("x +", ["x"])).toThrow(ExpressionError);
   });
 });

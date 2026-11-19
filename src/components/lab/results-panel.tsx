@@ -21,6 +21,7 @@ const CHART_TITLE = {
   steffensen: "chart.steffensen",
   halley: "chart.halley",
   chebyshev: "chart.chebyshev",
+  "combined-tangent": "chart.combinedTangent",
   cobweb: "chart.cobweb",
 } as const satisfies Record<FunctionPlot["kind"], MessageKey>;
 
@@ -70,6 +71,7 @@ export function ResultsPanel({
       steffensenSteps: t("chart.trace.steffensenSteps"),
       halleySteps: t("chart.trace.halleySteps"),
       chebyshevSteps: t("chart.trace.chebyshevSteps"),
+      combinedSteps: t("chart.trace.combinedSteps"),
       phi: t("chart.trace.phi"),
       identity: t("chart.trace.identity"),
       path: t("chart.trace.path"),

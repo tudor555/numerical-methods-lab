@@ -12,6 +12,9 @@ export const X = ["x"] as const;
 export const VALUE_LIMIT = 1e6;
 export const valueRule = { min: -VALUE_LIMIT, max: VALUE_LIMIT };
 
+/** A radicand: 1b's c and 4b's a lie in (0, 10⁶]. */
+export const radicandRule = { positive: true, max: VALUE_LIMIT } as const;
+
 export const functionField: FieldDefinition = {
   id: "f",
   kind: "expression",
