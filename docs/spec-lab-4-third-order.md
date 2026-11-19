@@ -75,7 +75,7 @@ context:
 - `src/labs/registry.ts` -- `lab4` replaces `planned(4, …)`; `PlannedNumber` drops 4.
 - `src/i18n/{en,ro}.ts` -- `lab4.*` keys; replace `lab4.topic`; add `chart.combinedTangent`, `chart.trace.combinedSteps`.
 
-**Ids and keys:** methods `4a`, `4b`. Presets `combined-ex1`, `combined-ex2` (4a), `root-ex1`, `root-ex2-sqrt3`, `root-ex2-sqrt5` (4b). Comparisons use the same five ids. Comparison-only presets `<id>-newton` (4a) and `<id>-kth-root` (4b). Keys `lab4.method.{combinedTangent,thirdOrderRoot}.*`, `lab4.preset.{combinedEx1,combinedEx2,rootEx1,rootEx2Sqrt3,rootEx2Sqrt5}`, `lab4.compare.<same>` and `.task`.
+**Ids and keys:** methods `4a`, `4b`. Presets `combined-ex1`, `combined-ex2` (4a), `root-ex1`, `root-ex2-sqrt3`, `root-ex2-sqrt5` (4b). Comparisons `combined-ex1`, `combined-ex2`, `root-ex1` and `root-ex2` (√3 and √5 in one card, four rows; see the Spec Change Log). Comparison-only presets `<id>-newton` (4a) and `<id>-kth-root` (4b). Keys `lab4.method.{combinedTangent,thirdOrderRoot}.*`, `lab4.preset.{combinedEx1,combinedEx2,rootEx1,rootEx2Sqrt3,rootEx2Sqrt5}`, `lab4.compare.{combinedEx1,combinedEx2,rootEx1,rootEx2}` and `.task`.
 
 **Tests to update** (Lab 4 becomes ready, Lab 5 `newton-systems` is the unbuilt example):
 
@@ -94,9 +94,11 @@ context:
 - [x] `src/lib/methods/lab4/{combined-tangent,third-order-root}.ts` + `lab4.test.ts` -- methods; lock every matrix row and count
 - [x] `src/labs/comparison-presets.ts`, `lab-1.ts`, `lab-3.ts` -- shared comparison presets, export `kthRootMethod`; Lab 1 and 3 tests stay green
 - [x] `src/labs/types.ts`, `src/components/lab/{charts.ts,results-panel.tsx}` + tests -- `combined-tangent` kind (two solid segments, vertical in the drop trace, fixture-tested fallback), title, legend name
-- [x] `src/labs/lab-4.ts` + `lab-4.test.ts`, `registry.ts` -- definition, five presets, five comparisons with `taskKey`; lock the n-matrix, preset and comparison ids
+- [x] `src/labs/lab-4.ts` + `lab-4.test.ts`, `registry.ts` -- definition, five presets, comparisons with `taskKey` (five at first, four after the √3/√5 merge); lock the n-matrix, preset and comparison ids
 - [x] `src/i18n/{en,ro}.ts` -- all Lab 4 keys, KaTeX formulas with `⟪⟫` words, native RO; replaced topic
 - [x] tests listed above -- Lab 4 ready, Lab 5 as the unbuilt example, Lab 4 panel and page blocks
+- [x] Dev-time, at the user's request: `src/lib/expressions/compile.ts` (`toTex`), `src/labs/compare.ts` (`comparisonInputs`) + `compare.test.ts`, `src/components/lab/comparison-panel.tsx` -- each comparison card lists its rows' inputs before the run; short Cerința lines in Labs 2–4; 4b ex. 2 as one card
+- [x] Dev-time: Lab 4 task wording checked against the lab PDF (reference-method name, "furnizate de metoda tangentei")
 - [x] `docs/labs-catalog.md` -- Lab 4: number the examples as the lab does (4a Ex. 1–2, 4b Ex. 1–2), 4a's x₀ entered directly with a, b as chart range; Shared rules input limits add 4b's a in (0, 10⁶]
 
 **Acceptance Criteria:**
@@ -111,8 +113,20 @@ context:
 - The 4a chart computes yₙ and f(yₙ) from the plot's own f and f′ (`combinedHelper` in `charts.ts`); the drop-line trace holds the vertical at yₙ before the drop at xₙ₊₁.
 - 4b has no `errorKeys` and no failure text: with a > 0 and x₀ = a every iterate is positive and the denominator 3xₙ² + a never vanishes. NaN, ∞, divergence and the cap still go through the shared driver.
 - Tab names: "4a · Combined tangent" / "4a · Metoda combinată a tangentei" and "4b · Square roots" / "4b · Calculul radicalilor" ("third-order root" would read as a cube root). Comparison row names: "Combined tangent method" and "Third-order method" / "Metoda de ordinul 3"; the reference rows keep Lab 1's "Tangent method".
+- Comparison inputs (`comparisonInputs` in `compare.ts`) are built from each row's method fields and preset values, so they cannot drift from what runs. Rules: ε gets its own line ("Precizia") and the iteration cap is left out (1000 everywhere); hidden fields are left out; a and b become one interval `[a; b]` (RO) or `[a, b]` (EN), but only when b is the interval's `field.b`, so 4b's radicand a stays `a = 3`; a choice (x₀ mode) shows in words ("x₀: Regula R0") only when no visible field already gives its symbol, so a typed-in x₀ replaces it; a value that does not parse shows as typed.
+- `toTex` (`compile.ts`) prints with math.js `toTex`, hides a number-times-variable product (`2 * x` from "Derive from f" reads `2x`, like the typed form) and drops parentheses that only grouped a fraction.
+- Lab 1's task lines were already short and stay as they are; Lab 1 ex. 3 still names x₀ = 3π/8 and ε in its task because the lab states them in the task itself.
 
 ## Spec Change Log
+
+Dev-time changes after the review pass, each at the user's request on 2026-11-19. The frozen intent above is kept as approved; where it disagrees with these entries, these entries win:
+
+- Frozen "Lab wording and numbering": the Cerința line no longer states the other method's inputs; the card's input list shows them. The 4b reference name is now the lab's own, "adaptată în urma folosirii metodei tangentei".
+- Frozen "Comparisons": 4b ex. 2 √3 and √5 are one comparison (`root-ex2`), not two; the order and the ε set are unchanged.
+- Frozen "Decisions", first bullet: two presets stay; the two cards became one, with the plain fact "Metoda converge către √a, deci se ia a = 3, respectiv a = 5." Still no words like typo or mistake in UI copy.
+
+- After review in the browser, the comparison cards list each row's inputs (f, f′, [a, b], x₀, a, c, k, ε) in a "Date de intrare" / "Inputs" block built from the presets, and every Cerința line keeps only the task: which method, compared with which. Labs 2 and 3 get the same short tasks; Lab 2 keeps one sentence on how Newton gets f′ and x₀, which the list can't show. 4b ex. 2 is now one card, "√3 și √5", with four rows (4b and 1b for a = 3, then for a = 5), replacing the two cards whose tasks both opened with "Approximate √5" and read as contradicting the √3 title.
+- A pass against the lab PDF brought the Lab 4 task wording closer to the source: the 4b reference is "metoda iterativă adaptată în urma folosirii metodei tangentei" / "the iterative method adapted from the tangent method" (was "obținută din" / "obtained from"), and the 4a tasks compare "cu cele furnizate de metoda tangentei", as the lab writes it.
 
 ## Review Triage Log
 
@@ -156,3 +170,11 @@ Review pass 1 (blind = B, edge-case = E, verification-gap = VG).
 - Every row of the I/O matrix is locked in `lab4.test.ts` and `lab-4.test.ts`, including the n-matrix of all five comparisons (both methods × three ε).
 - `/labs/third-order` served by `next start` in EN and RO: no `katex-error`, no `⟦key⟧`. Every Lab 4 formula and inline `$…$` parses with KaTeX `throwOnError`.
 - Not yet done: the browser checks above (preset runs, chart toolbar, phone width).
+
+**Results (2026-11-19, after the dev-time changes):**
+
+- `bun run typecheck` clean; `bun run test` 33 files, 647 tests pass; `bun run format:check` clean; `bun run build` succeeds.
+- Coverage: `compare.ts` 100% lines and branches, `toTex` fully covered; the Lab 4 files stay at 100%. The comparison panel's Run `onClick` is the one uncovered line: the tests render static HTML and have no DOM (as for the other click handlers).
+- No e2e suite, by project decision. Smoke check instead: `next start` on a spare port, every ready lab in EN and RO has an input list per comparison card, no `katex-error`, no `⟦key⟧`.
+- Lab 4 checked line by line against the lab PDF: formulas, x₀ rules, stopping rule, inputs, outputs and all four examples match (4b ex. 2 as noted above).
+- Headless Chrome at 520px: cards stack, input lists wrap, no horizontal scroll. A real 390px phone check is still manual (headless Chrome will not lay out narrower than about 500px).
