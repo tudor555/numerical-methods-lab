@@ -348,9 +348,9 @@ export const en = {
   "lab4.compare.combinedEx2.task":
     "Approximate the real root of x³ − x − 1 = 0 with the combined tangent method and compare the results with the tangent method.",
   "lab4.compare.rootEx1.task":
-    "Approximate √2 with the third-order method and compare the results with the iterative method obtained from the tangent method.",
+    "Approximate √2 with the third-order method and compare the results with the iterative method adapted from the tangent method.",
   "lab4.compare.rootEx2.task":
-    "Approximate √3 and √5 with the third-order method and compare the results with the iterative method obtained from the tangent method. The method converges to √a, so a = 3 and a = 5 respectively.",
+    "Approximate √3 and √5 with the third-order method and compare the results with the iterative method adapted from the tangent method. The method converges to √a, so a = 3 and a = 5 respectively.",
 } as const;
 
 export type MessageKey = keyof typeof en;

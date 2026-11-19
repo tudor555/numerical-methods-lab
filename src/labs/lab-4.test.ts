@@ -95,10 +95,10 @@ describe("Lab 4 messages", () => {
   it("names the 4b reference method as the lab does", () => {
     for (const id of ["rootEx1", "rootEx2"] as const) {
       expect(en[`lab4.compare.${id}.task`]).toContain(
-        "the iterative method obtained from the tangent method",
+        "the iterative method adapted from the tangent method",
       );
       expect(ro[`lab4.compare.${id}.task`]).toContain(
-        "metoda iterativă obținută din metoda tangentei",
+        "metoda iterativă adaptată în urma folosirii metodei tangentei",
       );
     }
   });

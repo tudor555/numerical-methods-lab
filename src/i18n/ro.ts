@@ -349,11 +349,11 @@ export const ro: Record<MessageKey, string> = {
   "lab4.compare.rootEx1": "Ex. 1: √2 prin metoda de ordinul 3",
   "lab4.compare.rootEx2": "Ex. 2: √3 și √5 prin metoda de ordinul 3",
   "lab4.compare.combinedEx1.task":
-    "Aproximează numărul √2 prin metoda combinată a tangentei și compară rezultatele cu cele obținute prin metoda tangentei.",
+    "Aproximează numărul √2 prin metoda combinată a tangentei și compară rezultatele cu cele furnizate de metoda tangentei.",
   "lab4.compare.combinedEx2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda combinată a tangentei și compară rezultatele cu cele obținute prin metoda tangentei.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda combinată a tangentei și compară rezultatele cu cele furnizate de metoda tangentei.",
   "lab4.compare.rootEx1.task":
-    "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei.",
+    "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei.",
   "lab4.compare.rootEx2.task":
-    "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
+    "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
 };

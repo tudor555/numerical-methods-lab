@@ -243,9 +243,11 @@ describe("ComparisonPanel for Lab 4", () => {
       expect(textOf(card)).toContain("Cerința:");
       if (i < 2) {
         expect(textOf(card)).toContain("metoda tangentei");
-        expect(textOf(card)).not.toContain("metoda iterativă obținută");
+        expect(textOf(card)).not.toContain("metoda iterativă adaptată");
       } else {
-        expect(textOf(card)).toContain("metoda iterativă obținută din metoda tangentei");
+        expect(textOf(card)).toContain(
+          "metoda iterativă adaptată în urma folosirii metodei tangentei",
+        );
       }
     });
   });
