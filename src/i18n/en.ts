@@ -169,6 +169,8 @@ export const en = {
   "compare.hint": "Each cell shows the number of iterations n and the final xₙ.",
   "compare.cell.error": "Error",
   "compare.cell.max": "Cap reached",
+  "compare.inputs": "Inputs",
+  "compare.precisions": "Precision",
 
   "lab1.intro":
     "Solve f(x) = 0 with Newton's tangent method, compute k-th roots with the same idea, and see how both compare with successive approximations.",

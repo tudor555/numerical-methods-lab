@@ -5,6 +5,7 @@ import { useState, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/provider";
 import {
+  comparisonInputs,
   findComparisonMethod,
   findComparisonPreset,
   runComparison,
@@ -143,6 +144,45 @@ export function ComparisonResults({
   );
 }
 
+/** What each row runs with, listed before the run so the task text can stay short. */
+function ComparisonInputs({ lab, comparison }: { lab: ReadyLab; comparison: Comparison }) {
+  const { t, lang } = useI18n();
+  const separator = lang === "ro" ? ";" : ",";
+  const precisions = comparison.eps.map(formatEpsTex).join(",\\ ");
+  return (
+    <div className="bg-raised flex flex-col gap-2 rounded-lg p-4 text-sm">
+      <h4 className="font-medium">{t("compare.inputs")}</h4>
+      <dl className="grid gap-x-4 gap-y-2 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]">
+        {comparison.rows.map((row) => {
+          const method = findComparisonMethod(lab, row.methodId);
+          const preset = findComparisonPreset(lab, row.presetId);
+          if (!method || !preset) return null;
+          return (
+            <div key={`${row.methodId}-${row.presetId}`} className="contents">
+              <dt className="text-muted-foreground">{t(method.nameKey)}</dt>
+              <dd className="flex flex-wrap gap-x-4 gap-y-1">
+                {comparisonInputs(method, preset.values, separator).map((input, i) =>
+                  input.kind === "tex" ? (
+                    <Tex key={i} tex={input.tex} />
+                  ) : (
+                    <span key={i}>
+                      <Tex tex={input.symbol} />: {t(input.labelKey)}
+                    </span>
+                  ),
+                )}
+              </dd>
+            </div>
+          );
+        })}
+        <dt className="text-muted-foreground">{t("compare.precisions")}</dt>
+        <dd>
+          <Tex tex={`\\varepsilon = ${precisions}`} />
+        </dd>
+      </dl>
+    </div>
+  );
+}
+
 function ComparisonCard({ lab, comparison }: { lab: ReadyLab; comparison: Comparison }) {
   const { t } = useI18n();
   const [cells, setCells] = useState<Cell[][] | null>(null);
@@ -167,6 +207,7 @@ function ComparisonCard({ lab, comparison }: { lab: ReadyLab; comparison: Compar
           {t("compare.run")}
         </Button>
       </div>
+      <ComparisonInputs lab={lab} comparison={comparison} />
       {cells && <ComparisonResults lab={lab} comparison={comparison} cells={cells} />}
     </div>
   );

@@ -12,6 +12,19 @@ const cards = (html: string) =>
   html.split('<div class="border-border bg-card flex min-w-0 flex-col gap-4').slice(1);
 
 describe("ComparisonPanel", () => {
+  it("leaves a row out of the inputs when its method or preset is unknown", () => {
+    const comparison = {
+      ...lab1.comparisons[0],
+      rows: [
+        { methodId: "nope", presetId: "ex1" },
+        { methodId: "1a", presetId: "nope" },
+        { methodId: "1a", presetId: "ex1" },
+      ],
+    };
+    const html = render(<ComparisonPanel lab={{ ...lab1, comparisons: [comparison] }} />);
+    expect(elements(html, "dt").map(textOf)).toEqual(["Tangent method", "Precision"]);
+  });
+
   it("shows one card per comparison, in the lab's order", () => {
     const html = render(<ComparisonPanel lab={lab1} />);
     expect(cards(html)).toHaveLength(lab1.comparisons.length);
@@ -41,7 +54,8 @@ describe("ComparisonPanel", () => {
   it("shows no results before a comparison runs", () => {
     const html = render(<ComparisonPanel lab={lab1} />);
     expect(html).not.toContain("<ul");
-    expect(textOf(html)).not.toContain("n = ");
+    // Not "\\varepsilon = …" from the inputs: an n tile starts the word.
+    expect(textOf(html)).not.toMatch(/(^|[^a-z])n = \d/);
     expect(textOf(html)).not.toContain("Each cell shows");
   });
 });

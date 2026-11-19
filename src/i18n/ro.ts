@@ -174,6 +174,8 @@ export const ro: Record<MessageKey, string> = {
   "compare.hint": "Fiecare celulă arată numărul de iterații n și ultima iterație xₙ.",
   "compare.cell.error": "Eroare",
   "compare.cell.max": "Limită atinsă",
+  "compare.inputs": "Date de intrare",
+  "compare.precisions": "Precizia",
 
   "lab1.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda tangentei a lui Newton, calculează rădăcinile de ordinul k folosind aceeași idee și compară rezultatele cu cele obținute prin metoda aproximațiilor succesive.",
