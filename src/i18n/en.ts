@@ -262,11 +262,11 @@ export const en = {
   "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0 with the secant method",
   "lab2.compare.steffensen": "Numerical example: x³ − x − 1 = 0 with Steffensen's method",
   "lab2.compare.ex1.task":
-    "Approximate the number √2 with the secant method, using f(x) = x² − 2 on [1, 2] with starting values x₀ = 2 and x₁ = 1.4, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f and [1, 2], with f′ derived from f and x₀ = 2 from rule R0.",
+    "Approximate the number √2 with the secant method and compare the results with the tangent method. The tangent method derives f′ from f and takes x₀ from rule R0.",
   "lab2.compare.ex2.task":
-    "Approximate the real root of x³ − x − 1 = 0 with the secant method on [1, 2], from x₀ = 2 and x₁ = 1.5, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f and [1, 2], with f′ derived from f and x₀ = 2 from rule R0.",
+    "Approximate the real root of x³ − x − 1 = 0 with the secant method and compare the results with the tangent method. The tangent method derives f′ from f and takes x₀ from rule R0.",
   "lab2.compare.steffensen.task":
-    "Approximate the real root of x³ − x − 1 = 0 with Steffensen's method on [1, 2], from x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method. Both start from x₀ = 2 from rule R0, and the tangent method uses f′ derived from f.",
+    "Approximate the real root of x³ − x − 1 = 0 with Steffensen's method and compare the results with the tangent method. The tangent method derives f′ from f and takes x₀ from rule R0.",
 
   "lab3.intro":
     "Solve f(x) = 0 with Halley's method and Chebyshev's method, two generalizations of the tangent method that also use the second derivative. Then compare the results and iteration counts with the tangent method.",
@@ -304,11 +304,11 @@ export const en = {
   "lab3.compare.ex2": "Ex. 2: x³ − x − 1 = 0 with Halley's method",
   "lab3.compare.chebyshev": "Numerical example: x³ − x − 1 = 0 with Chebyshev's method",
   "lab3.compare.ex1.task":
-    "Approximate the number √2 with Halley's method, using f(x) = x² − 2, f′(x) = 2x and f″(x) = 2 on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 2x and starts from x₀ = 2.",
+    "Approximate the number √2 with Halley's method and compare the results with the tangent method.",
   "lab3.compare.ex2.task":
-    "Approximate the real root of x³ − x − 1 = 0 with Halley's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+    "Approximate the real root of x³ − x − 1 = 0 with Halley's method and compare the results with the tangent method.",
   "lab3.compare.chebyshev.task":
-    "Approximate the real root of x³ − x − 1 = 0 with Chebyshev's method, using f′(x) = 3x² − 1 and f″(x) = 6x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+    "Approximate the real root of x³ − x − 1 = 0 with Chebyshev's method and compare the results with the tangent method.",
 
   "lab4.intro":
     "Solve f(x) = 0 with the combined tangent method, which follows each tangent step with a second step of the same slope, and compute square roots with a third-order iteration. Then compare the results and iteration counts with the tangent method.",
@@ -342,18 +342,15 @@ export const en = {
   "lab4.compare.combinedEx1": "Ex. 1: √2 with the combined tangent method",
   "lab4.compare.combinedEx2": "Ex. 2: x³ − x − 1 = 0 with the combined tangent method",
   "lab4.compare.rootEx1": "Ex. 1: √2 with the third-order method",
-  "lab4.compare.rootEx2Sqrt3": "Ex. 2: √3 with the third-order method",
-  "lab4.compare.rootEx2Sqrt5": "Ex. 2: √5 with the third-order method",
+  "lab4.compare.rootEx2": "Ex. 2: √3 and √5 with the third-order method",
   "lab4.compare.combinedEx1.task":
-    "Approximate the number √2 with the combined tangent method, using f(x) = x² − 2 and f′(x) = 2x on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 2x and starts from x₀ = 2.",
+    "Approximate the number √2 with the combined tangent method and compare the results with the tangent method.",
   "lab4.compare.combinedEx2.task":
-    "Approximate the real root of x³ − x − 1 = 0 with the combined tangent method, using f′(x) = 3x² − 1 on [1, 2] with x₀ = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the tangent method, which uses the same f with f′(x) = 3x² − 1 and starts from x₀ = 2.",
+    "Approximate the real root of x³ − x − 1 = 0 with the combined tangent method and compare the results with the tangent method.",
   "lab4.compare.rootEx1.task":
-    "Approximate √2 with the third-order method, taking a = 2, for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 2 and k = 2 and starts from the same x₀ = 2.",
-  "lab4.compare.rootEx2Sqrt3.task":
-    "Approximate √5 with the third-order method. The method converges to √a, so a = 3 gives √3 and a = 5 gives √5; this card uses a = 3. Run it for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 3 and k = 2 and starts from the same x₀ = 3.",
-  "lab4.compare.rootEx2Sqrt5.task":
-    "Approximate √5 with the third-order method. The method converges to √a, so a = 3 gives √3 and a = 5 gives √5; this card uses a = 5. Run it for ε = 10⁻⁴, 10⁻⁸ and 10⁻¹², and compare with the iterative method obtained from the tangent method, which uses c = 5 and k = 2 and starts from the same x₀ = 5.",
+    "Approximate √2 with the third-order method and compare the results with the iterative method obtained from the tangent method.",
+  "lab4.compare.rootEx2.task":
+    "Approximate √3 and √5 with the third-order method and compare the results with the iterative method obtained from the tangent method. The method converges to √a, so a = 3 and a = 5 respectively.",
 } as const;
 
 export type MessageKey = keyof typeof en;

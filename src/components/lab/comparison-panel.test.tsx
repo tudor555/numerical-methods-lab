@@ -231,17 +231,15 @@ describe("ComparisonPanel for Lab 3", () => {
 });
 
 describe("ComparisonPanel for Lab 4", () => {
-  it("shows the five comparisons in the lab's order, each with its task", () => {
+  it("shows the four comparisons in the lab's order, each with its task", () => {
     const html = render(<ComparisonPanel lab={lab4} />, "ro");
     expect(elements(html, "h3").map(textOf)).toEqual([
       "Ex. 1: √2 prin metoda combinată a tangentei",
       "Ex. 2: x³ − x − 1 = 0 prin metoda combinată a tangentei",
       "Ex. 1: √2 prin metoda de ordinul 3",
-      "Ex. 2: √3 prin metoda de ordinul 3",
-      "Ex. 2: √5 prin metoda de ordinul 3",
+      "Ex. 2: √3 și √5 prin metoda de ordinul 3",
     ]);
-    const all = cards(html);
-    all.forEach((card, i) => {
+    cards(html).forEach((card, i) => {
       expect(textOf(card)).toContain("Cerința:");
       if (i < 2) {
         expect(textOf(card)).toContain("metoda tangentei");
@@ -250,9 +248,43 @@ describe("ComparisonPanel for Lab 4", () => {
         expect(textOf(card)).toContain("metoda iterativă obținută din metoda tangentei");
       }
     });
-    for (const card of all.slice(3)) {
-      expect(textOf(card)).toContain("Metoda converge către √a, deci a = 3 dă √3, iar a = 5 dă √5");
-    }
+  });
+
+  it("lists each row's inputs before the run, so the task text stays short", () => {
+    const [combined, , , roots] = cards(render(<ComparisonPanel lab={lab4} />, "ro"));
+    expect(textOf(combined)).toContain("Date de intrare");
+    expect(elements(combined, "dt").map(textOf)).toEqual([
+      "Metoda combinată a tangentei",
+      "Metoda tangentei",
+      "Precizia",
+    ]);
+    expect(texOf(combined)).toEqual([
+      "f(x) = { x}^{2}-2",
+      "f'(x) = 2 x",
+      "[a;\\ b] = [1;\\ 2]",
+      "x_0 = 2",
+      "f(x) = { x}^{2}-2",
+      "f'(x) = 2 x",
+      "[a;\\ b] = [1;\\ 2]",
+      "x_0 = 2",
+      "\\varepsilon = 10^{-4},\\ 10^{-8},\\ 10^{-12}",
+    ]);
+    // √3 and √5 sit in one card: a = 3 next to c = 3, then a = 5 next to c = 5.
+    expect(texOf(roots).slice(0, -1)).toEqual([
+      "a = 3",
+      "c = 3",
+      "k = 2",
+      "a = 5",
+      "c = 5",
+      "k = 2",
+    ]);
+  });
+
+  it("names rule R0 for Newton's start in Lab 2, in words", () => {
+    const [first] = cards(render(<ComparisonPanel lab={lab2} />));
+    expect(textOf(first)).toContain(": Rule R0");
+    expect(texOf(first)).toContain("\\mathrm{dda} = f''(a) = 2");
+    expect(texOf(first)).toContain("x_1 = 1.4");
   });
 
   it.each([
@@ -265,10 +297,10 @@ describe("ComparisonPanel for Lab 4", () => {
     ],
     [
       "ro",
-      "root-ex2-sqrt5",
+      "root-ex1",
       ["Metoda de ordinul 3", "Metoda tangentei"],
-      ["n = 4", "n = 5", "n = 6"],
-      "\\sqrt{5}",
+      ["n = 3", "n = 4", "n = 6"],
+      "\\sqrt{2}",
     ],
   ] as const)("in %s, %s names both methods and shows n for each ε", (lang, id, names, ns, tex) => {
     const comparison = lab4.comparisons.find((c) => c.id === id);

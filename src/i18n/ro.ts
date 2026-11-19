@@ -267,11 +267,11 @@ export const ro: Record<MessageKey, string> = {
   "lab2.compare.ex2": "Ex. 2: x³ − x − 1 = 0 prin metoda secantei",
   "lab2.compare.steffensen": "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Steffensen",
   "lab2.compare.ex1.task":
-    "Aproximează numărul √2 prin metoda secantei, folosind f(x) = x² − 2, intervalul [1; 2] și valorile inițiale x₀ = 2 și x₁ = 1,4, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție și același interval, cu derivata calculată din f și iterația inițială x₀ = 2, dată de regula R0.",
+    "Aproximează numărul √2 prin metoda secantei și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
   "lab2.compare.ex2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda secantei, cu intervalul [1; 2] și valorile inițiale x₀ = 2 și x₁ = 1,5, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție și același interval, cu derivata calculată din f și iterația inițială x₀ = 2, dată de regula R0.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda secantei și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
   "lab2.compare.steffensen.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Steffensen, cu intervalul [1; 2] și valoarea inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Ambele metode pornesc din x₀ = 2, dată de regula R0, iar metoda tangentei folosește derivata calculată din f.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Steffensen și compară rezultatele cu cele obținute prin metoda tangentei. Pentru metoda tangentei, f′ este calculată din f, iar x₀ este dat de regula R0.",
 
   "lab3.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda lui Halley și prin metoda lui Cebîșev, două generalizări ale metodei tangentei care folosesc și derivata a doua. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
@@ -309,11 +309,11 @@ export const ro: Record<MessageKey, string> = {
   "lab3.compare.ex2": "Ex. 2: x³ − x − 1 = 0 prin metoda lui Halley",
   "lab3.compare.chebyshev": "Exemplu numeric: x³ − x − 1 = 0 prin metoda lui Cebîșev",
   "lab3.compare.ex1.task":
-    "Aproximează numărul √2 prin metoda lui Halley, folosind f(x) = x² − 2, f′(x) = 2x și f″(x) = 2, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 2x și iterația inițială x₀ = 2.",
+    "Aproximează numărul √2 prin metoda lui Halley și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab3.compare.ex2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Halley, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Halley și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab3.compare.chebyshev.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Cebîșev, folosind f′(x) = 3x² − 1 și f″(x) = 6x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda lui Cebîșev și compară rezultatele cu cele obținute prin metoda tangentei.",
 
   "lab4.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda combinată a tangentei, care adaugă fiecărui pas al metodei tangentei un al doilea pas cu aceeași pantă, și calculează radicalii cu o metodă de ordinul 3. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
@@ -347,16 +347,13 @@ export const ro: Record<MessageKey, string> = {
   "lab4.compare.combinedEx1": "Ex. 1: √2 prin metoda combinată a tangentei",
   "lab4.compare.combinedEx2": "Ex. 2: x³ − x − 1 = 0 prin metoda combinată a tangentei",
   "lab4.compare.rootEx1": "Ex. 1: √2 prin metoda de ordinul 3",
-  "lab4.compare.rootEx2Sqrt3": "Ex. 2: √3 prin metoda de ordinul 3",
-  "lab4.compare.rootEx2Sqrt5": "Ex. 2: √5 prin metoda de ordinul 3",
+  "lab4.compare.rootEx2": "Ex. 2: √3 și √5 prin metoda de ordinul 3",
   "lab4.compare.combinedEx1.task":
-    "Aproximează numărul √2 prin metoda combinată a tangentei, folosind f(x) = x² − 2 și f′(x) = 2x, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 2x și iterația inițială x₀ = 2.",
+    "Aproximează numărul √2 prin metoda combinată a tangentei și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab4.compare.combinedEx2.task":
-    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda combinată a tangentei, folosind f′(x) = 3x² − 1, intervalul [1; 2] și iterația inițială x₀ = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele obținute prin metoda tangentei. Metoda tangentei folosește aceeași funcție, derivata f′(x) = 3x² − 1 și iterația inițială x₀ = 2.",
+    "Aproximează rădăcina reală a ecuației x³ − x − 1 = 0 prin metoda combinată a tangentei și compară rezultatele cu cele obținute prin metoda tangentei.",
   "lab4.compare.rootEx1.task":
-    "Aproximează √2 prin metoda de ordinul 3, luând a = 2, pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹², și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei. Aceasta folosește c = 2 și k = 2 și pornește din aceeași iterație inițială x₀ = 2.",
-  "lab4.compare.rootEx2Sqrt3.task":
-    "Aproximează √5 prin metoda de ordinul 3. Metoda converge către √a, deci a = 3 dă √3, iar a = 5 dă √5; aici se ia a = 3. Calculează pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹² și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei, care folosește c = 3 și k = 2 și pornește din aceeași iterație inițială x₀ = 3.",
-  "lab4.compare.rootEx2Sqrt5.task":
-    "Aproximează √5 prin metoda de ordinul 3. Metoda converge către √a, deci a = 3 dă √3, iar a = 5 dă √5; aici se ia a = 5. Calculează pentru ε = 10⁻⁴, 10⁻⁸ și 10⁻¹² și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei, care folosește c = 5 și k = 2 și pornește din aceeași iterație inițială x₀ = 5.",
+    "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei.",
+  "lab4.compare.rootEx2.task":
+    "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă obținută din metoda tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
 };

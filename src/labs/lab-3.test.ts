@@ -174,12 +174,13 @@ describe("Lab 3 comparisons", () => {
     }
   });
 
-  it("states in every task which inputs Newton uses, as plain facts", () => {
+  it("keeps every task to the two methods; the card lists the inputs", () => {
     for (const { taskKey } of lab3.comparisons) {
-      expect(en[taskKey]).toContain("tangent method");
-      expect(en[taskKey]).toMatch(/f′\(x\) = (2x|3x² − 1) and starts from x₀ = 2\.$/);
-      expect(ro[taskKey]).toContain("metoda tangentei");
-      expect(ro[taskKey]).toMatch(/derivata f′\(x\) = (2x|3x² − 1) și iterația inițială x₀ = 2\.$/);
+      expect(en[taskKey]).toMatch(/and compare the results with the tangent method\.$/);
+      expect(ro[taskKey]).toMatch(
+        /și compară rezultatele cu cele obținute prin metoda tangentei\.$/,
+      );
+      for (const text of [en[taskKey], ro[taskKey]]) expect(text).not.toMatch(/x₀ =|ε =|\[1/);
       expect(en[taskKey]).not.toMatch(/\bthe lab\b/i);
       expect(ro[taskKey]).not.toContain("Laboratorul");
     }

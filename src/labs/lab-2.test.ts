@@ -134,12 +134,10 @@ describe("Lab 2 comparisons", () => {
     }
   });
 
-  it("states in every task which inputs Newton uses", () => {
+  it("says in every task how Newton gets f′ and x₀, which the inputs list cannot show", () => {
     for (const { taskKey } of lab2.comparisons) {
-      expect(en[taskKey]).toContain("f′ derived from f");
-      expect(en[taskKey]).toContain("x₀ = 2 from rule R0");
-      expect(ro[taskKey]).toContain("derivata calculată din f");
-      expect(ro[taskKey]).toContain("regula R0");
+      expect(en[taskKey]).toContain("derives f′ from f and takes x₀ from rule R0.");
+      expect(ro[taskKey]).toContain("f′ este calculată din f, iar x₀ este dat de regula R0.");
       // The choice is stated plainly, not as a gap in the lab.
       expect(en[taskKey]).not.toMatch(/\bthe lab\b/i);
       expect(ro[taskKey]).not.toContain("Laboratorul");

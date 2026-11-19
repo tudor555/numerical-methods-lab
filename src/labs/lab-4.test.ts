@@ -93,7 +93,7 @@ describe("Lab 4 messages", () => {
   });
 
   it("names the 4b reference method as the lab does", () => {
-    for (const id of ["rootEx1", "rootEx2Sqrt3", "rootEx2Sqrt5"] as const) {
+    for (const id of ["rootEx1", "rootEx2"] as const) {
       expect(en[`lab4.compare.${id}.task`]).toContain(
         "the iterative method obtained from the tangent method",
       );
@@ -169,12 +169,11 @@ describe("Lab 4 comparisons", () => {
       ["combined-ex1", ["4a", "1a"]],
       ["combined-ex2", ["4a", "1a"]],
       ["root-ex1", ["4b", "1b"]],
-      ["root-ex2-sqrt3", ["4b", "1b"]],
-      ["root-ex2-sqrt5", ["4b", "1b"]],
+      ["root-ex2", ["4b", "1b", "4b", "1b"]],
     ]);
     for (const comparison of lab4.comparisons) {
       expect(comparison.eps).toEqual([1e-4, 1e-8, 1e-12]);
-      expect(comparison.rows[0].presetId).toBe(comparison.id);
+      expect(comparison.rows[0].presetId.startsWith(comparison.id)).toBe(true);
     }
   });
 
@@ -191,11 +190,9 @@ describe("Lab 4 comparisons", () => {
       [3, 4, 4],
       [4, 5, 6],
     ]);
-    expect(n("root-ex2-sqrt3")).toEqual([
+    expect(n("root-ex2")).toEqual([
       [3, 4, 4],
       [4, 5, 6],
-    ]);
-    expect(n("root-ex2-sqrt5")).toEqual([
       [4, 4, 5],
       [5, 6, 6],
     ]);
@@ -228,48 +225,39 @@ describe("Lab 4 comparisons", () => {
         c: String(a),
         k: "2",
       });
+    }
+    // Rows come in pairs (4b, then 1b) per radicand.
+    for (const [id, starts] of [
+      ["root-ex1", [2, 2]],
+      ["root-ex2", [3, 3, 5, 5]],
+    ] as const) {
       const comparison = lab4.comparisons.find((c) => c.id === id);
       if (!comparison) throw new Error(id);
-      for (const row of runComparison(lab4, comparison)) {
-        expect(row.every((cell) => cell?.iterations[0].x === a)).toBe(true);
-      }
+      runComparison(lab4, comparison).forEach((row, i) => {
+        expect(row.every((cell) => cell?.iterations[0].x === starts[i])).toBe(true);
+      });
     }
   });
 
-  it("states in every task which inputs the other method uses, as plain facts", () => {
-    for (const { id, taskKey } of lab4.comparisons) {
-      if (id.startsWith("combined")) {
-        expect(en[taskKey]).toMatch(/f′\(x\) = (2x|3x² − 1) and starts from x₀ = 2\.$/);
-        expect(ro[taskKey]).toMatch(
-          /derivata f′\(x\) = (2x|3x² − 1) și iterația inițială x₀ = 2\.$/,
-        );
-      } else {
-        expect(en[taskKey]).toMatch(/uses c = (\d) and k = 2 and starts from the same x₀ = \1\.$/);
-        expect(ro[taskKey]).toMatch(
-          /c = (\d) și k = 2 și pornește din aceeași iterație inițială x₀ = \1\.$/,
-        );
+  it("keeps every task to the two methods; the card lists the inputs", () => {
+    for (const { taskKey } of lab4.comparisons) {
+      for (const text of [en[taskKey], ro[taskKey]]) {
+        expect(text).not.toMatch(/x₀ =|ε =|c =|k =|\[1/);
       }
       expect(en[taskKey]).not.toMatch(/\bthe lab\b/i);
       expect(ro[taskKey]).not.toContain("Laboratorul");
     }
   });
 
-  it("paraphrases ex. 2 as the lab asks (√5), then states the √a fact and the card's a", () => {
-    for (const [id, a] of [
-      ["rootEx2Sqrt3", 3],
-      ["rootEx2Sqrt5", 5],
-    ] as const) {
-      expect(en[`lab4.compare.${id}.task`]).toMatch(
-        new RegExp(
-          `^Approximate √5 with the third-order method\\. The method converges to √a, so a = 3 gives √3 and a = 5 gives √5; this card uses a = ${a}\\. `,
-        ),
-      );
-      expect(ro[`lab4.compare.${id}.task`]).toMatch(
-        new RegExp(
-          `^Aproximează √5 prin metoda de ordinul 3\\. Metoda converge către √a, deci a = 3 dă √3, iar a = 5 dă √5; aici se ia a = ${a}\\. `,
-        ),
-      );
-    }
+  it("asks ex. 2 for √3 and √5 in one card, naming a = 3 and a = 5 together", () => {
+    expect(en["lab4.compare.rootEx2"]).toBe("Ex. 2: √3 and √5 with the third-order method");
+    expect(ro["lab4.compare.rootEx2"]).toBe("Ex. 2: √3 și √5 prin metoda de ordinul 3");
+    expect(en["lab4.compare.rootEx2.task"]).toMatch(
+      /^Approximate √3 and √5 with .* converges to √a, so a = 3 and a = 5 respectively\.$/,
+    );
+    expect(ro["lab4.compare.rootEx2.task"]).toMatch(
+      /^Aproximează √3 și √5 prin .* converge către √a, deci se ia a = 3, respectiv a = 5\.$/,
+    );
   });
 });
 

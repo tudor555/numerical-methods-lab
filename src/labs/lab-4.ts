@@ -176,21 +176,13 @@ export const lab4: ReadyLab = {
       ],
     },
     {
-      id: "root-ex2-sqrt3",
-      titleKey: "lab4.compare.rootEx2Sqrt3",
-      taskKey: "lab4.compare.rootEx2Sqrt3.task",
+      id: "root-ex2",
+      titleKey: "lab4.compare.rootEx2",
+      taskKey: "lab4.compare.rootEx2.task",
       eps: EPS_SET,
       rows: [
         { methodId: "4b", presetId: "root-ex2-sqrt3" },
         { methodId: "1b", presetId: "root-ex2-sqrt3-kth-root" },
-      ],
-    },
-    {
-      id: "root-ex2-sqrt5",
-      titleKey: "lab4.compare.rootEx2Sqrt5",
-      taskKey: "lab4.compare.rootEx2Sqrt5.task",
-      eps: EPS_SET,
-      rows: [
         { methodId: "4b", presetId: "root-ex2-sqrt5" },
         { methodId: "1b", presetId: "root-ex2-sqrt5-kth-root" },
       ],
