@@ -384,4 +384,40 @@ export const ro: Record<MessageKey, string> = {
     "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei.",
   "lab4.compare.rootEx2.task":
     "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
+
+  "lab5.intro":
+    "Rezolvă sistemul neliniar F(x, y) = 0, G(x, y) = 0 prin metoda lui Newton, care liniarizează ambele ecuații la fiecare pas, și prin metoda lui Newton modificată, care păstrează derivatele parțiale din punctul inițial. Compară apoi rezultatele și numărul de iterații obținute prin cele două metode.",
+  "lab5.method.newton.tab": "5a · Metoda lui Newton",
+  "lab5.method.newton.title": "Metoda lui Newton pentru sisteme neliniare",
+  "lab5.method.newton.name": "Metoda lui Newton",
+  "lab5.method.newton.idea":
+    "În vecinătatea punctului $(x_n; y_n)$, funcțiile $F$ și $G$ se înlocuiesc cu planele lor tangente, iar următoarea iterație $(x_{n+1}; y_{n+1})$ este punctul în care ambele plane se anulează. Rezolvând acest sistem liniar 2×2 cu regula lui Cramer se obțin formulele de mai jos, în care $F$, $G$ și derivatele parțiale $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ se calculează în $(x_n; y_n)$, iar $J$ este jacobianul. În apropierea unei soluții simple, convergența este pătratică:",
+  "lab5.method.newton.start":
+    "Punctul inițial $(x_0; y_0)$, funcțiile $F$, $G$ și cele patru derivate parțiale se introduc direct; derivatele parțiale pot fi completate cu „Calculează din F” și „Calculează din G”. Metoda converge doar dacă punctul inițial este suficient de aproape de soluție.",
+  "lab5.method.newton.failure":
+    "Dacă $F$ și $G$ se anulează exact în $(x_n; y_n)$, acesta este chiar soluția, iar iterațiile rămân în acest punct. Altfel, dacă $J = 0$, sistemul liniar nu are soluție unică și metoda se oprește cu eroare.",
+  "lab5.method.newton.chart":
+    "Primul grafic arată curbele $F(x, y) = 0$ și $G(x, y) = 0$ în jurul iterațiilor: soluția este punctul lor de intersecție, iar traseul arată cum ajung iterațiile acolo. Al doilea grafic arată ambele diferențe pe scară logaritmică.",
+
+  "lab5.method.modified.tab": "5b · Newton modificată",
+  "lab5.method.modified.title": "Metoda lui Newton modificată",
+  "lab5.method.modified.name": "Metoda lui Newton modificată",
+  "lab5.method.modified.idea":
+    "Pasul este cel al metodei lui Newton, dar derivatele parțiale, și odată cu ele $J$, se calculează o singură dată, în punctul inițial: $F_x^0 = F_x(x_0, y_0)$ și așa mai departe. Doar $F$ și $G$ se calculează în $(x_n; y_n)$. Fiecare pas este mai simplu, dar convergența este doar liniară, deci sunt necesare mai multe iterații:",
+  "lab5.method.modified.start":
+    "Punctul inițial $(x_0; y_0)$, funcțiile $F$, $G$ și cele patru derivate parțiale se introduc direct; derivatele parțiale pot fi completate cu „Calculează din F” și „Calculează din G”. Derivatele parțiale se folosesc doar în $(x_0; y_0)$.",
+  "lab5.method.modified.failure":
+    "Dacă $F$ și $G$ se anulează exact în $(x_n; y_n)$, acesta este chiar soluția, iar iterațiile rămân în acest punct. Altfel, dacă $J_0 = 0$, metoda se oprește cu eroare chiar la primul pas, deoarece $J_0$ nu se mai schimbă.",
+  "lab5.method.modified.chart":
+    "Primul grafic arată curbele $F(x, y) = 0$ și $G(x, y) = 0$ în jurul iterațiilor: soluția este punctul lor de intersecție, iar traseul arată cum ajung iterațiile acolo. Al doilea grafic arată ambele diferențe pe scară logaritmică.",
+
+  "lab5.preset.ex1": "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, din (1,2; 1,7)",
+  "lab5.preset.ex2First": "Ex. 2: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
+  "lab5.preset.ex2Second": "Ex. 2: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
+  "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
+  "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
+
+  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+  "lab5.compare.ex3.task":
+    "Aplică metoda lui Newton modificată sistemului din ex. 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se folosesc ambele puncte inițiale din ex. 2, fiecare cu cele trei precizii.",
 };

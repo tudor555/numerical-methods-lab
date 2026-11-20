@@ -3,6 +3,7 @@ import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
+import { lab5 } from "@/labs/lab-5";
 import { elements, render, texOf, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
@@ -248,5 +249,66 @@ describe("LabPage, Lab 4", () => {
     expect(textOf(label)).toContain(radicand);
     expect(html).not.toContain('aria-label="Derive from f"');
     expect(html).not.toContain(lang === "en" ? "Derive from f" : "Calculează din f");
+  });
+});
+
+describe("LabPage, Lab 5", () => {
+  it.each([
+    [
+      "en",
+      "Lab 5",
+      "Newton's method for 2×2 systems",
+      "Solve a nonlinear system F(x, y) = 0, G(x, y) = 0",
+      ["5a · Newton", "5b · Modified Newton"],
+      "How it works: Newton's method for nonlinear systems",
+      "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, from (1.2, 1.7)",
+    ],
+    [
+      "ro",
+      "Laboratorul 5",
+      "Metoda lui Newton pentru sisteme 2×2",
+      "Rezolvă sistemul neliniar F(x, y) = 0, G(x, y) = 0",
+      ["5a · Metoda lui Newton", "5b · Newton modificată"],
+      "Cum funcționează: Metoda lui Newton pentru sisteme neliniare",
+      "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, din (1,2; 1,7)",
+    ],
+  ] as const)("first render in %s", (lang, chip, title, intro, methodTabs, heading, preset) => {
+    const html = render(<LabPage slug="newton-systems" />, lang);
+    const header = html.slice(0, html.indexOf("</header>"));
+    expect(
+      textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+    ).toBe(chip);
+    expect(textOf(elements(header, "h1")[0])).toBe(title);
+    expect(textOf(elements(header, "p")[0])).toContain(intro);
+    expect(textOf(elements(header, "p")[0])).not.toContain(chip);
+    expect(tabs(html).map(textOf)).toEqual(methodTabs);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    const fieldIds = [...html.matchAll(/id="field-([\w]+)"/g)].map((m) => m[1]);
+    expect(fieldIds).toEqual(["F", "G", "Fx", "Fy", "Gx", "Gy", "x0", "y0", "eps", "maxIter"]);
+    const pressed = elements(html, "button").filter(
+      (b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'),
+    );
+    expect(pressed.map(textOf)).toEqual([preset]);
+    expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+      lab5.comparisons.length,
+    );
+  });
+
+  it("offers “Derive from F” and “Derive from G” for the partials only", () => {
+    const html = render(<LabPage slug="newton-systems" />);
+    expect(html.split('aria-label="Derive from F"').length - 1).toBe(2);
+    expect(html.split('aria-label="Derive from G"').length - 1).toBe(2);
+    expect(html).not.toContain('aria-label="Derive from f"');
+    expect(render(<LabPage slug="newton-systems" />, "ro")).toContain("Calculează din G");
+  });
+
+  it("opens 5b on ex. 3 from (0.9, 3.1)", () => {
+    openTab.id = "5b";
+    const html = render(<LabPage slug="newton-systems" />);
+    const pressed = elements(html, "button").filter(
+      (b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'),
+    );
+    expect(pressed.map(textOf)).toEqual(["Ex. 3: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)"]);
+    expect(textOf(elements(html, "h2")[0])).toBe("How it works: Modified Newton's method");
   });
 });

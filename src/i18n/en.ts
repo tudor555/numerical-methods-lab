@@ -378,6 +378,42 @@ export const en = {
     "Approximate √2 with the third-order method and compare the results with the iterative method adapted from the tangent method.",
   "lab4.compare.rootEx2.task":
     "Approximate √3 and √5 with the third-order method and compare the results with the iterative method adapted from the tangent method. The method converges to √a, so a = 3 and a = 5 respectively.",
+
+  "lab5.intro":
+    "Solve a nonlinear system F(x, y) = 0, G(x, y) = 0 with Newton's method, which linearizes both equations at every step, and with modified Newton, which keeps the partial derivatives of the starting point. Then compare the results and iteration counts of the two methods.",
+  "lab5.method.newton.tab": "5a · Newton",
+  "lab5.method.newton.title": "Newton's method for nonlinear systems",
+  "lab5.method.newton.name": "Newton's method",
+  "lab5.method.newton.idea":
+    "Near $(x_n, y_n)$, both $F$ and $G$ are replaced by their tangent planes, and the next iterate $(x_{n+1}, y_{n+1})$ is the point where both planes reach zero. Solving that 2×2 linear system with Cramer's rule gives the formulas below, where $F$, $G$ and the partial derivatives $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ are all evaluated at $(x_n, y_n)$, and $J$ is the Jacobian. Close to a simple solution the convergence is quadratic:",
+  "lab5.method.newton.start":
+    "The starting point $(x_0, y_0)$, $F$, $G$ and the four partial derivatives are entered directly; “Derive from F” and “Derive from G” can fill in the partial derivatives. The method converges only from a starting point close enough to the solution.",
+  "lab5.method.newton.failure":
+    "If $F$ and $G$ are both exactly 0 at $(x_n, y_n)$, it is the exact solution and the iteration stays there. Otherwise, if $J = 0$, the linear system has no unique solution and the method stops with an error.",
+  "lab5.method.newton.chart":
+    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$ around the iterates: the solution is where they cross, and the path shows how the iterates get there. The second chart shows both differences on a log scale.",
+
+  "lab5.method.modified.tab": "5b · Modified Newton",
+  "lab5.method.modified.title": "Modified Newton's method",
+  "lab5.method.modified.name": "Modified Newton",
+  "lab5.method.modified.idea":
+    "The step is Newton's, but the partial derivatives, and with them $J$, are computed only once, at the starting point: $F_x^0 = F_x(x_0, y_0)$, and so on. Only $F$ and $G$ are evaluated at $(x_n, y_n)$. Each step is cheaper, but the convergence is only linear, so it takes more iterations:",
+  "lab5.method.modified.start":
+    "The starting point $(x_0, y_0)$, $F$, $G$ and the four partial derivatives are entered directly; “Derive from F” and “Derive from G” can fill in the partial derivatives. The partial derivatives are used only at $(x_0, y_0)$.",
+  "lab5.method.modified.failure":
+    "If $F$ and $G$ are both exactly 0 at $(x_n, y_n)$, it is the exact solution and the iteration stays there. Otherwise, if $J_0 = 0$, the method stops with an error at the very first step, since $J_0$ never changes.",
+  "lab5.method.modified.chart":
+    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$ around the iterates: the solution is where they cross, and the path shows how the iterates get there. The second chart shows both differences on a log scale.",
+
+  "lab5.preset.ex1": "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, from (1.2, 1.7)",
+  "lab5.preset.ex2First": "Ex. 2: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)",
+  "lab5.preset.ex2Second": "Ex. 2: x² + y² = 10, √(x + y) = 2, from (2.9, 1.1)",
+  "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)",
+  "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, from (2.9, 1.1)",
+
+  "lab5.compare.ex3": "Ex. 3: modified Newton on the system of ex. 2",
+  "lab5.compare.ex3.task":
+    "Apply modified Newton to the system of ex. 2 and compare the result and the number of iterations with Newton's method. Both starting points of ex. 2 are used, each with three precisions.",
 } as const;
 
 export type MessageKey = keyof typeof en;

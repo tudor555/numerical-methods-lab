@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lab1 } from "@/labs/lab-1";
+import { lab5 } from "@/labs/lab-5";
 import type { FieldErrors, FieldValues, MethodDefinition } from "@/labs/types";
 import { count, elements, render, textOf } from "@/test/render";
 import { MethodForm } from "./method-form";
@@ -98,6 +99,14 @@ describe("MethodForm fields", () => {
     expect(textOf(field(form(newton, { errors, lang: "ro" }), "eps"))).toContain(
       "Valoarea trebuie să fie strict pozitivă.",
     );
+  });
+
+  it("names the field it derives from in the button", () => {
+    const partial = lab5.methods[0];
+    const html = form(partial);
+    expect(count(html, 'aria-label="Derive from F"')).toBe(2);
+    expect(count(html, 'aria-label="Derive from G"')).toBe(2);
+    expect(count(form(partial, { lang: "ro" }), 'aria-label="Calculează din G"')).toBe(2);
   });
 
   it("offers Derive from f only on fields that can be derived", () => {

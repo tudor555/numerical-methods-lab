@@ -43,9 +43,16 @@ describe("/labs/[slug]", () => {
     expect(html).toContain('id="field-f"');
   });
 
+  it("renders the lab page for the ready 2×2 systems lab /labs/newton-systems", async () => {
+    const html = render(await LabRoute(props("newton-systems")));
+    expect(textOf(html)).toContain("Newton's method for 2×2 systems");
+    expect(html).toContain('id="field-F"');
+    expect(html).toContain('id="field-y0"');
+  });
+
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "newton-systems"],
+    ["a lab that is not built yet", "nonlinear-systems"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -102,6 +109,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("newton-systems"))).resolves.toEqual({});
+    await expect(generateMetadata(props("nonlinear-systems"))).resolves.toEqual({});
   });
 });
