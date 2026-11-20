@@ -62,12 +62,14 @@ export const ro: Record<MessageKey, string> = {
 
   "common.stopping":
     "Criteriul de oprire: $x_1$ se calculează separat din $x_0$, apoi, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+  "common.systemStopping":
+    "Criteriul de oprire: $(x_1; y_1)$ se calculează separat din $(x_0; y_0)$, apoi, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$ sau $|y_n - y_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $(x_n; y_n)$.",
 
   "math.if": "dacă",
 
   "form.run": "Calculează",
   "form.blocked": "Corectează câmpurile marcate ca să poți calcula.",
-  "form.derive": "Calculează din f",
+  "form.derive": "Calculează din {source}",
   "form.exprHint":
     "Variabile: {vars}. Funcții: sin, cos, exp, ln, lg, sqrt și altele. Constante: pi, e.",
   "form.numberHint": "Un număr sau o expresie, de exemplu 3*pi/8 sau 1e-4.",
@@ -88,6 +90,11 @@ export const ro: Record<MessageKey, string> = {
   "field.c": "Numărul de sub radical",
   "field.k": "Ordinul rădăcinii",
   "field.phi": "Funcția de iterație",
+  "field.F": "Funcția F",
+  "field.G": "Funcția G",
+  "field.partial": "Derivata parțială",
+  "field.startX": "Punctul inițial, x",
+  "field.startY": "Punctul inițial, y",
 
   "field.error.empty": "Câmpul este obligatoriu.",
   "field.error.syntax": "Expresia nu este scrisă corect. Verifică operatorii și parantezele.",
@@ -124,6 +131,12 @@ export const ro: Record<MessageKey, string> = {
   "result.maxIterations":
     "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
   "result.partial": "Iterațiile calculate până la eroare sunt afișate mai jos.",
+  "result.system.converged":
+    "Precizia dorită a fost atinsă la iterația n = {n}: |xₙ − xₙ₋₁| < ε și |yₙ − yₙ₋₁| < ε.",
+  "result.system.maxIterations":
+    "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
+  "result.startPoint": "Punctul inițial",
+  "result.exactSolution": "Soluția exactă",
 
   "run.error.zero-derivative":
     "Derivata se anulează la n = {n}, în xₙ = {x}: tangenta este orizontală, deci xₙ₊₁ nu poate fi calculat.",
@@ -134,6 +147,14 @@ export const ro: Record<MessageKey, string> = {
   "run.error.overflow":
     "La pasul care pornește din n = {n}, xₙ = {x}, o valoare a devenit infinită (±∞).",
   "run.error.diverged": "Șirul iterațiilor diverge: |xₙ| a depășit 10¹⁰⁰ la n = {n} (xₙ = {x}).",
+  "run.systemError.zero-jacobian":
+    "Jacobianul J se anulează la n = {n}, în (xₙ; yₙ) = {point}: pasul ar împărți la zero, deci (xₙ₊₁; yₙ₊₁) nu poate fi calculat.",
+  "run.systemError.undefined-value":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ) = {point}, o valoare nu este definită (NaN). Verifică domeniul de definiție al funcțiilor (radical dintr-un număr negativ, logaritm dintr-un număr nepozitiv).",
+  "run.systemError.overflow":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ) = {point}, o valoare a devenit infinită (±∞).",
+  "run.systemError.diverged":
+    "Șirul iterațiilor diverge: la n = {n}, în (xₙ; yₙ) = {point}, |xₙ| sau |yₙ| a depășit 10¹⁰⁰.",
 
   "table.title": "Tabelul iterațiilor",
   "table.hidden": "Iterații ascunse: {count}",
@@ -147,6 +168,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.combinedTangent": "Graficul lui f și pașii metodei combinate a tangentei",
   "chart.cobweb": "Graficul lui φ, dreapta y = x și traseul iterațiilor",
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
+  "chart.path": "Curbele F = 0 și G = 0 și traseul iterațiilor",
+  "chart.systemConvergence": "Convergența: |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
   "chart.tool.zoom": "Mărește o zonă",
   "chart.tool.pan": "Deplasează graficul",
@@ -168,10 +191,15 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.diff": "|xₙ − xₙ₋₁|",
   "chart.trace.eps": "ε",
   "chart.trace.error": "|xₙ − valoarea exactă|",
+  "chart.trace.curveF": "F(x, y) = 0",
+  "chart.trace.curveG": "G(x, y) = 0",
+  "chart.trace.diffY": "|yₙ − yₙ₋₁|",
+  "chart.trace.systemError": "max(|xₙ − x*|, |yₙ − y*|)",
 
   "compare.run": "Compară",
   "compare.method": "Metoda",
   "compare.hint": "Fiecare celulă arată numărul de iterații n și ultima iterație xₙ.",
+  "compare.systemHint": "Fiecare celulă arată numărul de iterații n și ultima iterație (xₙ; yₙ).",
   "compare.cell.error": "Eroare",
   "compare.cell.max": "Limită atinsă",
   "compare.inputs": "Date de intrare",

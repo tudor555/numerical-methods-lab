@@ -161,7 +161,7 @@ describe("Lab 4 comparisons", () => {
   const n = (id: string) => {
     const comparison = lab4.comparisons.find((c) => c.id === id);
     if (!comparison) throw new Error(id);
-    return runComparison(lab4, comparison).map((row) => row.map((cell) => cell?.n ?? null));
+    return runComparison(lab4, comparison).map((row) => row.map((cell) => cell?.result.n ?? null));
   };
 
   it("lists exactly the comparisons the lab asks for, in order", () => {
@@ -234,7 +234,7 @@ describe("Lab 4 comparisons", () => {
       const comparison = lab4.comparisons.find((c) => c.id === id);
       if (!comparison) throw new Error(id);
       runComparison(lab4, comparison).forEach((row, i) => {
-        expect(row.every((cell) => cell?.iterations[0].x === starts[i])).toBe(true);
+        expect(row.every((cell) => cell?.result.iterations[0].x === starts[i])).toBe(true);
       });
     }
   });

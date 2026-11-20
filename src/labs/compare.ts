@@ -1,6 +1,6 @@
 import type { MessageKey } from "@/i18n/en";
 import { toTex } from "@/lib/expressions/compile";
-import type { ScalarRunResult } from "@/lib/methods/types";
+import type { ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
 import type {
   Comparison,
   ComparisonPreset,
@@ -10,8 +10,9 @@ import type {
   ReadyLab,
 } from "./types";
 
-/** One cell of a comparison; null when the preset does not pass validation. */
-export type ComparisonCell = ScalarRunResult | null;
+/** One cell of a comparison, with its kind; null when the preset does not pass validation. */
+export type ComparisonCell =
+  { kind: "scalar"; result: ScalarRunResult } | { kind: "system"; result: SystemRunResult } | null;
 
 /** A method a comparison row names: one of the lab's tabs, or one used only in comparisons. */
 export function findComparisonMethod(lab: ReadyLab, id: string): MethodDefinition | undefined {
@@ -31,7 +32,11 @@ export function runComparison(lab: ReadyLab, comparison: Comparison): Comparison
     return comparison.eps.map((eps) => {
       if (!method || !preset) return null;
       const prepared = method.prepare({ ...preset.values, eps: String(eps) });
-      return prepared.ok ? prepared.prepared.run() : null;
+      if (!prepared.ok) return null;
+      const run = prepared.prepared;
+      return run.kind === "system"
+        ? { kind: "system", result: run.run() }
+        : { kind: "scalar", result: run.run() };
     });
   });
 }
@@ -45,8 +50,8 @@ const NOT_LISTED = new Set(["eps", "maxIter"]);
 
 /**
  * The inputs a comparison row runs with, in form order, so a card can show them before it runs.
- * Hidden fields are left out, [a, b] is one interval, and a choice shows only when no visible
- * field already gives its value (x₀ typed in replaces "x₀: rule R0").
+ * Hidden fields are left out, [a, b] is one interval, (x₀, y₀) is one point, and a choice shows
+ * only when no visible field already gives its value (x₀ typed in replaces "x₀: rule R0").
  */
 export function comparisonInputs(
   method: MethodDefinition,
@@ -60,6 +65,7 @@ export function comparisonInputs(
   // 4b names its radicand `a` too, so [a, b] needs the interval's own b.
   const end = byId("b");
   const intervalEnd = byId("a") && end?.labelKey === "field.b" ? end : undefined;
+  const pointEnd = byId("x0") ? byId("y0") : undefined;
   const asTex = (field: FieldDefinition): string => {
     const raw = values[field.id] ?? "";
     try {
@@ -80,7 +86,13 @@ export function comparisonInputs(
     } else if (intervalEnd && field.id === "a") {
       const [a, b] = [asTex(field), asTex(intervalEnd)];
       inputs.push({ kind: "tex", tex: `[a${separator}\\ b] = [${a}${separator}\\ ${b}]` });
-    } else if (field !== intervalEnd) {
+    } else if (pointEnd && field.id === "x0") {
+      const [x, y] = [asTex(field), asTex(pointEnd)];
+      inputs.push({
+        kind: "tex",
+        tex: `(x_0${separator}\\ y_0) = (${x}${separator}\\ ${y})`,
+      });
+    } else if (field !== intervalEnd && field !== pointEnd) {
       inputs.push({ kind: "tex", tex: `${field.symbol} = ${asTex(field)}` });
     }
   }

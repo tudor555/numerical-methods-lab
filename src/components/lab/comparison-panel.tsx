@@ -12,12 +12,15 @@ import {
   type ComparisonCell as Cell,
 } from "@/labs/compare";
 import type { Comparison, MethodDefinition, ReadyLab } from "@/labs/types";
-import { formatEpsTex, formatValue } from "@/lib/format";
+import { formatEpsTex, formatPoint, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Tex } from "./formula";
-import { runErrorKey, STATUS_STYLE } from "./status";
+import { runErrorKey, STATUS_STYLE, systemErrorKey } from "./status";
 
-/** One ε cell: n and the last iterate, or the error. Wide screens show ε in a shared header instead. */
+/**
+ * One ε cell: n and the last iterate (a number, or a point for a system), or the error. Wide
+ * screens show ε in a shared header instead.
+ */
 function ResultCell({
   cell,
   eps,
@@ -27,7 +30,8 @@ function ResultCell({
   eps: number;
   errorKeys?: MethodDefinition["errorKeys"];
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const separator = lang === "ro" ? ";" : ",";
   const label = (
     <span className="text-muted-foreground text-sm lg:sr-only">
       <Tex tex={`\\varepsilon = ${formatEpsTex(eps)}`} />
@@ -43,14 +47,25 @@ function ResultCell({
     );
   }
 
-  const style = STATUS_STYLE[cell.status];
+  const run = cell.result;
+  const style = STATUS_STYLE[run.status];
   const Icon = style.icon;
 
-  if (cell.status === "error") {
-    const detail = t(runErrorKey(cell.error?.code, errorKeys), {
-      n: cell.error?.n ?? 0,
-      x: formatValue(cell.error?.x ?? Number.NaN),
-    });
+  if (run.status === "error") {
+    const detail =
+      cell.kind === "system"
+        ? t(systemErrorKey(cell.result.error?.code), {
+            n: cell.result.error?.n ?? 0,
+            point: formatPoint(
+              cell.result.error?.x ?? Number.NaN,
+              cell.result.error?.y ?? Number.NaN,
+              separator,
+            ),
+          })
+        : t(runErrorKey(cell.result.error?.code, errorKeys), {
+            n: cell.result.error?.n ?? 0,
+            x: formatValue(cell.result.error?.x ?? Number.NaN),
+          });
     return (
       <div className="bg-error/10 flex min-w-0 flex-col gap-1 rounded-lg px-4 py-2" title={detail}>
         {label}
@@ -63,12 +78,20 @@ function ResultCell({
     );
   }
 
+  let value: string;
+  if (cell.kind === "system") {
+    const point = cell.result.result;
+    value = point ? formatPoint(point.x, point.y, separator) : "—";
+  } else {
+    value = formatValue(cell.result.result ?? Number.NaN);
+  }
+
   return (
     <div className="bg-raised flex min-w-0 flex-col gap-1 rounded-lg px-4 py-2">
       {label}
       <span className="inline-flex flex-wrap items-center gap-2">
-        <span className="font-mono font-semibold tabular-nums">n = {cell.n}</span>
-        {cell.status === "max-iterations" && (
+        <span className="font-mono font-semibold tabular-nums">n = {run.n}</span>
+        {run.status === "max-iterations" && (
           <span className={cn("inline-flex items-center gap-1 text-sm", style.text)}>
             <Icon className="size-4" aria-hidden />
             {t("compare.cell.max")}
@@ -76,7 +99,7 @@ function ResultCell({
         )}
       </span>
       <span className="text-muted-foreground font-mono text-sm break-all tabular-nums">
-        {formatValue(cell.result ?? Number.NaN)}
+        {value}
       </span>
     </div>
   );
@@ -93,6 +116,10 @@ export function ComparisonResults({
   cells: Cell[][];
 }) {
   const { t } = useI18n();
+  // A system row's cells show a point, so the hint names (xₙ, yₙ) when the card has system rows
+  // and no scalar ones; a row whose preset failed (all null) does not change that.
+  const kinds = new Set(cells.flat().map((cell) => cell?.kind));
+  const allSystem = kinds.has("system") && !kinds.has("scalar");
   return (
     <div
       className="flex flex-col gap-4"
@@ -139,7 +166,9 @@ export function ComparisonResults({
           );
         })}
       </ul>
-      <p className="text-muted-foreground text-sm">{t("compare.hint")}</p>
+      <p className="text-muted-foreground text-sm">
+        {t(allSystem ? "compare.systemHint" : "compare.hint")}
+      </p>
     </div>
   );
 }

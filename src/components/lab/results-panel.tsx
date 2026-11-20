@@ -7,11 +7,13 @@ import type { RunView } from "@/labs/lab-state";
 import type { FunctionPlot, MethodDefinition } from "@/labs/types";
 import { formatSmall, formatValue } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { buildConvergenceChart, buildFunctionChart, type ChartLabels } from "./charts";
+import { buildConvergenceChart, buildFunctionChart } from "./charts";
 import { Tex } from "./formula";
 import { IterationTable } from "./iteration-table";
 import { PlotlyChart } from "./plotly-chart";
+import { Stat, useChartLabels } from "./results-common";
 import { runErrorKey, STATUS_STYLE, StatusBadge } from "./status";
+import { SystemResultsPanel } from "./system-results-panel";
 
 export type { RunView };
 
@@ -25,21 +27,28 @@ const CHART_TITLE = {
   cobweb: "chart.cobweb",
 } as const satisfies Record<FunctionPlot["kind"], MessageKey>;
 
-function Stat({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="border-border bg-raised min-w-0 rounded-lg border px-4 py-2">
-      <div className="text-muted-foreground text-sm">{label}</div>
-      <div className="mt-2 truncate font-mono text-xl tabular-nums sm:text-2xl">{children}</div>
-    </div>
-  );
-}
+type ScalarRunView = Exclude<RunView, { kind: "system" }>;
 
+/** Picks the panel for the run's kind before any hook runs, so each panel keeps its own hooks. */
 export function ResultsPanel({
   view,
   valueColumn,
   errorKeys,
 }: {
   view: RunView;
+  valueColumn?: string;
+  errorKeys?: MethodDefinition["errorKeys"];
+}) {
+  if (view.kind === "system") return <SystemResultsPanel view={view} />;
+  return <ScalarResultsPanel view={view} valueColumn={valueColumn} errorKeys={errorKeys} />;
+}
+
+function ScalarResultsPanel({
+  view,
+  valueColumn,
+  errorKeys,
+}: {
+  view: ScalarRunView;
   valueColumn?: string;
   errorKeys?: MethodDefinition["errorKeys"];
 }) {
@@ -62,25 +71,7 @@ export function ResultsPanel({
     message = result.iterations.length > 0 ? `${detail} ${t("result.partial")}` : detail;
   }
 
-  const labels: ChartLabels = useMemo(
-    () => ({
-      f: t("chart.trace.f"),
-      iterates: t("chart.trace.iterates"),
-      tangents: t("chart.trace.tangents"),
-      secants: t("chart.trace.secants"),
-      steffensenSteps: t("chart.trace.steffensenSteps"),
-      halleySteps: t("chart.trace.halleySteps"),
-      chebyshevSteps: t("chart.trace.chebyshevSteps"),
-      combinedSteps: t("chart.trace.combinedSteps"),
-      phi: t("chart.trace.phi"),
-      identity: t("chart.trace.identity"),
-      path: t("chart.trace.path"),
-      diff: t("chart.trace.diff"),
-      eps: t("chart.trace.eps"),
-      error: t("chart.trace.error"),
-    }),
-    [t],
-  );
+  const labels = useChartLabels();
 
   const functionChart = useMemo(
     () => (plot ? buildFunctionChart(plot, result.iterations, labels) : null),

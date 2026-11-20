@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { scalarRun } from "@/test/runs";
 import { en } from "@/i18n/en";
 import { ro } from "@/i18n/ro";
 import { findComparisonMethod, findComparisonPreset, runComparison } from "./compare";
@@ -21,7 +22,7 @@ const prepare = (id: string, patch: FieldValues = {}) => {
   const m = method(id);
   const prepared = m.prepare({ ...m.defaults, ...patch });
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
-  return prepared.prepared;
+  return scalarRun(prepared.prepared);
 };
 
 describe("Lab 3 registry", () => {
@@ -118,7 +119,7 @@ describe("Lab 3 comparisons", () => {
   const n = (id: string) => {
     const comparison = lab3.comparisons.find((c) => c.id === id);
     if (!comparison) throw new Error(id);
-    return runComparison(lab3, comparison).map((row) => row.map((cell) => cell?.n ?? null));
+    return runComparison(lab3, comparison).map((row) => row.map((cell) => cell?.result.n ?? null));
   };
 
   it("lists exactly the comparisons the lab asks for, in order, each against Newton", () => {
@@ -169,7 +170,7 @@ describe("Lab 3 comparisons", () => {
   it("starts both methods at x₀ = 2 in all three", () => {
     for (const comparison of lab3.comparisons) {
       for (const row of runComparison(lab3, comparison)) {
-        expect(row.every((cell) => cell?.iterations[0].x === 2)).toBe(true);
+        expect(row.every((cell) => cell?.result.iterations[0].x === 2)).toBe(true);
       }
     }
   });

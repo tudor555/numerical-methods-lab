@@ -6,7 +6,7 @@ import { useMemo, useReducer, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/i18n/provider";
 import { findReadyLab } from "@/labs/registry";
-import { initialLabState, labReducer } from "@/labs/lab-state";
+import { initialLabState, labReducer, toRunView } from "@/labs/lab-state";
 import type { Preset, ReadyLab } from "@/labs/types";
 import { cn } from "@/lib/utils";
 import { ComparisonPanel } from "./comparison-panel";
@@ -56,8 +56,7 @@ function LabView({ lab }: { lab: ReadyLab }) {
 
   const execute = () => {
     if (!prepared.ok) return;
-    const { run: start, plot, eps, exact } = prepared.prepared;
-    dispatch({ type: "run", methodId: method.id, run: { result: start(), plot, eps, exact } });
+    dispatch({ type: "run", methodId: method.id, run: toRunView(prepared.prepared) });
   };
 
   return (

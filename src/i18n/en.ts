@@ -58,12 +58,14 @@ export const en = {
 
   "common.stopping":
     "Stopping rule: $x_1$ is computed from $x_0$ as a separate step, then the iteration continues from $n = 1$ while $|x_n - x_{n-1}| \\ge \\varepsilon$. The output is $n$ and $x_n$.",
+  "common.systemStopping":
+    "Stopping rule: $(x_1, y_1)$ is computed from $(x_0, y_0)$ as a separate step, then the iteration continues from $n = 1$ while $|x_n - x_{n-1}| \\ge \\varepsilon$ or $|y_n - y_{n-1}| \\ge \\varepsilon$. The output is $n$ and $(x_n, y_n)$.",
 
   "math.if": "if",
 
   "form.run": "Run",
   "form.blocked": "Fix the highlighted fields to run.",
-  "form.derive": "Derive from f",
+  "form.derive": "Derive from {source}",
   "form.exprHint":
     "Variables: {vars}. Functions such as sin, cos, exp, ln, lg, sqrt. Constants: pi, e.",
   "form.numberHint": "A number or a constant expression, e.g. 3*pi/8 or 1e-4.",
@@ -84,6 +86,11 @@ export const en = {
   "field.c": "Radicand",
   "field.k": "Root order",
   "field.phi": "Iteration function",
+  "field.F": "Function F",
+  "field.G": "Function G",
+  "field.partial": "Partial derivative",
+  "field.startX": "Starting point, x",
+  "field.startY": "Starting point, y",
 
   "field.error.empty": "Required.",
   "field.error.syntax": "Cannot read this expression. Check the operators and parentheses.",
@@ -120,6 +127,11 @@ export const en = {
   "result.maxIterations":
     "Stopped at the cap of {n} iterations while |xₙ − xₙ₋₁| was still ≥ ε. The last iterate is shown, but it does not meet the tolerance.",
   "result.partial": "The iterations computed before the error are kept below.",
+  "result.system.converged": "|xₙ − xₙ₋₁| < ε and |yₙ − yₙ₋₁| < ε after n = {n} iterations.",
+  "result.system.maxIterations":
+    "Stopped at the cap of {n} iterations while |xₙ − xₙ₋₁| or |yₙ − yₙ₋₁| was still ≥ ε. The last iterate is shown, but it does not meet the tolerance.",
+  "result.startPoint": "Starting point",
+  "result.exactSolution": "Exact solution",
 
   "run.error.zero-derivative":
     "The derivative is zero at n = {n}, xₙ = {x}. The step divides by zero, so xₙ₊₁ is undefined.",
@@ -129,6 +141,14 @@ export const en = {
     "A value is undefined (NaN) in the step from n = {n}, xₙ = {x}. Check the domain of the functions (√ of a negative number, ln of a non-positive one).",
   "run.error.overflow": "A value overflowed to ±∞ in the step from n = {n}, xₙ = {x}.",
   "run.error.diverged": "The iteration diverges: |xₙ| passed 10¹⁰⁰ at n = {n} (xₙ = {x}).",
+  "run.systemError.zero-jacobian":
+    "The Jacobian J is zero at n = {n}, (xₙ, yₙ) = {point}. The step divides by zero, so (xₙ₊₁, yₙ₊₁) is undefined.",
+  "run.systemError.undefined-value":
+    "A value is undefined (NaN) in the step from n = {n}, (xₙ, yₙ) = {point}. Check the domain of the functions (√ of a negative number, ln of a non-positive one).",
+  "run.systemError.overflow":
+    "A value overflowed to ±∞ in the step from n = {n}, (xₙ, yₙ) = {point}.",
+  "run.systemError.diverged":
+    "The iteration diverges: at n = {n}, (xₙ, yₙ) = {point}, |xₙ| or |yₙ| passed 10¹⁰⁰.",
 
   "table.title": "Iterations",
   "table.hidden": "Hidden iterations: {count}",
@@ -142,6 +162,8 @@ export const en = {
   "chart.combinedTangent": "f(x) with the combined tangent steps",
   "chart.cobweb": "φ(x), y = x and the iteration path",
   "chart.convergence": "Convergence: |xₙ − xₙ₋₁| on a log scale",
+  "chart.path": "F = 0 and G = 0 with the iteration path",
+  "chart.systemConvergence": "Convergence: |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| on a log scale",
   "chart.toolbar": "Chart tools",
   "chart.tool.zoom": "Zoom to an area",
   "chart.tool.pan": "Pan",
@@ -163,10 +185,15 @@ export const en = {
   "chart.trace.diff": "|xₙ − xₙ₋₁|",
   "chart.trace.eps": "ε",
   "chart.trace.error": "|xₙ − exact value|",
+  "chart.trace.curveF": "F(x, y) = 0",
+  "chart.trace.curveG": "G(x, y) = 0",
+  "chart.trace.diffY": "|yₙ − yₙ₋₁|",
+  "chart.trace.systemError": "max(|xₙ − x*|, |yₙ − y*|)",
 
   "compare.run": "Run comparison",
   "compare.method": "Method",
   "compare.hint": "Each cell shows the number of iterations n and the final xₙ.",
+  "compare.systemHint": "Each cell shows the number of iterations n and the final point (xₙ, yₙ).",
   "compare.cell.error": "Error",
   "compare.cell.max": "Cap reached",
   "compare.inputs": "Inputs",

@@ -1,5 +1,5 @@
 import type { MessageKey } from "@/i18n/en";
-import type { MethodErrorCode, ScalarRunResult } from "@/lib/methods/types";
+import type { ScalarErrorCode, ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
 
 /** Raw text of every form field, keyed by field id. */
 export type FieldValues = Record<string, string>;
@@ -31,8 +31,11 @@ export interface NumberField extends FieldBase {
 export interface ExpressionField extends FieldBase {
   kind: "expression";
   variables: readonly string[];
-  /** "Derive from f": the symbolic derivative of field `from`, of the given order (default 1). */
-  derive?: { from: string; order?: 1 | 2 };
+  /**
+   * "Derive from f": the symbolic derivative of field `from`, of the given order (default 1), in
+   * `variable` (default: the source's first variable, as ∂F/∂y needs y).
+   */
+  derive?: { from: string; order?: 1 | 2; variable?: string };
 }
 
 export interface ChoiceField extends FieldBase {
@@ -72,13 +75,39 @@ export interface ExactSolution {
   tex: string;
 }
 
-export interface PreparedRun {
+/** What the path chart draws for a 2×2 system: the curves F = 0 and G = 0 under the iterates. */
+export interface SystemPlot {
+  kind: "system";
+  F: (x: number, y: number) => number;
+  G: (x: number, y: number) => number;
+}
+
+/** A known exact solution (x*, y*) of a 2×2 system. */
+export interface SystemExactSolution {
+  x: number;
+  y: number;
+}
+
+/** A run whose iterate is a number xₙ. `kind` may be left out, so Labs 1–4 need not name it. */
+export interface ScalarPreparedRun {
+  kind?: "scalar";
   run: () => ScalarRunResult & { x0Rule?: "a" | "b" };
   plot?: FunctionPlot;
   eps: number;
   /** Set when the exact solution is known, so the results can show the error at each iterate (CAP-5). */
   exact?: ExactSolution;
 }
+
+/** A run whose iterate is a point (xₙ, yₙ). */
+export interface SystemPreparedRun {
+  kind: "system";
+  run: () => SystemRunResult;
+  plot: SystemPlot;
+  eps: number;
+  exact?: SystemExactSolution;
+}
+
+export type PreparedRun = ScalarPreparedRun | SystemPreparedRun;
 
 export type PrepareResult =
   { ok: true; prepared: PreparedRun } | { ok: false; errors: FieldErrors };
@@ -106,7 +135,7 @@ export interface MethodDefinition {
   defaults: FieldValues;
   prepare: (values: FieldValues) => PrepareResult;
   /** Messages for error codes whose shared wording doesn't fit this method (`run.error.*` otherwise). */
-  errorKeys?: Partial<Record<MethodErrorCode, MessageKey>>;
+  errorKeys?: Partial<Record<ScalarErrorCode, MessageKey>>;
 }
 
 /** The inputs of one comparison row. */

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { FunctionPlot } from "@/labs/types";
-import type { ScalarIterationRow } from "@/lib/methods/types";
+import type { FunctionPlot, SystemPlot } from "@/labs/types";
+import type { ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
 import {
   buildConvergenceChart,
   buildFunctionChart,
+  buildPathChart,
+  buildSystemConvergenceChart,
   fileName,
   zoomRange,
   type ChartLabels,
@@ -25,6 +27,10 @@ const labels: ChartLabels = {
   diff: "diff",
   eps: "eps",
   error: "error",
+  curveF: "curveF",
+  curveG: "curveG",
+  diffY: "diffY",
+  systemError: "systemError",
 };
 
 interface Trace {
@@ -535,5 +541,120 @@ describe("buildConvergenceChart with a known exact solution", () => {
   it("has no error line without an exact solution", () => {
     const spec = buildConvergenceChart(rows, 1e-4, labels);
     expect(spec?.traces.some((t) => (t as { name?: string }).name === "error")).toBe(false);
+  });
+});
+
+describe("buildPathChart", () => {
+  const plot: SystemPlot = {
+    kind: "system",
+    F: (x, y) => x * x + y * y - 10,
+    G: (x, y) => {
+      if (x + y < 0) throw new Error("undefined");
+      return Math.sqrt(x + y) - 2;
+    },
+  };
+  const systemRow = (n: number, x: number, y: number): SystemIterationRow => ({
+    n,
+    x,
+    y,
+    F: null,
+    G: null,
+    dx: n === 0 ? null : 1,
+    dy: n === 0 ? null : 1,
+  });
+  const rows = [systemRow(0, 0.9, 3.1), systemRow(1, 1.01, 2.99), systemRow(2, 1, 3)];
+
+  interface Contour extends Trace {
+    type: string;
+    z: (number | null)[][];
+    contours: { start: number; end: number; coloring: string };
+    showscale: boolean;
+  }
+
+  it("draws F = 0 and G = 0 as zero-level contours with a legend entry, and no colour scale", () => {
+    const spec = buildPathChart(plot, rows, labels);
+    for (const name of ["curveF", "curveG"]) {
+      const curve = trace(spec, name) as Contour;
+      expect(curve.type).toBe("contour");
+      expect(curve.contours).toMatchObject({ start: 0, end: 0, coloring: "none" });
+      expect(curve.showscale).toBe(false);
+      expect(curve.showlegend).toBe(true);
+      expect(curve.x).toHaveLength(80);
+      expect(curve.y).toHaveLength(80);
+      expect(curve.z).toHaveLength(80);
+    }
+  });
+
+  it("covers the iterates, padded, on both axes", () => {
+    const curve = trace(buildPathChart(plot, rows, labels), "curveF") as Contour;
+    expect(curve.x[0]).toBeLessThan(0.9);
+    expect(curve.x[79]).toBeGreaterThan(1.01);
+    expect(curve.y[0]).toBeLessThan(2.99);
+    expect(curve.y[79]).toBeGreaterThan(3.1);
+    // z[j][i] is F at (x[i], y[j]).
+    const [i, j] = [10, 70];
+    expect(curve.z[j][i]).toBeCloseTo(plot.F(curve.x[i] as number, curve.y[j] as number), 12);
+  });
+
+  it("leaves a gap where F or G is undefined", () => {
+    const spec = buildPathChart(plot, [systemRow(0, -3, -3), systemRow(1, -2.5, -2.5)], labels);
+    const curve = trace(spec, "curveG") as Contour;
+    expect(curve.z.flat()).toContain(null);
+    expect((trace(spec, "curveF") as Contour).z.flat()).not.toContain(null);
+  });
+
+  it("draws the path through every iterate, with n for the hover", () => {
+    const path = trace(buildPathChart(plot, rows, labels), "path");
+    expect(path.x).toEqual([0.9, 1.01, 1]);
+    expect(path.y).toEqual([3.1, 2.99, 3]);
+    expect(path.customdata).toEqual([0, 1, 2]);
+  });
+
+  it("leaves out iterates past the plot limit and breaks the path there", () => {
+    const far = [systemRow(0, 1, 1), systemRow(1, 1e9, 1), systemRow(2, 2, 2)];
+    const path = trace(buildPathChart(plot, far, labels), "path");
+    expect(path.x).toEqual([1, null, 2]);
+  });
+
+  it("gives no chart when nothing can be plotted", () => {
+    expect(buildPathChart(plot, [systemRow(0, Number.NaN, 1)], labels)).toBeNull();
+  });
+});
+
+describe("buildSystemConvergenceChart", () => {
+  const systemRow = (n: number, dx: number | null, dy: number | null, x = 1, y = 3) => ({
+    n,
+    x,
+    y,
+    F: null,
+    G: null,
+    dx,
+    dy,
+  });
+
+  it("plots both differences and ε, each dropping its own zero points", () => {
+    const rows = [systemRow(0, null, null), systemRow(1, 0.1, 0), systemRow(2, 1e-3, 1e-4)];
+    const spec = buildSystemConvergenceChart(rows, 1e-4, labels);
+    expect(spec?.yLog).toBe(true);
+    expect(trace(spec, "diff").y).toEqual([0.1, 1e-3]);
+    expect(trace(spec, "diffY").x).toEqual([2]);
+    expect(trace(spec, "eps").y).toEqual([1e-4, 1e-4]);
+    expect(trace(spec, "eps").x).toEqual([1, 2]);
+    expect(spec?.traces.some((t) => (t as Trace).name === "systemError")).toBe(false);
+  });
+
+  it("adds max(|xₙ − x*|, |yₙ − y*|) when the exact solution is known", () => {
+    const rows = [systemRow(0, null, null, 0.9, 3.1), systemRow(1, 0.1, 0.1, 1.01, 2.995)];
+    const error = trace(
+      buildSystemConvergenceChart(rows, 1e-4, labels, { x: 1, y: 3 }),
+      "systemError",
+    );
+    expect(error.x).toEqual([0, 1]);
+    expect(error.y[0]).toBeCloseTo(0.1, 12);
+    expect(error.y[1]).toBeCloseTo(0.01, 12);
+  });
+
+  it("gives no chart when no difference is positive", () => {
+    expect(buildSystemConvergenceChart([systemRow(0, null, null)], 1e-4, labels)).toBeNull();
   });
 });

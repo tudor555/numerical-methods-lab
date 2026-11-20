@@ -1,12 +1,40 @@
-import type { ScalarRunResult } from "@/lib/methods/types";
-import type { ExactSolution, FieldValues, FunctionPlot, Preset, ReadyLab } from "./types";
+import type { ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
+import type {
+  ExactSolution,
+  FieldValues,
+  FunctionPlot,
+  PreparedRun,
+  Preset,
+  ReadyLab,
+  SystemExactSolution,
+  SystemPlot,
+} from "./types";
 
-/** A finished run as the results panel shows it. */
-export interface RunView {
-  result: ScalarRunResult & { x0Rule?: "a" | "b" };
-  plot?: FunctionPlot;
-  eps: number;
-  exact?: ExactSolution;
+/** A finished run as the results panel shows it: a scalar run (`kind` optional) or a system run. */
+export type RunView =
+  | {
+      kind?: "scalar";
+      result: ScalarRunResult & { x0Rule?: "a" | "b" };
+      plot?: FunctionPlot;
+      eps: number;
+      exact?: ExactSolution;
+    }
+  | {
+      kind: "system";
+      result: SystemRunResult;
+      plot: SystemPlot;
+      eps: number;
+      exact?: SystemExactSolution;
+    };
+
+/** Runs a prepared method and keeps what the results panel needs, with its kind. */
+export function toRunView(prepared: PreparedRun): RunView {
+  if (prepared.kind === "system") {
+    const { plot, eps, exact } = prepared;
+    return { kind: "system", result: prepared.run(), plot, eps, exact };
+  }
+  const { plot, eps, exact } = prepared;
+  return { kind: "scalar", result: prepared.run(), plot, eps, exact };
 }
 
 /**

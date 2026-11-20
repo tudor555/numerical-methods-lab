@@ -4,7 +4,7 @@ import { CircleCheck, OctagonX, TriangleAlert, type LucideIcon } from "lucide-re
 import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
 import type { MethodDefinition } from "@/labs/types";
-import type { MethodErrorCode, RunStatus } from "@/lib/methods/types";
+import type { RunStatus, ScalarErrorCode, SystemErrorCode } from "@/lib/methods/types";
 import { cn } from "@/lib/utils";
 
 export const STATUS_STYLE: Record<RunStatus, { icon: LucideIcon; text: string; tint: string }> = {
@@ -19,11 +19,16 @@ export const STATUS_STYLE: Record<RunStatus, { icon: LucideIcon; text: string; t
 
 /** The message key for a run error: the method's own wording when it has one, else the shared one. */
 export function runErrorKey(
-  code: MethodErrorCode | undefined,
+  code: ScalarErrorCode | undefined,
   errorKeys?: MethodDefinition["errorKeys"],
 ): MessageKey {
   const shared = code ?? "undefined-value";
   return errorKeys?.[shared] ?? (`run.error.${shared}` satisfies MessageKey);
+}
+
+/** The message key for a system run error; its params are `n` and `point` (see `formatPoint`). */
+export function systemErrorKey(code: SystemErrorCode | undefined): MessageKey {
+  return `run.systemError.${code ?? "undefined-value"}` satisfies MessageKey;
 }
 
 /** Status pill: color, icon and text, so it never relies on color alone. */

@@ -144,11 +144,13 @@ function TextInput({
             variant="outline"
             className="h-10 shrink-0"
             onClick={runDerive}
-            aria-label={t("form.derive")}
-            title={t("form.derive")}
+            aria-label={t("form.derive", { source: field.derive.from })}
+            title={t("form.derive", { source: field.derive.from })}
           >
             <WandSparkles aria-hidden />
-            <span className="hidden sm:inline">{t("form.derive")}</span>
+            <span className="hidden sm:inline">
+              {t("form.derive", { source: field.derive.from })}
+            </span>
           </Button>
         )}
       </div>

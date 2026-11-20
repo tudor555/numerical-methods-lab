@@ -112,7 +112,8 @@ export function deriveField(
   const source = fields.find((f) => f.id === field.derive?.from);
   if (!source || source.kind !== "expression")
     return { ok: false, issue: { key: "field.error.not-differentiable" } };
-  const variable = source.variables[0];
+  const variable =
+    (field.kind === "expression" ? field.derive.variable : undefined) ?? source.variables[0];
   try {
     const order = field.derive.order ?? 1;
     let expression = values[source.id] ?? "";
