@@ -9,7 +9,7 @@ The methods, inputs, algorithm steps and worked examples for each of the 13 labs
 - **Rule R0 (choosing x₀):** x₀ = a if f(a)·f″(a) > 0, otherwise x₀ = b. Here f″(a) is either the input value `dda` or the expression `ddf` evaluated at a.
 - **Cauchy problem nodes (Labs 7–9):** inputs x₀, y₀, T, n; h = T/n; xᵢ = x₀ + i·h; output yᵢ for i = 1..n.
 - **ε presets:** "ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}" means run once per value and compare the iteration counts (CAP-7).
-- **Input limits:** interval ends and starting values lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. In Lab 4, 4b's a is in (0, 10⁶]. The limits live in `src/labs/shared-fields.ts`.
+- **Input limits:** interval ends and starting values (including Lab 5's x₀ and y₀) lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. In Lab 4, 4b's a is in (0, 10⁶]. The limits live in `src/labs/shared-fields.ts`.
 
 ---
 
@@ -69,13 +69,13 @@ Numerical example (Chebyshev, unnumbered in the lab): f = x³ − x − 1 (same 
 Solves F(x, y) = 0, G(x, y) = 0. Inputs: x₀, y₀, F, G, Fₓ, F_y, Gₓ, G_y, ε.
 **5a. Newton.** J = Fₓ G_y − F_y Gₓ.
 xₙ₊₁ = xₙ − (F·G_y − G·F_y)/J, yₙ₊₁ = yₙ − (Fₓ·G − Gₓ·F)/J, with everything evaluated at (xₙ, yₙ).
-**5b. Modified Newton.** Same as 5a, except the partial derivatives and J stay fixed at (x₀, y₀). F and G are still evaluated at (xₙ, yₙ).
+**5b. Modified Newton** (the lab's step 4′, unnumbered). Same as 5a, except the partial derivatives and J stay fixed at (x₀, y₀). F and G are still evaluated at (xₙ, yₙ). For both methods, F = G = 0 exactly at (xₙ, yₙ) keeps the point, and J = 0 otherwise stops the run.
 
 Examples (ε = 10⁻⁴):
 
 1. F = 2x³ − y² − 1, G = xy³ − y − 4. Fₓ = 6x², F_y = −2y, Gₓ = y³, G_y = 3xy² − 1. Start at (1.2, 1.7).
 2. x² + y² = 10, √(x+y) = 2: F = x² + y² − 10, G = √(x+y) − 2. Fₓ = 2x, F_y = 2y, Gₓ = G_y = 1/(2√(x+y)). Start at (0.9, 3.1), which should reach exactly (1, 3), and at (2.9, 1.1), which should reach exactly (3, 1).
-3. 5b on example 2. Compare the result and the iteration count with 5a.
+3. 5b on the system of example 2, from both of its starting points. Compare the result and the iteration count with 5a, over ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}, as Labs 1–4 compare.
 
 ## Lab 6: Successive approximations and Gauss–Seidel for nonlinear systems
 

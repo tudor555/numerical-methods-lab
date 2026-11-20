@@ -12,3 +12,7 @@
 - source_spec: `docs/spec-lab-3-halley-chebyshev.md`
   summary: Cover the lab page's wiring of a method's own error messages (`errorKeys`) to the results panel with a test, and consider building the run-error message in one shared helper.
   evidence: Removing `errorKeys={method.errorKeys}` in `src/components/lab/lab-page.tsx` passes every test, because lab page tests render only the first state and never reach a finished run. A Halley zero-denominator run would then show the secant wording. Needs DOM or interaction testing, which the project doesn't have yet.
+
+- source_spec: `docs/spec-lab-5-newton-systems.md`
+  summary: Give every "Derive from …" button an accessible name that says which field it fills (for example via `aria-describedby` to the field's label), so two buttons in one form don't read the same.
+  evidence: Lab 5's ∂F/∂x and ∂F/∂y buttons are both "Derive from F" (and both G buttons "Derive from G"). Lab 1 already has the same pattern (f′ and dda both read "Derive from f"), so it predates this lab and needs a label id in `MethodForm`.
