@@ -7,7 +7,7 @@ import { lab5 } from "@/labs/lab-5";
 import { toRunView, type RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
-import { elements, render, textOf } from "@/test/render";
+import { count, elements, render, textOf } from "@/test/render";
 import { scalarView, systemView } from "@/test/runs";
 import type { ChartSpec } from "./charts";
 import { ResultsPanel } from "./results-panel";
@@ -62,7 +62,8 @@ describe("ResultsPanel", () => {
   it("reports a converged run with its stats, charts and table", () => {
     const html = panel(ex1);
     expect(html).toContain('role="status"');
-    expect(html).toContain("lucide-circle-check");
+    // One status icon, in the badge, not a second one beside it.
+    expect(count(html, "lucide-circle-check")).toBe(1);
     expect(message(html)).toBe("|xₙ − xₙ₋₁| < ε after n = 5 iterations.");
     const [value, n, start] = stats(html);
     expect(value.value).toBe(formatValue(ex1.result.result as number));
@@ -81,7 +82,7 @@ describe("ResultsPanel", () => {
   it("reports the iteration cap as a warning, with the last iterate", () => {
     const html = panel(capped);
     expect(html).toContain('role="alert"');
-    expect(html).toContain("lucide-triangle-alert");
+    expect(count(html, "lucide-triangle-alert")).toBe(1);
     expect(message(html)).toMatch(/^Stopped at the cap of 3 iterations/);
     expect(stats(html)[1].value).toBe("3");
     expect(stats(html)[0].value).toBe(formatValue(capped.result.result as number));
@@ -90,7 +91,7 @@ describe("ResultsPanel", () => {
   it("reports an error, keeps the partial rows and highlights the failing row", () => {
     const html = panel(ex2R0);
     expect(html).toContain('role="alert"');
-    expect(html).toContain("lucide-octagon-x");
+    expect(count(html, "lucide-octagon-x")).toBe(1);
     expect(message(html)).toBe(
       "The derivative is zero at n = 0, xₙ = 1. The step divides by zero, so xₙ₊₁ is undefined. " +
         "The iterations computed before the error are kept below.",
@@ -331,6 +332,7 @@ describe("ResultsPanel for a 2×2 system", () => {
 
   it("shows xₙ, yₙ, n and the start, both charts and the 7-column table", () => {
     const html = panel(systemRun("5a"));
+    expect(count(html, "lucide-circle-check")).toBe(1);
     expect(message(html)).toBe("|xₙ − xₙ₋₁| < ε and |yₙ − yₙ₋₁| < ε after n = 3 iterations.");
     const [x, y, n, start] = stats(html);
     expect(x.label).toContain("Result");

@@ -20,7 +20,6 @@ export function SystemResultsPanel({ view }: { view: SystemRunView }) {
   const { result, plot, eps, exact } = view;
   const separator = lang === "ro" ? ";" : ",";
   const style = STATUS_STYLE[result.status];
-  const Icon = style.icon;
 
   let message: string;
   if (result.status === "converged") {
@@ -53,13 +52,10 @@ export function SystemResultsPanel({ view }: { view: SystemRunView }) {
     <div className="flex flex-col gap-4">
       <div
         role={result.status === "converged" ? "status" : "alert"}
-        className={cn("flex items-start gap-4 rounded-xl border p-4 sm:p-4", style.tint)}
+        className={cn("flex flex-col gap-2 rounded-xl border p-4", style.tint)}
       >
-        <Icon className={cn("mt-1 size-6 shrink-0", style.text)} aria-hidden />
-        <div className="flex min-w-0 flex-col gap-2">
-          <StatusBadge status={result.status} />
-          <p className="text-base">{message}</p>
-        </div>
+        <StatusBadge status={result.status} />
+        <p className="text-base">{message}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)]">
