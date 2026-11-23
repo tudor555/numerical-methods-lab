@@ -24,7 +24,7 @@ Examples (ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²} unless stated):
 1. x³ − x − 1 = 0 on [1, 2].
 2. x⁵ − 5x + 1 = 0, root in (−1, 1).
 3. Kepler: x = sin x + 0.25 on (π/4, π/2), so f = x − sin x − 0.25. Start at x₀ = 3π/8 ≈ 1.1781 with ε = 10⁻⁴. Compare with 1c using φ(x) = sin x + 0.25.
-4. √2, √3, √5 with 1b (k = 2), compared with 1c. ∛2, ∛3, ∛12 with 1b (k = 3).
+4. √2, √3, √5 with 1b (k = 2), compared with 1c. ∛2, ∛3, ∛(1/2) with 1b (k = 3); ∛(1/2) is the lab's c < 1 case, so x₀ = 1.
 
 ## Lab 2: Secant and Steffensen methods
 
