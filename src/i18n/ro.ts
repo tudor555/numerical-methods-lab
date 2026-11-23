@@ -61,9 +61,9 @@ export const ro: Record<MessageKey, string> = {
   "lab.methods": "Metode",
 
   "common.stopping":
-    "Criteriul de oprire: $x_1$ se calculează separat din $x_0$, apoi, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+    "Criteriul de oprire: primul pas, de la $x_0$ la $x_1$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, adică până când două iterații consecutive diferă cu mai puțin de $\\varepsilon$. Se afișează $n$ și $x_n$.",
   "common.systemStopping":
-    "Criteriul de oprire: $(x_1; y_1)$ se calculează separat din $(x_0; y_0)$, apoi, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$ sau $|y_n - y_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $(x_n; y_n)$.",
+    "Criteriul de oprire: primul pas, de la $(x_0; y_0)$ la $(x_1; y_1)$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$ sau $|y_n - y_{n-1}| \\ge \\varepsilon$, adică până când ambele coordonate se modifică cu mai puțin de $\\varepsilon$. Se afișează $n$ și $(x_n; y_n)$.",
 
   "math.if": "dacă",
 
@@ -271,7 +271,7 @@ export const ro: Record<MessageKey, string> = {
   "lab2.method.secant.start":
     "Metoda pornește din două iterații inițiale: introduci atât $x_0$, cât și $x_1$, iar ele trebuie să fie diferite. Intervalul $[a; b]$ stabilește doar porțiunea afișată pe grafic.",
   "lab2.method.secant.stopping":
-    "Criteriul de oprire: $x_1$ este dat, așa că, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+    "Criteriul de oprire: $x_0$ și $x_1$ sunt date. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, adică până când două iterații consecutive diferă cu mai puțin de $\\varepsilon$. Se afișează $n$ și $x_n$.",
   "lab2.method.secant.failure":
     "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f(x_n) = f(x_{n-1})$, secanta este paralelă cu axa $Ox$ și metoda se oprește cu eroare.",
 
@@ -391,25 +391,25 @@ export const ro: Record<MessageKey, string> = {
   "lab5.method.newton.title": "Metoda lui Newton pentru sisteme neliniare",
   "lab5.method.newton.name": "Metoda lui Newton",
   "lab5.method.newton.idea":
-    "În vecinătatea punctului $(x_n; y_n)$, funcțiile $F$ și $G$ se înlocuiesc cu planele lor tangente, iar următoarea iterație $(x_{n+1}; y_{n+1})$ este punctul în care ambele plane se anulează. Rezolvând acest sistem liniar 2×2 cu regula lui Cramer se obțin formulele de mai jos, în care $F$, $G$ și derivatele parțiale $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ se calculează în $(x_n; y_n)$, iar $J$ este jacobianul. În apropierea unei soluții simple, convergența este pătratică:",
+    "În jurul punctului $(x_n; y_n)$, fiecare dintre funcțiile $F$ și $G$ se aproximează prin planul său tangent. Următoarea iterație $(x_{n+1}; y_{n+1})$ este punctul în care ambele plane tangente se anulează, adică soluția unui sistem liniar 2×2. Rezolvând acest sistem cu regula lui Cramer, se obțin formulele de mai jos, în care $F$, $G$ și derivatele parțiale $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ se calculează în $(x_n; y_n)$, iar $J$ este jacobianul:",
   "lab5.method.newton.start":
-    "Punctul inițial $(x_0; y_0)$, funcțiile $F$, $G$ și cele patru derivate parțiale se introduc direct; derivatele parțiale pot fi completate cu „Calculează din F” și „Calculează din G”. Metoda converge doar dacă punctul inițial este suficient de aproape de soluție.",
+    "Punctul inițial $(x_0; y_0)$ trebuie ales suficient de aproape de soluție, altfel metoda poate să nu conveargă. În apropierea unei soluții simple, convergența este pătratică: la fiecare pas, numărul de zecimale exacte aproape se dublează.",
   "lab5.method.newton.failure":
-    "Dacă $F$ și $G$ se anulează exact în $(x_n; y_n)$, acesta este chiar soluția, iar iterațiile rămân în acest punct. Altfel, dacă $J = 0$, sistemul liniar nu are soluție unică și metoda se oprește cu eroare.",
+    "Dacă jacobianul se anulează într-o iterație, sistemul liniar nu mai are soluție unică, pasul următor nu poate fi calculat și metoda se oprește cu eroare. Excepție face cazul în care $F$ și $G$ sunt exact zero în $(x_n; y_n)$: punctul este deja soluția, iar iterațiile rămân în el.",
   "lab5.method.newton.chart":
-    "Primul grafic arată curbele $F(x, y) = 0$ și $G(x, y) = 0$ în jurul iterațiilor: soluția este punctul lor de intersecție, iar traseul arată cum ajung iterațiile acolo. Al doilea grafic arată ambele diferențe pe scară logaritmică.",
+    "Primul grafic desenează curbele $F(x, y) = 0$ și $G(x, y) = 0$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
 
   "lab5.method.modified.tab": "5b · Newton modificată",
   "lab5.method.modified.title": "Metoda lui Newton modificată",
   "lab5.method.modified.name": "Metoda lui Newton modificată",
   "lab5.method.modified.idea":
-    "Pasul este cel al metodei lui Newton, dar derivatele parțiale, și odată cu ele $J$, se calculează o singură dată, în punctul inițial: $F_x^0 = F_x(x_0, y_0)$ și așa mai departe. Doar $F$ și $G$ se calculează în $(x_n; y_n)$. Fiecare pas este mai simplu, dar convergența este doar liniară, deci sunt necesare mai multe iterații:",
+    "Metoda folosește aceleași formule ca metoda lui Newton, cu o singură diferență: derivatele parțiale, și odată cu ele jacobianul, se calculează o singură dată, în punctul inițial ($F_x^0 = F_x(x_0, y_0)$ și analog pentru celelalte). La fiecare pas se recalculează doar $F$ și $G$ în $(x_n; y_n)$:",
   "lab5.method.modified.start":
-    "Punctul inițial $(x_0; y_0)$, funcțiile $F$, $G$ și cele patru derivate parțiale se introduc direct; derivatele parțiale pot fi completate cu „Calculează din F” și „Calculează din G”. Derivatele parțiale se folosesc doar în $(x_0; y_0)$.",
+    "Astfel, un pas costă mai puțin, dar convergența devine liniară și sunt necesare mai multe iterații decât la metoda lui Newton. Punctul inițial $(x_0; y_0)$ contează aici de două ori: trebuie să fie suficient de aproape de soluție și tot din el provin derivatele folosite pe parcursul întregului calcul.",
   "lab5.method.modified.failure":
-    "Dacă $F$ și $G$ se anulează exact în $(x_n; y_n)$, acesta este chiar soluția, iar iterațiile rămân în acest punct. Altfel, dacă $J_0 = 0$, metoda se oprește cu eroare chiar la primul pas, deoarece $J_0$ nu se mai schimbă.",
+    "Cum $J_0$ nu se schimbă de la un pas la altul, un jacobian nul în punctul inițial oprește metoda cu eroare chiar de la primul pas. Excepție face cazul în care $F$ și $G$ sunt exact zero într-o iterație $(x_n; y_n)$: punctul este deja soluția, iar iterațiile rămân în el.",
   "lab5.method.modified.chart":
-    "Primul grafic arată curbele $F(x, y) = 0$ și $G(x, y) = 0$ în jurul iterațiilor: soluția este punctul lor de intersecție, iar traseul arată cum ajung iterațiile acolo. Al doilea grafic arată ambele diferențe pe scară logaritmică.",
+    "Primul grafic desenează curbele $F(x, y) = 0$ și $G(x, y) = 0$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
 
   "lab5.preset.ex1": "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, din (1,2; 1,7)",
   "lab5.preset.ex2First": "Ex. 2: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",

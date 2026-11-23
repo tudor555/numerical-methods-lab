@@ -57,9 +57,9 @@ export const en = {
   "lab.methods": "Methods",
 
   "common.stopping":
-    "Stopping rule: $x_1$ is computed from $x_0$ as a separate step, then the iteration continues from $n = 1$ while $|x_n - x_{n-1}| \\ge \\varepsilon$. The output is $n$ and $x_n$.",
+    "Stopping rule: the first step, from $x_0$ to $x_1$, is always taken. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$, that is, until two consecutive iterates differ by less than $\\varepsilon$. The output is $n$ and $x_n$.",
   "common.systemStopping":
-    "Stopping rule: $(x_1, y_1)$ is computed from $(x_0, y_0)$ as a separate step, then the iteration continues from $n = 1$ while $|x_n - x_{n-1}| \\ge \\varepsilon$ or $|y_n - y_{n-1}| \\ge \\varepsilon$. The output is $n$ and $(x_n, y_n)$.",
+    "Stopping rule: the first step, from $(x_0, y_0)$ to $(x_1, y_1)$, is always taken. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$ or $|y_n - y_{n-1}| \\ge \\varepsilon$, that is, until both coordinates change by less than $\\varepsilon$. The output is $n$ and $(x_n, y_n)$.",
 
   "math.if": "if",
 
@@ -265,7 +265,7 @@ export const en = {
   "lab2.method.secant.start":
     "The method starts from two values: you enter both $x_0$ and $x_1$, and they must differ. The interval $[a, b]$ only sets the range of the chart.",
   "lab2.method.secant.stopping":
-    "Stopping rule: $x_1$ is given, so the iteration starts from $n = 1$ and continues while $|x_n - x_{n-1}| \\ge \\varepsilon$. The output is $n$ and $x_n$.",
+    "Stopping rule: $x_0$ and $x_1$ are both given. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$, that is, until two consecutive iterates differ by less than $\\varepsilon$. The output is $n$ and $x_n$.",
   "lab2.method.secant.failure":
     "If $f(x_n) = 0$, $x_n$ is the exact root and the iteration stays there. Otherwise, if $f(x_n) = f(x_{n-1})$, the chord is parallel to the x-axis and the method stops with an error.",
 
@@ -385,25 +385,25 @@ export const en = {
   "lab5.method.newton.title": "Newton's method for nonlinear systems",
   "lab5.method.newton.name": "Newton's method",
   "lab5.method.newton.idea":
-    "Near $(x_n, y_n)$, both $F$ and $G$ are replaced by their tangent planes, and the next iterate $(x_{n+1}, y_{n+1})$ is the point where both planes reach zero. Solving that 2×2 linear system with Cramer's rule gives the formulas below, where $F$, $G$ and the partial derivatives $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ are all evaluated at $(x_n, y_n)$, and $J$ is the Jacobian. Close to a simple solution the convergence is quadratic:",
+    "Around $(x_n, y_n)$, each of $F$ and $G$ is approximated by its tangent plane. The next iterate $(x_{n+1}, y_{n+1})$ is the point where both tangent planes reach zero, which is the solution of a 2×2 linear system. Solving that system with Cramer's rule gives the formulas below, where $F$, $G$ and the partial derivatives $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ are evaluated at $(x_n, y_n)$, and $J$ is the Jacobian:",
   "lab5.method.newton.start":
-    "The starting point $(x_0, y_0)$, $F$, $G$ and the four partial derivatives are entered directly; “Derive from F” and “Derive from G” can fill in the partial derivatives. The method converges only from a starting point close enough to the solution.",
+    "The starting point $(x_0, y_0)$ has to be close enough to the solution, otherwise the method may not converge. Near a simple solution the convergence is quadratic: each step roughly doubles the number of correct digits.",
   "lab5.method.newton.failure":
-    "If $F$ and $G$ are both exactly 0 at $(x_n, y_n)$, it is the exact solution and the iteration stays there. Otherwise, if $J = 0$, the linear system has no unique solution and the method stops with an error.",
+    "If the Jacobian is zero at an iterate, the linear system has no unique solution, the next step cannot be computed and the method stops with an error. The exception is when $F$ and $G$ are both exactly 0 at $(x_n, y_n)$: the point is already the solution, and the iteration stays there.",
   "lab5.method.newton.chart":
-    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$ around the iterates: the solution is where they cross, and the path shows how the iterates get there. The second chart shows both differences on a log scale.",
+    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$. The solution of the system is where they cross, and the path of the iterates shows how the method approaches it. The second chart shows, on a log scale, how the differences $|x_n - x_{n-1}|$ and $|y_n - y_{n-1}|$ shrink from step to step until they fall below $\\varepsilon$.",
 
   "lab5.method.modified.tab": "5b · Modified Newton",
   "lab5.method.modified.title": "Modified Newton's method",
   "lab5.method.modified.name": "Modified Newton",
   "lab5.method.modified.idea":
-    "The step is Newton's, but the partial derivatives, and with them $J$, are computed only once, at the starting point: $F_x^0 = F_x(x_0, y_0)$, and so on. Only $F$ and $G$ are evaluated at $(x_n, y_n)$. Each step is cheaper, but the convergence is only linear, so it takes more iterations:",
+    "The method uses the same formulas as Newton's method, with one difference: the partial derivatives, and with them the Jacobian, are computed only once, at the starting point ($F_x^0 = F_x(x_0, y_0)$, and likewise for the others). Each step re-evaluates only $F$ and $G$ at $(x_n, y_n)$:",
   "lab5.method.modified.start":
-    "The starting point $(x_0, y_0)$, $F$, $G$ and the four partial derivatives are entered directly; “Derive from F” and “Derive from G” can fill in the partial derivatives. The partial derivatives are used only at $(x_0, y_0)$.",
+    "Each step is therefore cheaper, but the convergence becomes linear and it takes more iterations than Newton's method. The starting point $(x_0, y_0)$ matters twice here: it has to be close enough to the solution, and it supplies the derivatives used for the whole run.",
   "lab5.method.modified.failure":
-    "If $F$ and $G$ are both exactly 0 at $(x_n, y_n)$, it is the exact solution and the iteration stays there. Otherwise, if $J_0 = 0$, the method stops with an error at the very first step, since $J_0$ never changes.",
+    "Since $J_0$ never changes, a zero Jacobian at the starting point stops the method with an error at the very first step. The exception is when $F$ and $G$ are both exactly 0 at an iterate $(x_n, y_n)$: the point is already the solution, and the iteration stays there.",
   "lab5.method.modified.chart":
-    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$ around the iterates: the solution is where they cross, and the path shows how the iterates get there. The second chart shows both differences on a log scale.",
+    "The first chart draws the curves $F(x, y) = 0$ and $G(x, y) = 0$. The solution of the system is where they cross, and the path of the iterates shows how the method approaches it. The second chart shows, on a log scale, how the differences $|x_n - x_{n-1}|$ and $|y_n - y_{n-1}|$ shrink from step to step until they fall below $\\varepsilon$.",
 
   "lab5.preset.ex1": "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, from (1.2, 1.7)",
   "lab5.preset.ex2First": "Ex. 2: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)",
