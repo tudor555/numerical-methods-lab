@@ -65,6 +65,14 @@ describe("MethodForm presets", () => {
     ]);
   });
 
+  it("lets a long preset label wrap inside the form instead of widening a phone page", () => {
+    const presets = buttons(form(newton)).filter((b) => b.includes("min-h-8"));
+    for (const preset of presets) {
+      expect(preset).toContain("max-w-full");
+      expect(preset).toContain("whitespace-normal");
+    }
+  });
+
   it("presses no preset after an edit", () => {
     const html = form(kthRoot);
     expect(count(html, 'aria-pressed="true"')).toBe(0);

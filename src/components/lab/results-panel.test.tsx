@@ -7,7 +7,7 @@ import { lab5 } from "@/labs/lab-5";
 import { toRunView, type RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
-import { count, elements, render, textOf } from "@/test/render";
+import { count, elements, render, texOf, textOf } from "@/test/render";
 import { scalarView, systemView } from "@/test/runs";
 import type { ChartSpec } from "./charts";
 import { ResultsPanel } from "./results-panel";
@@ -325,9 +325,15 @@ describe("ResultsPanel for a 2×2 system", () => {
     return systemView(toRunView(prepared.prepared));
   };
   const ex2 = lab5.presets.find((p) => p.id === "ex2-first")?.values ?? {};
-  const headers = (html: string) =>
-    [...html.matchAll(/<th[^>]*>[\s\S]*?<annotation encoding="application\/x-tex">([^<]*)</g)].map(
-      (m) => m[1].replace(/&gt;/g, ">"),
+  /** Every header formula in order; a paired column gives its top one, then its bottom one. */
+  const headers = (html: string) => texOf(elements(html, "thead")[0] ?? "");
+  /** The columns of each body row; a paired cell reads as its top value, then its bottom one. */
+  const rowValues = (html: string) =>
+    elements(html.slice(html.indexOf("<tbody")), "tr").map((row) =>
+      elements(row, "td").flatMap((cell) => {
+        const lines = elements(cell, "span");
+        return lines.length > 0 ? lines.map(textOf) : [textOf(cell)];
+      }),
     );
 
   it("shows xₙ, yₙ, n and the start, both charts and the 7-column table", () => {
@@ -378,10 +384,10 @@ describe("ResultsPanel for a 2×2 system", () => {
     // The trace names contain "|", so the attribute is compared whole.
     const convergence = [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
     expect(convergence).toBe("|xₙ − xₙ₋₁|||yₙ − yₙ₋₁||ε|max(|xₙ − x*|, |yₙ − y*|)");
-    const rows = elements(html.slice(html.indexOf("<tbody")), "tr").map((row) =>
-      elements(row, "td").map(textOf),
-    );
+    const rows = rowValues(html);
     expect(rows).toHaveLength(4);
+    // Four columns plus the error: xₙ over yₙ, F over G, |Δx| over |Δy|.
+    expect(elements(elements(html.slice(html.indexOf("<tbody")), "tr")[0], "td")).toHaveLength(5);
     // n, xₙ, yₙ, F, G, |Δx|, |Δy|, max-norm error: F(0.9, 3.1) = 0.42, G = 0, error 0.1.
     expect(rows[0]).toEqual(["0", "0.9", "3.1", "4.200e-1", "0", "—", "—", "1.000e-1"]);
     expect(rows[3][0]).toBe("3");
@@ -414,15 +420,7 @@ describe("ResultsPanel for a 2×2 system", () => {
     const rows = elements(html.slice(html.indexOf("<tbody")), "tr");
     expect(rows).toHaveLength(1);
     expect(rows[0]).toContain("bg-error/10");
-    expect(elements(rows[0], "td").map(textOf)).toEqual([
-      "0",
-      "0",
-      "0",
-      "0",
-      "-1.000e+0",
-      "—",
-      "—",
-    ]);
+    expect(rowValues(html)[0]).toEqual(["0", "0", "0", "0", "-1.000e+0", "—", "—"]);
   });
 
   it("says when the cap stops a system run", () => {

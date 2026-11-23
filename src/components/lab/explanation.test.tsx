@@ -18,7 +18,9 @@ describe("Explanation", () => {
     expect(texOf(idea)).toEqual([
       "x_n",
       "f",
-      "x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}, \\qquad n = 0, 1, 2, \\dots",
+      // The index range is its own formula, so it can wrap below on a phone.
+      "x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)},",
+      "n = 0, 1, 2, \\dots",
     ]);
     expect(idea.indexOf("katex-display")).toBeGreaterThan(idea.indexOf("</p>"));
   });

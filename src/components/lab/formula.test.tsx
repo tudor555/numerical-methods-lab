@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { count, texOf } from "@/test/render";
-import { Formula, RichText, Tex } from "./formula";
+import { Formula, formulaScale, MIN_FORMULA_SCALE, RichText, Tex } from "./formula";
 
 describe("Tex", () => {
   it("renders inline KaTeX markup inside a span", () => {
@@ -25,9 +25,34 @@ describe("Formula", () => {
     expect(texOf(html)).toEqual(["x = \\varphi(x)"]);
   });
 
+  it("splits a trailing index range into its own formula, so it can wrap below", () => {
+    const html = renderToStaticMarkup(
+      <Formula tex="x_{n+1} = \varphi(x_n), \qquad n = 0, 1, 2, \dots" />,
+    );
+    expect(texOf(html)).toEqual(["x_{n+1} = \\varphi(x_n),", "n = 0, 1, 2, \\dots"]);
+    expect(html).toMatch(/^<div class="[^"]*\bflex-wrap\b/);
+  });
+
   it("can shrink below its formula's width, so a long formula scrolls instead of widening the page", () => {
     // Without min-w-0 the Lab 2 secant formula pushed phone pages to 432px wide.
     expect(renderToStaticMarkup(<Formula tex="x" />)).toMatch(/^<div class="[^"]*\bmin-w-0\b/);
+  });
+});
+
+describe("formulaScale", () => {
+  it("keeps a formula that fits at full size", () => {
+    expect(formulaScale(300, 300)).toBe(1);
+    expect(formulaScale(300, 120)).toBe(1);
+    expect(formulaScale(300, 0)).toBe(1);
+  });
+
+  it("shrinks a wider formula just enough, rounded down so it surely fits", () => {
+    expect(formulaScale(278, 300)).toBe(0.92);
+    expect(300 * formulaScale(278, 300)).toBeLessThanOrEqual(278);
+  });
+
+  it("stops at the minimum scale; past it the formula scrolls", () => {
+    expect(formulaScale(200, 412)).toBe(MIN_FORMULA_SCALE);
   });
 });
 

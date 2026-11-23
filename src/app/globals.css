@@ -139,6 +139,8 @@
   font-size: 1.05em;
 }
 .katex-display {
+  /* Contains KaTeX's visually hidden MathML copy, which would otherwise widen the page. */
+  position: relative;
   margin: 0;
   overflow-x: auto;
   overflow-y: hidden;
