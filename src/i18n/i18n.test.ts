@@ -1,3 +1,4 @@
+import katex from "katex";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_LANG, isLang, LANG_COOKIE, languageCookie, LANGS } from "./config";
 import { en, type MessageKey } from "./en";
@@ -11,6 +12,27 @@ describe("i18n", () => {
 
   it("ro has exactly the keys of en", () => {
     expect(Object.keys(ro).sort()).toEqual(Object.keys(en).sort());
+  });
+
+  it("writes every inline $…$ formula in valid TeX, in both languages", () => {
+    const broken: string[] = [];
+    for (const [lang, messages] of [
+      ["en", en],
+      ["ro", ro],
+    ] as const) {
+      for (const [key, text] of Object.entries(messages)) {
+        // The same split as RichText: the odd parts are TeX.
+        text.split(/\$([^$]+)\$/g).forEach((part, i) => {
+          if (i % 2 === 0) return;
+          try {
+            katex.renderToString(part, { throwOnError: true });
+          } catch {
+            broken.push(`${lang} ${key}: ${part}`);
+          }
+        });
+      }
+    }
+    expect(broken).toEqual([]);
   });
 
   it("interpolates parameters", () => {
