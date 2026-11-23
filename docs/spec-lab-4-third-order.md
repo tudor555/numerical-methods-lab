@@ -178,3 +178,4 @@ Review pass 1 (blind = B, edge-case = E, verification-gap = VG).
 - No e2e suite, by project decision. Smoke check instead: `next start` on a spare port, every ready lab in EN and RO has an input list per comparison card, no `katex-error`, no `⟦key⟧`.
 - Lab 4 checked line by line against the lab PDF: formulas, x₀ rules, stopping rule, inputs, outputs and all four examples match (4b ex. 2 as noted above).
 - Headless Chrome at 520px: cards stack, input lists wrap, no horizontal scroll. A real 390px phone check is still manual (headless Chrome will not lay out narrower than about 500px).
+- 2026-11-23: phone widths are now checked with DevTools-protocol device emulation, which does lay out at 320–390 px; Lab 4 passes at 320–1024 px in RO and EN (see `spec-lab-5-newton-systems.md`, Verification).

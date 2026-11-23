@@ -2,7 +2,7 @@ import { EvaluationError } from "@/lib/expressions/compile";
 import {
   DIVERGENCE_LIMIT,
   MethodStepError,
-  type MethodErrorCode,
+  type ScalarErrorCode,
   type ScalarIterationRow,
   type ScalarRunResult,
 } from "./types";
@@ -53,7 +53,7 @@ export function scalarIterate(input: ScalarIterateInput): ScalarRunResult {
 
   const rows: ScalarIterationRow[] = [{ n: 0, x: x0, fx: value(x0), diff: null }];
 
-  const fail = (code: MethodErrorCode, n: number, x: number): ScalarRunResult => ({
+  const fail = (code: ScalarErrorCode, n: number, x: number): ScalarRunResult => ({
     status: "error",
     result: null,
     n: rows[rows.length - 1].n,
@@ -71,7 +71,8 @@ export function scalarIterate(input: ScalarIterateInput): ScalarRunResult {
         "step" in input ? input.step(last.x) : input.twoPointStep(last.x, rows[rows.length - 2].x);
     } catch (error) {
       if (error instanceof MethodStepError || error instanceof EvaluationError) {
-        return fail(error.code, last.n, last.x);
+        // A scalar step only ever throws a scalar code.
+        return fail(error.code as ScalarErrorCode, last.n, last.x);
       }
       throw error;
     }

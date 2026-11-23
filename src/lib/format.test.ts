@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatEpsTex, formatLimit, formatSmall, formatValue } from "./format";
+import { formatEpsTex, formatLimit, formatPoint, formatSmall, formatValue } from "./format";
 
 describe("formatLimit", () => {
   it("writes large and tiny powers of ten with superscripts", () => {
@@ -74,5 +74,16 @@ describe("formatEpsTex", () => {
   it("falls back to the plain number when the exponent is not an integer", () => {
     expect(formatEpsTex(5e-4)).toBe("0.0005");
     expect(formatEpsTex(0.5)).toBe("0.5");
+  });
+});
+
+describe("formatPoint", () => {
+  it("joins both parts, each formatted as a value", () => {
+    expect(formatPoint(1.234274484114495, 3)).toBe("(1.2342744841145, 3)");
+    expect(formatPoint(1e-7, -2.5)).toBe("(1e-7, -2.5)");
+  });
+
+  it("uses the separator it is given", () => {
+    expect(formatPoint(0.9, 3.1, ";")).toBe("(0.9; 3.1)");
   });
 });

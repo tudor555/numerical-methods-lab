@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, textOf } from "@/test/render";
-import { StatusBadge } from "./status";
+import { runErrorKey, StatusBadge, systemErrorKey } from "./status";
 
 describe("StatusBadge", () => {
   it.each([
@@ -27,5 +27,26 @@ describe("StatusBadge", () => {
       (status) => render(<StatusBadge status={status} />).match(/lucide-[a-z-]+/)?.[0],
     );
     expect(new Set(icons).size).toBe(3);
+  });
+});
+
+describe("error message keys", () => {
+  it("uses the shared scalar wording unless the method has its own", () => {
+    expect(runErrorKey("zero-derivative")).toBe("run.error.zero-derivative");
+    expect(
+      runErrorKey("zero-denominator", { "zero-denominator": "lab3.method.halley.failure" }),
+    ).toBe("lab3.method.halley.failure");
+    expect(runErrorKey(undefined)).toBe("run.error.undefined-value");
+  });
+
+  it.each(["zero-jacobian", "undefined-value", "overflow", "diverged"] as const)(
+    "gives a system run's %s the wording that names the point",
+    (code) => {
+      expect(systemErrorKey(code)).toBe(`run.systemError.${code}`);
+    },
+  );
+
+  it("falls back to undefined-value for a system run with no code", () => {
+    expect(systemErrorKey(undefined)).toBe("run.systemError.undefined-value");
   });
 });

@@ -61,13 +61,15 @@ export const ro: Record<MessageKey, string> = {
   "lab.methods": "Metode",
 
   "common.stopping":
-    "Criteriul de oprire: $x_1$ se calculează separat din $x_0$, apoi, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+    "Criteriul de oprire: primul pas, de la $x_0$ la $x_1$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, adică până când două iterații consecutive diferă cu mai puțin de $\\varepsilon$. Se afișează $n$ și $x_n$.",
+  "common.systemStopping":
+    "Criteriul de oprire: primul pas, de la $(x_0; y_0)$ la $(x_1; y_1)$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$ sau $|y_n - y_{n-1}| \\ge \\varepsilon$, adică până când ambele coordonate se modifică cu mai puțin de $\\varepsilon$. Se afișează $n$ și $(x_n; y_n)$.",
 
   "math.if": "dacă",
 
   "form.run": "Calculează",
   "form.blocked": "Corectează câmpurile marcate ca să poți calcula.",
-  "form.derive": "Calculează din f",
+  "form.derive": "Calculează din {source}",
   "form.exprHint":
     "Variabile: {vars}. Funcții: sin, cos, exp, ln, lg, sqrt și altele. Constante: pi, e.",
   "form.numberHint": "Un număr sau o expresie, de exemplu 3*pi/8 sau 1e-4.",
@@ -88,6 +90,11 @@ export const ro: Record<MessageKey, string> = {
   "field.c": "Numărul de sub radical",
   "field.k": "Ordinul rădăcinii",
   "field.phi": "Funcția de iterație",
+  "field.F": "Funcția F",
+  "field.G": "Funcția G",
+  "field.partial": "Derivata parțială",
+  "field.startX": "Punctul inițial, x",
+  "field.startY": "Punctul inițial, y",
 
   "field.error.empty": "Câmpul este obligatoriu.",
   "field.error.syntax": "Expresia nu este scrisă corect. Verifică operatorii și parantezele.",
@@ -124,6 +131,12 @@ export const ro: Record<MessageKey, string> = {
   "result.maxIterations":
     "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
   "result.partial": "Iterațiile calculate până la eroare sunt afișate mai jos.",
+  "result.system.converged":
+    "Precizia dorită a fost atinsă la iterația n = {n}: |xₙ − xₙ₋₁| < ε și |yₙ − yₙ₋₁| < ε.",
+  "result.system.maxIterations":
+    "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
+  "result.startPoint": "Punctul inițial",
+  "result.exactSolution": "Soluția exactă",
 
   "run.error.zero-derivative":
     "Derivata se anulează la n = {n}, în xₙ = {x}: tangenta este orizontală, deci xₙ₊₁ nu poate fi calculat.",
@@ -134,6 +147,14 @@ export const ro: Record<MessageKey, string> = {
   "run.error.overflow":
     "La pasul care pornește din n = {n}, xₙ = {x}, o valoare a devenit infinită (±∞).",
   "run.error.diverged": "Șirul iterațiilor diverge: |xₙ| a depășit 10¹⁰⁰ la n = {n} (xₙ = {x}).",
+  "run.systemError.zero-jacobian":
+    "Jacobianul J se anulează la n = {n}, în (xₙ; yₙ) = {point}: pasul ar împărți la zero, deci (xₙ₊₁; yₙ₊₁) nu poate fi calculat.",
+  "run.systemError.undefined-value":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ) = {point}, o valoare nu este definită (NaN). Verifică domeniul de definiție al funcțiilor (radical dintr-un număr negativ, logaritm dintr-un număr nepozitiv).",
+  "run.systemError.overflow":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ) = {point}, o valoare a devenit infinită (±∞).",
+  "run.systemError.diverged":
+    "Șirul iterațiilor diverge: la n = {n}, în (xₙ; yₙ) = {point}, |xₙ| sau |yₙ| a depășit 10¹⁰⁰.",
 
   "table.title": "Tabelul iterațiilor",
   "table.hidden": "Iterații ascunse: {count}",
@@ -147,6 +168,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.combinedTangent": "Graficul lui f și pașii metodei combinate a tangentei",
   "chart.cobweb": "Graficul lui φ, dreapta y = x și traseul iterațiilor",
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
+  "chart.path": "Curbele F = 0 și G = 0 și traseul iterațiilor",
+  "chart.systemConvergence": "Convergența: |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
   "chart.tool.zoom": "Mărește o zonă",
   "chart.tool.pan": "Deplasează graficul",
@@ -168,10 +191,15 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.diff": "|xₙ − xₙ₋₁|",
   "chart.trace.eps": "ε",
   "chart.trace.error": "|xₙ − valoarea exactă|",
+  "chart.trace.curveF": "F(x, y) = 0",
+  "chart.trace.curveG": "G(x, y) = 0",
+  "chart.trace.diffY": "|yₙ − yₙ₋₁|",
+  "chart.trace.systemError": "max(|xₙ − x*|, |yₙ − y*|)",
 
   "compare.run": "Compară",
   "compare.method": "Metoda",
   "compare.hint": "Fiecare celulă arată numărul de iterații n și ultima iterație xₙ.",
+  "compare.systemHint": "Fiecare celulă arată numărul de iterații n și ultima iterație (xₙ; yₙ).",
   "compare.cell.error": "Eroare",
   "compare.cell.max": "Limită atinsă",
   "compare.inputs": "Date de intrare",
@@ -213,7 +241,7 @@ export const ro: Record<MessageKey, string> = {
   "lab1.preset.sqrt5": "√5",
   "lab1.preset.cbrt2": "∛2",
   "lab1.preset.cbrt3": "∛3",
-  "lab1.preset.cbrt12": "∛12",
+  "lab1.preset.cbrtHalf": "∛(1/2)",
   "lab1.preset.keplerFp": "Ex. 3: ecuația lui Kepler, φ(x) = sin x + 0,25",
   "lab1.preset.sqrt2Fp": "√2: φ(x) = (x + 2)/(x + 1)",
   "lab1.preset.sqrt3Fp": "√3: φ(x) = (x + 3)/(x + 1)",
@@ -231,7 +259,7 @@ export const ro: Record<MessageKey, string> = {
   "lab1.compare.ex1": "Ex. 1: x³ − x − 1 = 0",
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 pe (−1; 1)",
   "lab1.compare.kepler": "Ex. 3: ecuația lui Kepler, x = sin x + 0,25",
-  "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
+  "lab1.compare.sqrt": "Calculul radicalilor: √2, √3, √5",
 
   "lab2.intro":
     "Rezolvă ecuația f(x) = 0 fără a folosi derivata: metoda secantei înlocuiește tangenta cu secanta determinată de ultimele două iterații, iar metoda lui Steffensen aproximează derivata doar din valorile lui f. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",
@@ -243,7 +271,7 @@ export const ro: Record<MessageKey, string> = {
   "lab2.method.secant.start":
     "Metoda pornește din două iterații inițiale: introduci atât $x_0$, cât și $x_1$, iar ele trebuie să fie diferite. Intervalul $[a; b]$ stabilește doar porțiunea afișată pe grafic.",
   "lab2.method.secant.stopping":
-    "Criteriul de oprire: $x_1$ este dat, așa că, pornind de la $n = 1$, calculul continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$. Se afișează $n$ și $x_n$.",
+    "Criteriul de oprire: $x_0$ și $x_1$ sunt date. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, adică până când două iterații consecutive diferă cu mai puțin de $\\varepsilon$. Se afișează $n$ și $x_n$.",
   "lab2.method.secant.failure":
     "Dacă $f(x_n) = 0$, $x_n$ este chiar rădăcina, iar iterațiile rămân în acest punct. Altfel, dacă $f(x_n) = f(x_{n-1})$, secanta este paralelă cu axa $Ox$ și metoda se oprește cu eroare.",
 
@@ -356,4 +384,40 @@ export const ro: Record<MessageKey, string> = {
     "Aproximează √2 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei.",
   "lab4.compare.rootEx2.task":
     "Aproximează √3 și √5 prin metoda de ordinul 3 și compară rezultatele cu cele furnizate de metoda iterativă adaptată în urma folosirii metodei tangentei. Metoda converge către √a, deci se ia a = 3, respectiv a = 5.",
+
+  "lab5.intro":
+    "Rezolvă sistemul neliniar F(x, y) = 0, G(x, y) = 0 prin metoda lui Newton, care liniarizează ambele ecuații la fiecare pas, și prin metoda lui Newton modificată, care păstrează derivatele parțiale din punctul inițial. Compară apoi rezultatele și numărul de iterații obținute prin cele două metode.",
+  "lab5.method.newton.tab": "5a · Metoda lui Newton",
+  "lab5.method.newton.title": "Metoda lui Newton pentru sisteme neliniare",
+  "lab5.method.newton.name": "Metoda lui Newton",
+  "lab5.method.newton.idea":
+    "În jurul punctului $(x_n; y_n)$, fiecare dintre funcțiile $F$ și $G$ se aproximează prin planul său tangent. Următoarea iterație $(x_{n+1}; y_{n+1})$ este punctul în care ambele plane tangente se anulează, adică soluția unui sistem liniar 2×2. Rezolvând acest sistem cu regula lui Cramer, se obțin formulele de mai jos, în care $F$, $G$ și derivatele parțiale $F_x = \\partial F/\\partial x$, $F_y$, $G_x$, $G_y$ se calculează în $(x_n; y_n)$, iar $J$ este jacobianul:",
+  "lab5.method.newton.start":
+    "Punctul inițial $(x_0; y_0)$ trebuie ales suficient de aproape de soluție, altfel metoda poate să nu conveargă. În apropierea unei soluții simple, convergența este pătratică: la fiecare pas, numărul de zecimale exacte aproape se dublează.",
+  "lab5.method.newton.failure":
+    "Dacă jacobianul se anulează într-o iterație, sistemul liniar nu mai are soluție unică, pasul următor nu poate fi calculat și metoda se oprește cu eroare. Excepție face cazul în care $F$ și $G$ sunt exact zero în $(x_n; y_n)$: punctul este deja soluția, iar iterațiile rămân în el.",
+  "lab5.method.newton.chart":
+    "Primul grafic desenează curbele $F(x, y) = 0$ și $G(x, y) = 0$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
+
+  "lab5.method.modified.tab": "5b · Newton modificată",
+  "lab5.method.modified.title": "Metoda lui Newton modificată",
+  "lab5.method.modified.name": "Metoda lui Newton modificată",
+  "lab5.method.modified.idea":
+    "Metoda folosește aceleași formule ca metoda lui Newton, cu o singură diferență: derivatele parțiale, și odată cu ele jacobianul, se calculează o singură dată, în punctul inițial ($F_x^0 = F_x(x_0, y_0)$ și analog pentru celelalte). La fiecare pas se recalculează doar $F$ și $G$ în $(x_n; y_n)$:",
+  "lab5.method.modified.start":
+    "Astfel, un pas costă mai puțin, dar convergența devine liniară și sunt necesare mai multe iterații decât la metoda lui Newton. Punctul inițial $(x_0; y_0)$ contează aici de două ori: trebuie să fie suficient de aproape de soluție și tot din el provin derivatele folosite pe parcursul întregului calcul.",
+  "lab5.method.modified.failure":
+    "Cum $J_0$ nu se schimbă de la un pas la altul, un jacobian nul în punctul inițial oprește metoda cu eroare chiar de la primul pas. Excepție face cazul în care $F$ și $G$ sunt exact zero într-o iterație $(x_n; y_n)$: punctul este deja soluția, iar iterațiile rămân în el.",
+  "lab5.method.modified.chart":
+    "Primul grafic desenează curbele $F(x, y) = 0$ și $G(x, y) = 0$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
+
+  "lab5.preset.ex1": "Ex. 1: 2x³ − y² − 1 = 0, xy³ − y − 4 = 0, din (1,2; 1,7)",
+  "lab5.preset.ex2First": "Ex. 2: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
+  "lab5.preset.ex2Second": "Ex. 2: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
+  "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
+  "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
+
+  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+  "lab5.compare.ex3.task":
+    "Aplică metoda lui Newton modificată sistemului din ex. 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se folosesc ambele puncte inițiale din ex. 2, fiecare cu cele trei precizii.",
 };

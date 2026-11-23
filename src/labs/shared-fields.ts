@@ -5,6 +5,9 @@ import type { ExplanationBlock, FieldDefinition, FieldValues, NumberField } from
 
 export const X = ["x"] as const;
 
+/** The variables of a 2×2 system's functions. */
+export const XY = ["x", "y"] as const;
+
 /**
  * Bound on interval ends and starting values. The labs work on small intervals; beyond this the
  * charts and tables stop being readable and double precision leaves few meaningful digits.

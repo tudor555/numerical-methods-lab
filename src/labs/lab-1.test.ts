@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { scalarRun } from "@/test/runs";
 import { runComparison } from "./compare";
 import { deriveField } from "./fields";
 import { lab1 } from "./lab-1";
@@ -17,16 +18,17 @@ const preset = (id: string) => {
 };
 
 describe("registry", () => {
-  it("lists all 13 labs, Labs 1–4 ready, Lab 1 at /labs/newton", () => {
+  it("lists all 13 labs, Labs 1–5 ready, Lab 1 at /labs/newton", () => {
     expect(labs.map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(labs.filter((l) => l.status === "ready").map((l) => l.slug)).toEqual([
       "newton",
       "secant-steffensen",
       "halley-chebyshev",
       "third-order",
+      "newton-systems",
     ]);
     expect(findReadyLab("newton")).toBe(lab1);
-    expect(findReadyLab("newton-systems")).toBeUndefined();
+    expect(findReadyLab("nonlinear-systems")).toBeUndefined();
     expect(findReadyLab("euler")).toBeUndefined();
     expect(new Set(labs.map((l) => l.slug)).size).toBe(13);
   });
@@ -43,6 +45,18 @@ describe("Lab 1 presets", () => {
     } else {
       expect(result.status).toBe("converged");
     }
+  });
+
+  it("offers the lab's ∛2, ∛3 and ∛(1/2); ∛(1/2) starts at 1, the lab's case c ≤ 1", () => {
+    const cubeRoots = lab1.presets.filter((p) => p.methodId === "1b" && p.values.k === "3");
+    expect(cubeRoots.map((p) => p.values.c)).toEqual(["2", "3", "1/2"]);
+    const prepared = method("1b").prepare(preset("cbrt-half").values);
+    if (!prepared.ok) throw new Error("invalid");
+    const run = scalarRun(prepared.prepared);
+    const r = run.run();
+    expect(r.iterations[0].x).toBe(1);
+    expect(r.result).toBeCloseTo(Math.cbrt(0.5), 4);
+    expect(run.exact?.tex).toBe("\\sqrt[3]{\\frac{1}{2}}");
   });
 
   it("Kepler preset starts at 3π/8 and converges to ≈ 1.17122", () => {
@@ -71,7 +85,7 @@ describe("Lab 1 comparisons", () => {
   const n = (id: string) => {
     const comparison = lab1.comparisons.find((c) => c.id === id);
     if (!comparison) throw new Error(id);
-    return runComparison(lab1, comparison).map((row) => row.map((cell) => cell?.n ?? null));
+    return runComparison(lab1, comparison).map((row) => row.map((cell) => cell?.result.n ?? null));
   };
 
   it("matches the locked iteration counts", () => {
@@ -106,7 +120,7 @@ describe("Lab 1 comparisons", () => {
     const cells = runComparison(lab1, comparison);
     expect(cells[0]).toEqual([null, null]);
     expect(cells[1]).toEqual([null, null]);
-    expect(cells[2].map((cell) => cell?.n)).toEqual([5, 6]);
+    expect(cells[2].map((cell) => cell?.result.n)).toEqual([5, 6]);
   });
 
   it("gives a null cell when a preset fails validation", () => {
@@ -213,7 +227,7 @@ describe("Lab 1 exact solutions (CAP-5)", () => {
     if (!m) throw new Error(id);
     const prepared = m.prepare({ ...m.defaults, ...values });
     if (!prepared.ok) throw new Error("invalid");
-    return prepared.prepared;
+    return scalarRun(prepared.prepared);
   };
 
   it("gives the k-th root its exact value ᵏ√c, named in TeX", () => {
@@ -221,9 +235,10 @@ describe("Lab 1 exact solutions (CAP-5)", () => {
       value: Math.SQRT2,
       tex: "\\sqrt{2}",
     });
-    const cbrt = prepare("1b", { c: "12", k: "3" }).exact;
-    expect(cbrt?.tex).toBe("\\sqrt[3]{12}");
-    expect(cbrt?.value).toBeCloseTo(Math.cbrt(12), 15);
+    const cbrt = prepare("1b", { c: "1/2", k: "3" }).exact;
+    expect(cbrt?.tex).toBe("\\sqrt[3]{\\frac{1}{2}}");
+    expect(cbrt?.value).toBeCloseTo(Math.cbrt(0.5), 15);
+    expect(prepare("1b", { c: "3", k: "3" }).exact?.tex).toBe("\\sqrt[3]{3}");
   });
 
   it("claims no exact value where none is known (Newton, successive approximations)", () => {

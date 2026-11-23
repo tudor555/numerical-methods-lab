@@ -41,16 +41,24 @@ describe("Hub", () => {
     expect(fourth).not.toContain("Coming soon");
   });
 
-  it("shows labs 5–13 as coming soon, without a link", () => {
-    const rest = cards("en").slice(4);
-    expect(rest).toHaveLength(9);
+  it("links Lab 5 to /labs/newton-systems", () => {
+    const fifth = cards("en")[4];
+    expect(fifth).toContain('href="/labs/newton-systems"');
+    expect(fifth).toContain('aria-label="Lab 5: Newton&#x27;s method for 2×2 systems. Open lab"');
+    expect(textOf(fifth)).toContain("Newton and modified Newton for nonlinear systems");
+    expect(fifth).not.toContain("Coming soon");
+  });
+
+  it("shows labs 6–13 as coming soon, without a link", () => {
+    const rest = cards("en").slice(5);
+    expect(rest).toHaveLength(8);
     rest.forEach((card, i) => {
-      expect(textOf(card)).toContain(`Lab ${i + 5}`);
+      expect(textOf(card)).toContain(`Lab ${i + 6}`);
       expect(card).toContain("Coming soon");
       expect(card).toContain('aria-disabled="true"');
       expect(card).not.toContain("<a ");
     });
-    expect(count(render(<Hub />), "href=")).toBe(4);
+    expect(count(render(<Hub />), "href=")).toBe(5);
   });
 
   it("renders in Romanian", () => {
@@ -65,7 +73,7 @@ describe("Hub", () => {
     expect(textOf(html)).toContain(
       "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
     );
-    expect(count(html, "În curând")).toBe(9);
+    expect(count(html, "În curând")).toBe(8);
     expect(html).not.toContain("Coming soon");
   });
 });

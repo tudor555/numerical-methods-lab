@@ -3,10 +3,12 @@ import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
-import type { RunView } from "@/labs/lab-state";
+import { lab5 } from "@/labs/lab-5";
+import { toRunView, type RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
-import { elements, render, textOf } from "@/test/render";
+import { count, elements, render, texOf, textOf } from "@/test/render";
+import { scalarView, systemView } from "@/test/runs";
 import type { ChartSpec } from "./charts";
 import { ResultsPanel } from "./results-panel";
 
@@ -22,13 +24,12 @@ vi.mock("./plotly-chart", () => ({
 const allMethods = [...lab1.methods, ...lab2.methods, ...lab3.methods, ...lab4.methods];
 
 /** Prepares and runs a Lab 1–4 method like the page does. */
-function view(methodId: string, patch: FieldValues = {}): RunView {
+function view(methodId: string, patch: FieldValues = {}) {
   const method = allMethods.find((m) => m.id === methodId);
   if (!method) throw new Error(methodId);
   const prepared = method.prepare({ ...method.defaults, ...patch });
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
-  const { run, plot, eps, exact } = prepared.prepared;
-  return { result: run(), plot, eps, exact };
+  return scalarView(toRunView(prepared.prepared));
 }
 
 function panel(run: RunView, lang: "en" | "ro" = "en", valueColumn = "f(x_n)"): string {
@@ -61,7 +62,8 @@ describe("ResultsPanel", () => {
   it("reports a converged run with its stats, charts and table", () => {
     const html = panel(ex1);
     expect(html).toContain('role="status"');
-    expect(html).toContain("lucide-circle-check");
+    // One status icon, in the badge, not a second one beside it.
+    expect(count(html, "lucide-circle-check")).toBe(1);
     expect(message(html)).toBe("|xₙ − xₙ₋₁| < ε after n = 5 iterations.");
     const [value, n, start] = stats(html);
     expect(value.value).toBe(formatValue(ex1.result.result as number));
@@ -80,7 +82,7 @@ describe("ResultsPanel", () => {
   it("reports the iteration cap as a warning, with the last iterate", () => {
     const html = panel(capped);
     expect(html).toContain('role="alert"');
-    expect(html).toContain("lucide-triangle-alert");
+    expect(count(html, "lucide-triangle-alert")).toBe(1);
     expect(message(html)).toMatch(/^Stopped at the cap of 3 iterations/);
     expect(stats(html)[1].value).toBe("3");
     expect(stats(html)[0].value).toBe(formatValue(capped.result.result as number));
@@ -89,7 +91,7 @@ describe("ResultsPanel", () => {
   it("reports an error, keeps the partial rows and highlights the failing row", () => {
     const html = panel(ex2R0);
     expect(html).toContain('role="alert"');
-    expect(html).toContain("lucide-octagon-x");
+    expect(count(html, "lucide-octagon-x")).toBe(1);
     expect(message(html)).toBe(
       "The derivative is zero at n = 0, xₙ = 1. The step divides by zero, so xₙ₊₁ is undefined. " +
         "The iterations computed before the error are kept below.",
@@ -166,7 +168,7 @@ describe("ResultsPanel with a known exact solution (CAP-5)", () => {
   });
 
   it("speaks Romanian", () => {
-    const text = textOf(panel(view("1b", { c: "12", k: "3" }), "ro"));
+    const text = textOf(panel(view("1b", { c: "1/2", k: "3" }), "ro"));
     expect(text).toContain("Valoarea exactă");
     expect(text).toContain("Eroarea");
   });
@@ -311,5 +313,118 @@ describe("ResultsPanel for Lab 4", () => {
     expect(Number(tiles.find((t) => t.label.startsWith("Error"))?.value)).toBeLessThan(1e-12);
     const convergenceTraces = [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
     expect(convergenceTraces).toContain("|xₙ − exact value|");
+  });
+});
+
+describe("ResultsPanel for a 2×2 system", () => {
+  const systemRun = (methodId: string, patch: FieldValues = {}) => {
+    const method = lab5.methods.find((m) => m.id === methodId);
+    if (!method) throw new Error(methodId);
+    const prepared = method.prepare({ ...method.defaults, ...patch });
+    if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
+    return systemView(toRunView(prepared.prepared));
+  };
+  const ex2 = lab5.presets.find((p) => p.id === "ex2-first")?.values ?? {};
+  /** Every header formula in order; a paired column gives its top one, then its bottom one. */
+  const headers = (html: string) => texOf(elements(html, "thead")[0] ?? "");
+  /** The columns of each body row; a paired cell reads as its top value, then its bottom one. */
+  const rowValues = (html: string) =>
+    elements(html.slice(html.indexOf("<tbody")), "tr").map((row) =>
+      elements(row, "td").flatMap((cell) => {
+        const lines = elements(cell, "span");
+        return lines.length > 0 ? lines.map(textOf) : [textOf(cell)];
+      }),
+    );
+
+  it("shows xₙ, yₙ, n and the start, both charts and the 7-column table", () => {
+    const html = panel(systemRun("5a"));
+    expect(count(html, "lucide-circle-check")).toBe(1);
+    expect(message(html)).toBe("|xₙ − xₙ₋₁| < ε and |yₙ − yₙ₋₁| < ε after n = 3 iterations.");
+    const [x, y, n, start] = stats(html);
+    expect(x.label).toContain("Result");
+    expect(x.value).toMatch(/^1\.234274484/);
+    expect(y.value).toMatch(/^1\.661526466/);
+    expect(n.value).toBe("3");
+    expect(start).toEqual({
+      label: expect.stringContaining("Starting point"),
+      value: "(1.2, 1.7)",
+    });
+    expect(stats(html)).toHaveLength(4);
+    expect(figures(html)).toEqual([
+      "F = 0 and G = 0 with the iteration path",
+      "Convergence: |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| on a log scale",
+    ]);
+    expect(traceNames(html)).toEqual(["F(x, y) = 0", "G(x, y) = 0", "Iteration path"]);
+    expect(headers(html)).toEqual([
+      "n",
+      "x_n",
+      "y_n",
+      "F(x_n, y_n)",
+      "G(x_n, y_n)",
+      "|x_n - x_{n-1}|",
+      "|y_n - y_{n-1}|",
+    ]);
+  });
+
+  it("shows the exact solution and the error for ex. 2, in Romanian", () => {
+    const html = panel(systemRun("5a", ex2), "ro");
+    const tiles = stats(html);
+    expect(tiles.map((s) => s.label.split(" ")[0])).toEqual([
+      "Aproximația",
+      "Aproximația",
+      "Numărul",
+      "Punctul",
+      "Soluția",
+      "Eroarea",
+    ]);
+    expect(tiles[3].value).toBe("(0.9; 3.1)");
+    expect(tiles[4].value).toBe("(1; 3)");
+    expect(tiles[5].value).toMatch(/e-1[01]$/);
+    expect(headers(html).at(-1)).toBe("\\max(|x_n - x^*|, |y_n - y^*|)");
+    // The trace names contain "|", so the attribute is compared whole.
+    const convergence = [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
+    expect(convergence).toBe("|xₙ − xₙ₋₁|||yₙ − yₙ₋₁||ε|max(|xₙ − x*|, |yₙ − y*|)");
+    const rows = rowValues(html);
+    expect(rows).toHaveLength(4);
+    // Four columns plus the error: xₙ over yₙ, F over G, |Δx| over |Δy|.
+    expect(elements(elements(html.slice(html.indexOf("<tbody")), "tr")[0], "td")).toHaveLength(5);
+    // n, xₙ, yₙ, F, G, |Δx|, |Δy|, max-norm error: F(0.9, 3.1) = 0.42, G = 0, error 0.1.
+    expect(rows[0]).toEqual(["0", "0.9", "3.1", "4.200e-1", "0", "—", "—", "1.000e-1"]);
+    expect(rows[3][0]).toBe("3");
+    expect(rows[3][1]).toMatch(/^0\.99999999994|^1$/);
+    expect(rows[3][7]).toMatch(/e-1[01]$/);
+  });
+
+  it("names the point when a step fails, and keeps the partial table", () => {
+    const html = panel(
+      systemRun("5b", {
+        F: "x + y",
+        G: "x + y - 1",
+        Fx: "1",
+        Fy: "1",
+        Gx: "1",
+        Gy: "1",
+        x0: "0",
+        y0: "0",
+      }),
+    );
+    expect(html).toContain('role="alert"');
+    expect(message(html)).toBe(
+      "The Jacobian J is zero at n = 0, (xₙ, yₙ) = (0, 0). The step divides by zero, so (xₙ₊₁, yₙ₊₁) is undefined. The iterations computed before the error are kept below.",
+    );
+    expect(
+      stats(html)
+        .slice(0, 2)
+        .map((s) => s.value),
+    ).toEqual(["—", "—"]);
+    const rows = elements(html.slice(html.indexOf("<tbody")), "tr");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toContain("bg-error/10");
+    expect(rowValues(html)[0]).toEqual(["0", "0", "0", "0", "-1.000e+0", "—", "—"]);
+  });
+
+  it("says when the cap stops a system run", () => {
+    const html = panel(systemRun("5b", { ...ex2, eps: "1e-12", maxIter: "2" }));
+    expect(message(html)).toMatch(/^Stopped at the cap of 2 iterations while \|xₙ − xₙ₋₁\| or/);
   });
 });

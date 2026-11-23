@@ -3,6 +3,7 @@ import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
+import { lab5 } from "@/labs/lab-5";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -32,7 +33,7 @@ describe("ComparisonPanel", () => {
       "Ex. 1: x³ − x − 1 = 0",
       "Ex. 2: x⁵ − 5x + 1 = 0 on (−1, 1)",
       "Ex. 3: Kepler's equation, x = sin x + 0.25",
-      "Ex. 4: √2, √3, √5",
+      "Computing roots: √2, √3, √5",
     ]);
   });
 
@@ -82,6 +83,8 @@ describe("ComparisonResults", () => {
     expect(text.indexOf("n = 5")).toBeLessThan(text.indexOf("n = 6"));
     expect(text.indexOf("n = 6")).toBeLessThan(text.indexOf("n = 7"));
     expect(text).toContain("1.32471795724");
+    expect(text).toContain("the final xₙ.");
+    expect(text).not.toContain("(xₙ, yₙ)");
   });
 
   it("labels each tile with its ε and repeats the ε values in a shared header", () => {
@@ -115,7 +118,11 @@ describe("ComparisonResults", () => {
       iterations: [],
     };
     const html = render(
-      <ComparisonResults lab={lab1} comparison={comparison("kepler")} cells={[[capped], [null]]} />,
+      <ComparisonResults
+        lab={lab1}
+        comparison={comparison("kepler")}
+        cells={[[{ kind: "scalar", result: capped }], [null]]}
+      />,
     );
     expect(textOf(html)).toContain("Cap reached");
     expect(textOf(html)).toContain("n = 3");
@@ -221,7 +228,7 @@ describe("ComparisonPanel for Lab 3", () => {
         lab={lab3}
         comparison={comparison}
         cells={[
-          [failed, null, null],
+          [{ kind: "scalar", result: failed }, null, null],
           [null, null, null],
         ]}
       />,
@@ -320,5 +327,71 @@ describe("ComparisonPanel for Lab 4", () => {
     rows.forEach((row, i) => expect(textOf(row)).toContain(names[i]));
     for (const n of ns) expect(textOf(html)).toContain(n);
     expect(texOf(rows[1])[0]).toBe(tex);
+  });
+});
+
+describe("ComparisonPanel for Lab 5", () => {
+  const ex3 = lab5.comparisons[0];
+
+  it("shows ex. 3 with its task and lists each row's system and start", () => {
+    const html = render(<ComparisonPanel lab={lab5} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+    ]);
+    const [card] = cards(html);
+    expect(textOf(card)).toContain("Cerința:");
+    expect(elements(card, "dt").map(textOf)).toEqual([
+      "Metoda lui Newton modificată",
+      "Metoda lui Newton",
+      "Metoda lui Newton modificată",
+      "Metoda lui Newton",
+      "Precizia",
+    ]);
+    const inputs = texOf(card);
+    expect(inputs.filter((tex) => tex.startsWith("(x_0;"))).toEqual([
+      "(x_0;\\ y_0) = (0.9;\\ 3.1)",
+      "(x_0;\\ y_0) = (0.9;\\ 3.1)",
+      "(x_0;\\ y_0) = (2.9;\\ 1.1)",
+      "(x_0;\\ y_0) = (2.9;\\ 1.1)",
+    ]);
+  });
+
+  it.each([
+    ["en", ",", "final point (xₙ, yₙ)"],
+    ["ro", ";", "ultima iterație (xₙ; yₙ)"],
+  ] as const)("shows n and the point in each cell, in %s", (lang, separator, hint) => {
+    const html = render(
+      <ComparisonResults lab={lab5} comparison={ex3} cells={runComparison(lab5, ex3)} />,
+      lang,
+    );
+    const text = textOf(html);
+    for (const n of [4, 8, 12, 3, 5, 9, 13]) expect(text).toContain(`n = ${n}`);
+    // 5a from (0.9, 3.1) at ε = 10⁻⁸ ends on (1, 3) to 15 digits.
+    expect(text).toContain(`(1${separator} 3)`);
+    expect(text).toContain(hint);
+    expect(text).not.toContain("final xₙ.");
+  });
+
+  it("explains a failed system tile with the point", () => {
+    const failed = {
+      kind: "system" as const,
+      result: {
+        status: "error" as const,
+        result: null,
+        n: 0,
+        iterations: [{ n: 0, x: 0, y: 0, F: 0, G: -1, dx: null, dy: null }],
+        error: { code: "zero-jacobian" as const, n: 0, x: 0, y: 0 },
+      },
+    };
+    const html = render(
+      <ComparisonResults
+        lab={lab5}
+        comparison={ex3}
+        cells={[[failed, null, null], ...Array(3).fill([null, null, null])]}
+      />,
+    );
+    expect(textOf(html)).toContain("The Jacobian J is zero at n = 0, (xₙ, yₙ) = (0, 0).");
+    // Rows whose presets failed do not turn the hint back into the scalar one.
+    expect(textOf(html)).toContain("the final point (xₙ, yₙ).");
   });
 });

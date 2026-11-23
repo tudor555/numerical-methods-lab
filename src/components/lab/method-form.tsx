@@ -144,11 +144,13 @@ function TextInput({
             variant="outline"
             className="h-10 shrink-0"
             onClick={runDerive}
-            aria-label={t("form.derive")}
-            title={t("form.derive")}
+            aria-label={t("form.derive", { source: field.derive.from })}
+            title={t("form.derive", { source: field.derive.from })}
           >
             <WandSparkles aria-hidden />
-            <span className="hidden sm:inline">{t("form.derive")}</span>
+            <span className="hidden sm:inline">
+              {t("form.derive", { source: field.derive.from })}
+            </span>
           </Button>
         )}
       </div>
@@ -209,7 +211,8 @@ export function MethodForm({
                 aria-pressed={activePreset === preset.id}
                 onClick={() => onPreset(preset)}
                 className={cn(
-                  "h-auto min-h-8 py-1 whitespace-normal",
+                  // max-w-full lets a long label wrap instead of pushing the page wider on a phone.
+                  "h-auto min-h-8 max-w-full py-1 text-left whitespace-normal",
                   activePreset === preset.id &&
                     "border-primary/70 text-foreground dark:border-primary/70",
                 )}

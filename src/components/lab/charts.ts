@@ -1,6 +1,6 @@
 import type { Data } from "plotly.js-dist-min";
-import type { FunctionPlot } from "@/labs/types";
-import type { ScalarIterationRow } from "@/lib/methods/types";
+import type { FunctionPlot, SystemExactSolution, SystemPlot } from "@/labs/types";
+import type { ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
 
 /** The data for one chart. Built here without Plotly so it can be tested; PlotlyInner draws it. */
 export interface ChartSpec {
@@ -25,6 +25,10 @@ export interface ChartLabels {
   diff: string;
   eps: string;
   error: string;
+  curveF: string;
+  curveG: string;
+  diffY: string;
+  systemError: string;
 }
 
 const COLORS = {
@@ -380,6 +384,158 @@ function errorTrace(rows: readonly ScalarIterationRow[], exact: number, labels: 
     marker: { color: COLORS.secondary, size: 6 },
     hovertemplate: "n = %{x}<br>|xₙ − x*| = %{y:.3e}<extra></extra>",
   };
+}
+
+/** Grid points per axis for the F = 0 and G = 0 contours. */
+const GRID = 80;
+
+/** F or G on the grid, row by row (z[j][i] at xs[i], ys[j]); a throwing or non-finite value is a gap. */
+function grid(
+  fn: (x: number, y: number) => number,
+  xs: readonly number[],
+  ys: readonly number[],
+): (number | null)[][] {
+  return ys.map((y) =>
+    xs.map((x) => {
+      try {
+        const z = fn(x, y);
+        return Number.isFinite(z) ? z : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+}
+
+function axis([lo, hi]: [number, number]): number[] {
+  return Array.from({ length: GRID }, (_, i) => lo + ((hi - lo) * i) / (GRID - 1));
+}
+
+/**
+ * The iteration path in the (x, y) plane over the curves F = 0 and G = 0, drawn as the zero
+ * contours of F and G on a grid around the iterates. The solution is where the two curves cross.
+ */
+export function buildPathChart(
+  plot: SystemPlot,
+  rows: readonly SystemIterationRow[],
+  labels: ChartLabels,
+): ChartSpec | null {
+  const points = rows.filter(
+    (r) =>
+      Number.isFinite(r.x) &&
+      Number.isFinite(r.y) &&
+      Math.abs(r.x) <= PLOT_LIMIT &&
+      Math.abs(r.y) <= PLOT_LIMIT,
+  );
+  if (points.length === 0) return null;
+  const xs = axis(xRange(points.map((r) => r.x)));
+  const ys = axis(xRange(points.map((r) => r.y)));
+  const curve = (fn: SystemPlot["F"], name: string, color: string): Data => ({
+    type: "contour",
+    name,
+    x: xs,
+    y: ys,
+    z: grid(fn, xs, ys),
+    contours: { start: 0, end: 0, size: 1, coloring: "none" },
+    line: { color, width: 2 },
+    showscale: false,
+    showlegend: true,
+    hoverinfo: "skip",
+  });
+
+  // A gap in n (an iterate left out above) breaks the line instead of joining across it.
+  const pathX: (number | null)[] = [];
+  const pathY: (number | null)[] = [];
+  const pathN: (number | null)[] = [];
+  points.forEach((r, i) => {
+    if (i > 0 && r.n !== points[i - 1].n + 1) {
+      pathX.push(null);
+      pathY.push(null);
+      pathN.push(null);
+    }
+    pathX.push(r.x);
+    pathY.push(r.y);
+    pathN.push(r.n);
+  });
+
+  return {
+    xTitle: "x",
+    yTitle: "y",
+    traces: [
+      curve(plot.F, labels.curveF, COLORS.accent),
+      curve(plot.G, labels.curveG, COLORS.secondary),
+      {
+        type: "scatter",
+        mode: "lines+markers",
+        name: labels.path,
+        x: pathX,
+        y: pathY,
+        customdata: pathN,
+        line: { color: COLORS.text, width: 1.5 },
+        marker: { color: COLORS.text, size: 7, line: { color: COLORS.accent, width: 1.5 } },
+        hovertemplate: "n = %{customdata}<br>x = %{x:.12g}<br>y = %{y:.12g}<extra></extra>",
+      },
+    ],
+  };
+}
+
+/**
+ * |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| per iteration on a log scale, with ε as a reference line and, when
+ * the exact solution is known, max(|xₙ − x*|, |yₙ − y*|).
+ */
+export function buildSystemConvergenceChart(
+  rows: readonly SystemIterationRow[],
+  eps: number,
+  labels: ChartLabels,
+  exact?: SystemExactSolution,
+): ChartSpec | null {
+  // Each difference drops its own zero and non-finite points, which a log axis cannot show.
+  const positive = (pick: (r: SystemIterationRow) => number | null) =>
+    rows
+      .map((r) => ({ n: r.n, value: pick(r) }))
+      .filter(
+        (p): p is { n: number; value: number } =>
+          p.value !== null && p.value > 0 && Number.isFinite(p.value),
+      );
+  const dx = positive((r) => r.dx);
+  const dy = positive((r) => r.dy);
+  if (dx.length === 0 && dy.length === 0) return null;
+  const lastN = rows[rows.length - 1].n;
+  const epsSpan = lastN > 1 ? [1, lastN] : [0.5, 1.5];
+  const series = (
+    points: { n: number; value: number }[],
+    name: string,
+    color: string,
+    hover: string,
+    dash?: "dot",
+  ): Data => ({
+    type: "scatter",
+    mode: "lines+markers",
+    name,
+    x: points.map((p) => p.n),
+    y: points.map((p) => p.value),
+    line: { color, width: 2, dash },
+    marker: { color, size: 6 },
+    hovertemplate: `n = %{x}<br>${hover} = %{y:.3e}<extra></extra>`,
+  });
+  const traces: Data[] = [
+    series(dx, labels.diff, COLORS.accent, "|xₙ − xₙ₋₁|"),
+    series(dy, labels.diffY, COLORS.text, "|yₙ − yₙ₋₁|"),
+    {
+      type: "scatter",
+      mode: "lines",
+      name: labels.eps,
+      x: epsSpan,
+      y: [eps, eps],
+      line: { color: COLORS.muted, width: 1.5, dash: "dash" },
+      hovertemplate: `ε = ${eps}<extra></extra>`,
+    },
+  ];
+  if (exact) {
+    const error = positive((r) => Math.max(Math.abs(r.x - exact.x), Math.abs(r.y - exact.y)));
+    traces.push(series(error, labels.systemError, COLORS.secondary, "max(|xₙ − x*|, |yₙ − y*|)"));
+  }
+  return { xTitle: "n", yLog: true, traces };
 }
 
 /** Scales a [lo, hi] range around its centre: a factor below 1 zooms in, above 1 zooms out. */

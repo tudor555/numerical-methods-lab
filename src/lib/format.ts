@@ -7,6 +7,11 @@ export function formatValue(x: number): string {
   return String(Number(x.toPrecision(15)));
 }
 
+/** A point (x, y) for display, each part through {@link formatValue}: `(1.23, 1.66)`, or `(1.23; 1.66)` in RO. */
+export function formatPoint(x: number, y: number, separator = ","): string {
+  return `(${formatValue(x)}${separator} ${formatValue(y)})`;
+}
+
 /** Small quantities such as |xₙ − xₙ₋₁| or f(xₙ), in scientific notation. */
 export function formatSmall(x: number | null): string {
   if (x === null) return "—";

@@ -162,6 +162,19 @@ describe("deriveField", () => {
     expect(deriveField(df, fields, { f: "x^2" })).toEqual({ ok: true, value: "2 * x" });
   });
 
+  it("derives in the variable the field names, so ∂F/∂y differentiates in y", () => {
+    const F: ExpressionField = { ...expression("F"), variables: ["x", "y"] };
+    const Fy: ExpressionField = {
+      ...expression("Fy"),
+      variables: ["x", "y"],
+      derive: { from: "F", variable: "y" },
+    };
+    const Fx: ExpressionField = { ...Fy, id: "Fx", derive: { from: "F" } };
+    const values = { F: "x^2 + x y^3" };
+    expect(deriveField(Fy, [F, Fy, Fx], values)).toEqual({ ok: true, value: "3 * x * y ^ 2" });
+    expect(deriveField(Fx, [F, Fy, Fx], values)).toEqual({ ok: true, value: "2 * x + y ^ 3" });
+  });
+
   it("fills an expression field with the second derivative when its order is 2", () => {
     const ddf: ExpressionField = { ...expression("ddf"), derive: { from: "f", order: 2 } };
     expect(deriveField(ddf, [f, ddf], { f: "x^3 - x - 1" })).toEqual({ ok: true, value: "6 * x" });

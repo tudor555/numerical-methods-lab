@@ -83,4 +83,4 @@ A **vision plus a mandate**. The course _Numerical Methods for Operator Equation
 - Lab 1 ex. 1 gives no interval, so the app uses [1, 2], as Labs 2–4 do. Lab 6 examples that give no ε use 10⁻⁴.
 - "Compare with successive approximations" in Labs 1–2 means scalar fixed-point iteration xₙ₊₁ = φ(xₙ), with φ entered by the user. It lives in Lab 1.
 - Lab 1 ex. 2 asks for the root in (−1, 1), but f″ changes sign inside that interval, so rule R0 picks x₀ = 1, where f′(1) = 0. The preset keeps the lab's interval and shows that error; a second preset starts from x₀ = 0 and converges to ≈ 0.20006.
-- Lab 1 ex. 4 compares √2, √3 and √5 with successive approximations but gives neither φ nor ε. The app uses φ(x) = (x + c)/(x + 1) from x₀ = c, and the three ε values of ex. 1–2. The ∛ examples are approximated only, as the lab asks; they have no comparison.
+- Lab 1's roots example (unnumbered in the lab) compares √2, √3 and √5 with successive approximations but gives neither φ nor ε. The app uses φ(x) = (x + c)/(x + 1) from x₀ = c, and the three ε values of ex. 1–2. The ∛ examples are approximated only, as the lab asks; they have no comparison.
