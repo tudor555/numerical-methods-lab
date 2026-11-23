@@ -241,7 +241,7 @@ export const ro: Record<MessageKey, string> = {
   "lab1.preset.sqrt5": "√5",
   "lab1.preset.cbrt2": "∛2",
   "lab1.preset.cbrt3": "∛3",
-  "lab1.preset.cbrt12": "∛12",
+  "lab1.preset.cbrtHalf": "∛(1/2)",
   "lab1.preset.keplerFp": "Ex. 3: ecuația lui Kepler, φ(x) = sin x + 0,25",
   "lab1.preset.sqrt2Fp": "√2: φ(x) = (x + 2)/(x + 1)",
   "lab1.preset.sqrt3Fp": "√3: φ(x) = (x + 3)/(x + 1)",
@@ -259,7 +259,7 @@ export const ro: Record<MessageKey, string> = {
   "lab1.compare.ex1": "Ex. 1: x³ − x − 1 = 0",
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 pe (−1; 1)",
   "lab1.compare.kepler": "Ex. 3: ecuația lui Kepler, x = sin x + 0,25",
-  "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
+  "lab1.compare.sqrt": "Calculul radicalilor: √2, √3, √5",
 
   "lab2.intro":
     "Rezolvă ecuația f(x) = 0 fără a folosi derivata: metoda secantei înlocuiește tangenta cu secanta determinată de ultimele două iterații, iar metoda lui Steffensen aproximează derivata doar din valorile lui f. Compară apoi rezultatele și numărul de iterații cu cele obținute prin metoda tangentei.",

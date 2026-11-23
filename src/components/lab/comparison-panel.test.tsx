@@ -33,7 +33,7 @@ describe("ComparisonPanel", () => {
       "Ex. 1: x³ − x − 1 = 0",
       "Ex. 2: x⁵ − 5x + 1 = 0 on (−1, 1)",
       "Ex. 3: Kepler's equation, x = sin x + 0.25",
-      "Ex. 4: √2, √3, √5",
+      "Computing roots: √2, √3, √5",
     ]);
   });
 

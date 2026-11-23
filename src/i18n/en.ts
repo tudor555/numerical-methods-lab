@@ -235,7 +235,7 @@ export const en = {
   "lab1.preset.sqrt5": "√5",
   "lab1.preset.cbrt2": "∛2",
   "lab1.preset.cbrt3": "∛3",
-  "lab1.preset.cbrt12": "∛12",
+  "lab1.preset.cbrtHalf": "∛(1/2)",
   "lab1.preset.keplerFp": "Ex. 3: Kepler, φ = sin x + 0.25",
   "lab1.preset.sqrt2Fp": "√2: φ = (x + 2)/(x + 1)",
   "lab1.preset.sqrt3Fp": "√3: φ = (x + 3)/(x + 1)",
@@ -253,7 +253,7 @@ export const en = {
   "lab1.compare.ex1": "Ex. 1: x³ − x − 1 = 0",
   "lab1.compare.ex2": "Ex. 2: x⁵ − 5x + 1 = 0 on (−1, 1)",
   "lab1.compare.kepler": "Ex. 3: Kepler's equation, x = sin x + 0.25",
-  "lab1.compare.sqrt": "Ex. 4: √2, √3, √5",
+  "lab1.compare.sqrt": "Computing roots: √2, √3, √5",
 
   "lab2.intro":
     "Solve f(x) = 0 without a derivative: the secant method replaces the tangent with the secant line through the last two iterates, and Steffensen's method approximates the derivative from values of f alone. Then compare the results and iteration counts with the tangent method.",

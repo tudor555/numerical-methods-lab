@@ -121,13 +121,19 @@ export const kthRootMethod: MethodDefinition = {
     const { numbers, errors } = parseFields(kthRootMethod.fields, values);
     if (Object.keys(errors).length > 0) return { ok: false, errors };
     const { c, k, eps, maxIter } = numbers;
+    // A radicand typed as a fraction, such as the lab's 1/2, keeps that form: ∛(1/2), not ∛0.5.
+    const fraction = /^\s*(\d+)\s*\/\s*(\d+)\s*$/.exec(values.c ?? "");
+    const radicand = fraction ? `\\frac{${fraction[1]}}{${fraction[2]}}` : String(c);
     return {
       ok: true,
       prepared: {
         eps,
         run: () => kthRoot({ c, k, eps, maxIter }),
         plot: { kind: "tangent", f: (x) => x ** k - c },
-        exact: { value: c ** (1 / k), tex: k === 2 ? `\\sqrt{${c}}` : `\\sqrt[${k}]{${c}}` },
+        exact: {
+          value: c ** (1 / k),
+          tex: k === 2 ? `\\sqrt{${radicand}}` : `\\sqrt[${k}]{${radicand}}`,
+        },
       },
     };
   },
@@ -216,13 +222,21 @@ const presets: readonly Preset[] = [
     tex: `\\sqrt{${c}}`,
     values: { c: String(c), k: "2", ...newtonBase },
   })),
-  ...([2, 3, 12] as const).map((c) => ({
+  ...([2, 3] as const).map((c) => ({
     id: `cbrt${c}`,
     methodId: "1b",
     labelKey: `lab1.preset.cbrt${c}` as const,
     tex: `\\sqrt[3]{${c}}`,
     values: { c: String(c), k: "3", ...newtonBase },
   })),
+  // c < 1, so the start is x₀ = 1: the lab's "otherwise x[0] := 1" case.
+  {
+    id: "cbrt-half",
+    methodId: "1b",
+    labelKey: "lab1.preset.cbrtHalf",
+    tex: "\\sqrt[3]{\\tfrac{1}{2}}",
+    values: { c: "1/2", k: "3", ...newtonBase },
+  },
   {
     id: "kepler-fixed-point",
     methodId: "1c",
@@ -248,7 +262,7 @@ export const lab1: ReadyLab = {
   introKey: "lab1.intro",
   methods: [newtonMethod, kthRootMethod, fixedPointMethod],
   presets,
-  // Only the comparisons the lab asks for (ex. 1–4). The ∛ examples are plain presets: the lab
+  // Only the comparisons the lab asks for (ex. 1–3 and the roots). The ∛ examples are plain presets: the lab
   // asks to approximate them, not to compare.
   comparisons: [
     {

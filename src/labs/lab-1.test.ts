@@ -47,6 +47,18 @@ describe("Lab 1 presets", () => {
     }
   });
 
+  it("offers the lab's ∛2, ∛3 and ∛(1/2); ∛(1/2) starts at 1, the lab's case c ≤ 1", () => {
+    const cubeRoots = lab1.presets.filter((p) => p.methodId === "1b" && p.values.k === "3");
+    expect(cubeRoots.map((p) => p.values.c)).toEqual(["2", "3", "1/2"]);
+    const prepared = method("1b").prepare(preset("cbrt-half").values);
+    if (!prepared.ok) throw new Error("invalid");
+    const run = scalarRun(prepared.prepared);
+    const r = run.run();
+    expect(r.iterations[0].x).toBe(1);
+    expect(r.result).toBeCloseTo(Math.cbrt(0.5), 4);
+    expect(run.exact?.tex).toBe("\\sqrt[3]{\\frac{1}{2}}");
+  });
+
   it("Kepler preset starts at 3π/8 and converges to ≈ 1.17122", () => {
     const prepared = method("1a").prepare(preset("kepler").values);
     if (!prepared.ok) throw new Error("invalid");
@@ -223,9 +235,10 @@ describe("Lab 1 exact solutions (CAP-5)", () => {
       value: Math.SQRT2,
       tex: "\\sqrt{2}",
     });
-    const cbrt = prepare("1b", { c: "12", k: "3" }).exact;
-    expect(cbrt?.tex).toBe("\\sqrt[3]{12}");
-    expect(cbrt?.value).toBeCloseTo(Math.cbrt(12), 15);
+    const cbrt = prepare("1b", { c: "1/2", k: "3" }).exact;
+    expect(cbrt?.tex).toBe("\\sqrt[3]{\\frac{1}{2}}");
+    expect(cbrt?.value).toBeCloseTo(Math.cbrt(0.5), 15);
+    expect(prepare("1b", { c: "3", k: "3" }).exact?.tex).toBe("\\sqrt[3]{3}");
   });
 
   it("claims no exact value where none is known (Newton, successive approximations)", () => {

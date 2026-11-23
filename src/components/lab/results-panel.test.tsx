@@ -168,7 +168,7 @@ describe("ResultsPanel with a known exact solution (CAP-5)", () => {
   });
 
   it("speaks Romanian", () => {
-    const text = textOf(panel(view("1b", { c: "12", k: "3" }), "ro"));
+    const text = textOf(panel(view("1b", { c: "1/2", k: "3" }), "ro"));
     expect(text).toContain("Valoarea exactă");
     expect(text).toContain("Eroarea");
   });

@@ -203,12 +203,13 @@ describe("1b k-th root", () => {
     [5, 2, [5, 6, 6]],
     [2, 3, [5, 6, 6]],
     [3, 3, [6, 7, 7]],
-    [12, 3, [8, 9, 10]],
-  ])("c = %i, k = %i converges to ᵏ√c with n = %j", (c, k, ns) => {
+    [0.5, 3, [4, 5, 6]],
+  ])("c = %d, k = %i converges to ᵏ√c with n = %j", (c, k, ns) => {
     EPS.forEach((eps, i) => {
       const r = kthRoot({ c, k, eps, maxIter: MAX });
       expect(r.status).toBe("converged");
-      expect(r.iterations[0].x).toBe(c);
+      // The lab's start: x₀ = c when c > 1, otherwise 1 (∛(1/2)).
+      expect(r.iterations[0].x).toBe(c > 1 ? c : 1);
       expect(r.n).toBe(ns[i]);
       expect(Math.abs((r.result as number) - c ** (1 / k))).toBeLessThan(eps);
     });
