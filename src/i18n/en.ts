@@ -60,6 +60,8 @@ export const en = {
     "Stopping rule: the first step, from $x_0$ to $x_1$, is always taken. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$, that is, until two consecutive iterates differ by less than $\\varepsilon$. The output is $n$ and $x_n$.",
   "common.systemStopping":
     "Stopping rule: the first step, from $(x_0, y_0)$ to $(x_1, y_1)$, is always taken. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$ or $|y_n - y_{n-1}| \\ge \\varepsilon$, that is, until both coordinates change by less than $\\varepsilon$. The output is $n$ and $(x_n, y_n)$.",
+  "common.system3Stopping":
+    "Stopping rule: the first step, from $(x_0, y_0, z_0)$ to $(x_1, y_1, z_1)$, is always taken. Then, from $n = 1$, the iteration continues while $|x_n - x_{n-1}| \\ge \\varepsilon$, $|y_n - y_{n-1}| \\ge \\varepsilon$ or $|z_n - z_{n-1}| \\ge \\varepsilon$, that is, until all three coordinates change by less than $\\varepsilon$. The output is $n$ and $(x_n, y_n, z_n)$.",
 
   "math.if": "if",
 
@@ -91,6 +93,10 @@ export const en = {
   "field.partial": "Partial derivative",
   "field.startX": "Starting point, x",
   "field.startY": "Starting point, y",
+  "field.F1": "Function F₁",
+  "field.F2": "Function F₂",
+  "field.F3": "Function F₃",
+  "field.startZ": "Starting point, z",
 
   "field.error.empty": "Required.",
   "field.error.syntax": "Cannot read this expression. Check the operators and parentheses.",
@@ -130,6 +136,10 @@ export const en = {
   "result.system.converged": "|xₙ − xₙ₋₁| < ε and |yₙ − yₙ₋₁| < ε after n = {n} iterations.",
   "result.system.maxIterations":
     "Stopped at the cap of {n} iterations while |xₙ − xₙ₋₁| or |yₙ − yₙ₋₁| was still ≥ ε. The last iterate is shown, but it does not meet the tolerance.",
+  "result.system3.converged":
+    "|xₙ − xₙ₋₁| < ε, |yₙ − yₙ₋₁| < ε and |zₙ − zₙ₋₁| < ε after n = {n} iterations.",
+  "result.system3.maxIterations":
+    "Stopped at the cap of {n} iterations while |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| or |zₙ − zₙ₋₁| was still ≥ ε. The last iterate is shown, but it does not meet the tolerance.",
   "result.startPoint": "Starting point",
   "result.exactSolution": "Exact solution",
 
@@ -149,6 +159,12 @@ export const en = {
     "A value overflowed to ±∞ in the step from n = {n}, (xₙ, yₙ) = {point}.",
   "run.systemError.diverged":
     "The iteration diverges: at n = {n}, (xₙ, yₙ) = {point}, |xₙ| or |yₙ| passed 10¹⁰⁰.",
+  "run.system3Error.undefined-value":
+    "A value is undefined (NaN) in the step from n = {n}, (xₙ, yₙ, zₙ) = {point}. Check the domain of the functions (√ of a negative number, ln of a non-positive one).",
+  "run.system3Error.overflow":
+    "A value overflowed to ±∞ in the step from n = {n}, (xₙ, yₙ, zₙ) = {point}.",
+  "run.system3Error.diverged":
+    "The iteration diverges: at n = {n}, (xₙ, yₙ, zₙ) = {point}, |xₙ|, |yₙ| or |zₙ| passed 10¹⁰⁰.",
 
   "table.title": "Iterations",
   "table.hidden": "Hidden iterations: {count}",
@@ -164,6 +180,10 @@ export const en = {
   "chart.convergence": "Convergence: |xₙ − xₙ₋₁| on a log scale",
   "chart.path": "F = 0 and G = 0 with the iteration path",
   "chart.systemConvergence": "Convergence: |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| on a log scale",
+  "chart.fixedPointPath": "x = F(x, y) and y = G(x, y) with the iteration path",
+  "chart.components": "xₙ, yₙ and zₙ at each iteration",
+  "chart.system3Convergence":
+    "Convergence: |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| and |zₙ − zₙ₋₁| on a log scale",
   "chart.toolbar": "Chart tools",
   "chart.tool.zoom": "Zoom to an area",
   "chart.tool.pan": "Pan",
@@ -189,6 +209,12 @@ export const en = {
   "chart.trace.curveG": "G(x, y) = 0",
   "chart.trace.diffY": "|yₙ − yₙ₋₁|",
   "chart.trace.systemError": "max(|xₙ − x*|, |yₙ − y*|)",
+  "chart.trace.curveFixedX": "x = F(x, y)",
+  "chart.trace.curveFixedY": "y = G(x, y)",
+  "chart.trace.diffZ": "|zₙ − zₙ₋₁|",
+  "chart.trace.componentX": "xₙ",
+  "chart.trace.componentY": "yₙ",
+  "chart.trace.componentZ": "zₙ",
 
   "compare.run": "Run comparison",
   "compare.method": "Method",
@@ -414,6 +440,57 @@ export const en = {
   "lab5.compare.ex3": "Ex. 3: modified Newton on the system of ex. 2",
   "lab5.compare.ex3.task":
     "Apply modified Newton to the system of ex. 2 and compare the result and the number of iterations with Newton's method. Both starting points of ex. 2 are used, each with three precisions.",
+
+  "lab6.intro":
+    "Solve nonlinear systems written as x = F(x, y), y = G(x, y) with successive approximations, and with the Gauss–Seidel method, which puts each new coordinate to work as soon as it is computed, for systems of three and of two equations. Then compare the iteration counts of the two methods.",
+  "lab6.method.successive.tab": "6a · Successive approximations",
+  "lab6.method.successive.title": "Successive approximations for nonlinear systems",
+  "lab6.method.successive.name": "Successive approximations",
+  "lab6.method.successive.idea":
+    "The system is first rewritten as $x = F(x, y)$, $y = G(x, y)$, so its solution is a point that $F$ and $G$ leave unchanged. Starting from $(x_0, y_0)$, each step evaluates both functions at the current point:",
+  "lab6.method.successive.start":
+    "The first step, $(x_1, y_1) = (F(x_0, y_0), G(x_0, y_0))$, uses only the starting point. The method converges when, in a neighbourhood of the solution that contains $(x_0, y_0)$, the map $(x, y) \\mapsto (F(x, y), G(x, y))$ is a contraction with a constant $M < 1$. The convergence is linear: each step shrinks the error by a factor of about $M$, so the smaller $M$, the fewer iterations it takes.",
+  "lab6.method.successive.failure":
+    "If $F$ or $G$ is undefined at an iterate, such as a square root of a negative number, the method stops with an error. If the map is not a contraction near the solution, the iterates can drift away from it, and once a coordinate passes $10^{100}$ the method stops: the iteration diverges.",
+  "lab6.method.successive.chart":
+    "The first chart draws the curves $x = F(x, y)$ and $y = G(x, y)$. The solution of the system is where they cross, and the path of the iterates shows how the method approaches it. The second chart shows, on a log scale, how the differences $|x_n - x_{n-1}|$ and $|y_n - y_{n-1}|$ shrink from step to step until they fall below $\\varepsilon$.",
+
+  "lab6.method.gaussSeidel3.tab": "6b · Gauss–Seidel, 3 equations",
+  "lab6.method.gaussSeidel3.title": "The Gauss–Seidel method for three equations",
+  "lab6.method.gaussSeidel3.name": "Gauss–Seidel, 3 equations",
+  "lab6.method.gaussSeidel3.idea":
+    "The system is written as $x = F_1(x, y, z)$, $y = F_2(x, y, z)$, $z = F_3(x, y, z)$. Gauss–Seidel works like successive approximations with one change: each new coordinate is used as soon as it is known. So $y_{n+1}$ already takes $x_{n+1}$, and $z_{n+1}$ takes both $x_{n+1}$ and $y_{n+1}$:",
+  "lab6.method.gaussSeidel3.start":
+    "The first step uses only the starting point: $x_1$, $y_1$ and $z_1$ are $F_1$, $F_2$ and $F_3$ evaluated at $(x_0, y_0, z_0)$. From $n = 1$ on, the formulas above apply. As with successive approximations, the method converges when the map is a contraction near the solution and the starting point is close enough, and the convergence is linear. Using the newest values usually saves iterations.",
+  "lab6.method.gaussSeidel3.failure":
+    "If $F_1$, $F_2$ or $F_3$ is undefined at an iterate, such as a square root of a negative number or the logarithm of a non-positive one, the method stops with an error. If the iterates drift away from the solution and a coordinate passes $10^{100}$, the method stops: the iteration diverges.",
+  "lab6.method.gaussSeidel3.chart":
+    "With three unknowns the path no longer fits on a plane, so the first chart follows $x_n$, $y_n$ and $z_n$ from step to step as they settle on the solution. The second chart shows, on a log scale, how the three differences shrink until all of them fall below $\\varepsilon$.",
+
+  "lab6.method.gaussSeidel2.tab": "6c · Gauss–Seidel, 2 equations",
+  "lab6.method.gaussSeidel2.title": "The Gauss–Seidel method for two equations",
+  "lab6.method.gaussSeidel2.name": "Gauss–Seidel method",
+  "lab6.method.gaussSeidel2.idea":
+    "The system is written as $x = F(x, y)$, $y = G(x, y)$, as for successive approximations, with one change: $y_{n+1}$ is computed from the new $x_{n+1}$ instead of $x_n$. The newest value is put to work at once:",
+  "lab6.method.gaussSeidel2.start":
+    "The first step uses only the starting point, $(x_1, y_1) = (F(x_0, y_0), G(x_0, y_0))$, as in successive approximations. From $n = 1$ on, the formulas above apply. The method converges under the same contraction condition near the solution and the convergence is still linear, but usually with a smaller factor, so it takes fewer iterations.",
+  "lab6.method.gaussSeidel2.failure":
+    "If $F$ or $G$ is undefined at an iterate, such as a square root of a negative number, the method stops with an error. If the iterates drift away from the solution and a coordinate passes $10^{100}$, the method stops: the iteration diverges.",
+  "lab6.method.gaussSeidel2.chart":
+    "The first chart draws the curves $x = F(x, y)$ and $y = G(x, y)$. The solution of the system is where they cross, and the path of the iterates shows how the method approaches it. The second chart shows, on a log scale, how the differences $|x_n - x_{n-1}|$ and $|y_n - y_{n-1}|$ shrink from step to step until they fall below $\\varepsilon$.",
+
+  "lab6.preset.ex1": "Ex. 1: 2x² − xy − 5x + 1 = 0, x + 3 lg x − y² = 0, from (3.5, 2.2)",
+  "lab6.preset.ex2Near21": "Ex. 2: x² + y² = 5, xy = 2, near (2, 1)",
+  "lab6.preset.ex2Near12": "Ex. 2: x² + y² = 5, xy = 2, near (1, 2)",
+  "lab6.preset.ex2NearMinus1Minus2": "Ex. 2: x² + y² = 5, xy = 2, near (−1, −2)",
+  "lab6.preset.ex2NearMinus2Minus1": "Ex. 2: x² + y² = 5, xy = 2, near (−2, −1)",
+  "lab6.preset.ex3":
+    "Ex. 3: 2x² − yz − 5x + 1 = 0, y² − 2x − ln z = 0, z² − xy − 2z − 8 = 0, from (10, 10, 10)",
+  "lab6.preset.ex4": "Ex. 4: x² + y² = 5, xy = 2, near (2, 1)",
+
+  "lab6.compare.ex4": "Ex. 4: Gauss–Seidel on the system of ex. 2",
+  "lab6.compare.ex4.task":
+    "Apply the Gauss–Seidel method to the system of ex. 2 near (2, 1), starting from (1.5, 1.5), and compare the number of iterations with successive approximations. Both methods run with three precisions.",
 } as const;
 
 export type MessageKey = keyof typeof en;

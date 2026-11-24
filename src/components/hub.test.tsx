@@ -49,16 +49,26 @@ describe("Hub", () => {
     expect(fifth).not.toContain("Coming soon");
   });
 
-  it("shows labs 6–13 as coming soon, without a link", () => {
-    const rest = cards("en").slice(5);
-    expect(rest).toHaveLength(8);
+  it("links Lab 6 to /labs/nonlinear-systems", () => {
+    const sixth = cards("en")[5];
+    expect(sixth).toContain('href="/labs/nonlinear-systems"');
+    expect(sixth).toContain(
+      'aria-label="Lab 6: Successive approximations and Gauss–Seidel. Open lab"',
+    );
+    expect(textOf(sixth)).toContain("Fixed-point iteration for 2-D and 3-D nonlinear systems");
+    expect(sixth).not.toContain("Coming soon");
+  });
+
+  it("shows labs 7–13 as coming soon, without a link", () => {
+    const rest = cards("en").slice(6);
+    expect(rest).toHaveLength(7);
     rest.forEach((card, i) => {
-      expect(textOf(card)).toContain(`Lab ${i + 6}`);
+      expect(textOf(card)).toContain(`Lab ${i + 7}`);
       expect(card).toContain("Coming soon");
       expect(card).toContain('aria-disabled="true"');
       expect(card).not.toContain("<a ");
     });
-    expect(count(render(<Hub />), "href=")).toBe(5);
+    expect(count(render(<Hub />), "href=")).toBe(6);
   });
 
   it("renders in Romanian", () => {
@@ -73,7 +83,8 @@ describe("Hub", () => {
     expect(textOf(html)).toContain(
       "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
     );
-    expect(count(html, "În curând")).toBe(8);
+    expect(textOf(html)).toContain("Aproximații succesive și metoda Gauss–Seidel");
+    expect(count(html, "În curând")).toBe(7);
     expect(html).not.toContain("Coming soon");
   });
 });

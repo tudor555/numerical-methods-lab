@@ -4,6 +4,7 @@ import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
+import { lab6 } from "@/labs/lab-6";
 import { elements, render, texOf, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
@@ -310,5 +311,81 @@ describe("LabPage, Lab 5", () => {
     );
     expect(pressed.map(textOf)).toEqual(["Ex. 3: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)"]);
     expect(textOf(elements(html, "h2")[0])).toBe("How it works: Modified Newton's method");
+  });
+});
+
+describe("LabPage, Lab 6", () => {
+  const pressedPresets = (html: string) =>
+    elements(html, "button")
+      .filter((b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'))
+      .map(textOf);
+
+  it.each([
+    [
+      "en",
+      "Lab 6",
+      "Successive approximations and Gauss–Seidel",
+      "Solve nonlinear systems written as x = F(x, y), y = G(x, y)",
+      [
+        "6a · Successive approximations",
+        "6b · Gauss–Seidel, 3 equations",
+        "6c · Gauss–Seidel, 2 equations",
+      ],
+      "How it works: Successive approximations for nonlinear systems",
+      "Ex. 1: 2x² − xy − 5x + 1 = 0, x + 3 lg x − y² = 0, from (3.5, 2.2)",
+    ],
+    [
+      "ro",
+      "Laboratorul 6",
+      "Aproximații succesive și metoda Gauss–Seidel",
+      "Rezolvă sisteme neliniare scrise sub forma x = F(x, y), y = G(x, y)",
+      [
+        "6a · Aproximații succesive",
+        "6b · Gauss–Seidel, 3 ecuații",
+        "6c · Gauss–Seidel, 2 ecuații",
+      ],
+      "Cum funcționează: Metoda aproximațiilor succesive pentru sisteme neliniare",
+      "Ex. 1: 2x² − xy − 5x + 1 = 0, x + 3 lg x − y² = 0, din (3,5; 2,2)",
+    ],
+  ] as const)("first render in %s", (lang, chip, title, intro, methodTabs, heading, preset) => {
+    const html = render(<LabPage slug="nonlinear-systems" />, lang);
+    const header = html.slice(0, html.indexOf("</header>"));
+    expect(
+      textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+    ).toBe(chip);
+    expect(textOf(elements(header, "h1")[0])).toBe(title);
+    expect(textOf(elements(header, "p")[0])).toContain(intro);
+    expect(textOf(elements(header, "p")[0])).not.toContain(chip);
+    expect(tabs(html).map(textOf)).toEqual(methodTabs);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    const fieldIds = [...html.matchAll(/id="field-([\w]+)"/g)].map((m) => m[1]);
+    expect(fieldIds).toEqual(["F", "G", "x0", "y0", "eps", "maxIter"]);
+    expect(html).not.toContain("Derive from");
+    expect(pressedPresets(html)).toEqual([preset]);
+    expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+      lab6.comparisons.length,
+    );
+  });
+
+  it("opens 6b on ex. 3 with F₁, F₂, F₃ and the start (x₀, y₀, z₀)", () => {
+    openTab.id = "6b";
+    const html = render(<LabPage slug="nonlinear-systems" />);
+    const fieldIds = [...html.matchAll(/id="field-([\w]+)"/g)].map((m) => m[1]);
+    expect(fieldIds).toEqual(["F1", "F2", "F3", "x0", "y0", "z0", "eps", "maxIter"]);
+    expect(pressedPresets(html)).toEqual([
+      "Ex. 3: 2x² − yz − 5x + 1 = 0, y² − 2x − ln z = 0, z² − xy − 2z − 8 = 0, from (10, 10, 10)",
+    ]);
+    expect(textOf(elements(html, "h2")[0])).toBe(
+      "How it works: The Gauss–Seidel method for three equations",
+    );
+    expect(texOf(html).some((tex) => tex.includes("z_{n+1} &= F_3(x_{n+1}, y_{n+1}, z_n)"))).toBe(
+      true,
+    );
+  });
+
+  it("opens 6c on ex. 4", () => {
+    openTab.id = "6c";
+    const html = render(<LabPage slug="nonlinear-systems" />);
+    expect(pressedPresets(html)).toEqual(["Ex. 4: x² + y² = 5, xy = 2, near (2, 1)"]);
   });
 });
