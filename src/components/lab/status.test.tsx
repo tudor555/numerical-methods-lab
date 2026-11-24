@@ -48,5 +48,13 @@ describe("error message keys", () => {
 
   it("falls back to undefined-value for a system run with no code", () => {
     expect(systemErrorKey(undefined)).toBe("run.systemError.undefined-value");
+    expect(systemErrorKey(undefined, true)).toBe("run.system3Error.undefined-value");
   });
+
+  it.each(["undefined-value", "overflow", "diverged"] as const)(
+    "gives a run with three unknowns its own %s wording, naming (xₙ, yₙ, zₙ)",
+    (code) => {
+      expect(systemErrorKey(code, true)).toBe(`run.system3Error.${code}`);
+    },
+  );
 });

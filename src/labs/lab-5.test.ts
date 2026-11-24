@@ -262,7 +262,7 @@ describe("Lab 5 runs", () => {
 
   it("plots F and G, the curves the path chart draws", () => {
     const { plot } = prepare("5a");
-    expect(plot.kind).toBe("system");
+    if (plot.kind !== "system") throw new Error("expected the curves F = 0 and G = 0");
     expect(plot.F(1, 1)).toBe(0);
     expect(plot.G(1, 1)).toBe(-4);
   });

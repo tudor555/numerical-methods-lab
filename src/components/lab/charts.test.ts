@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { FunctionPlot, SystemPlot } from "@/labs/types";
 import type { ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
 import {
+  buildComponentsChart,
   buildConvergenceChart,
   buildFunctionChart,
   buildPathChart,
@@ -31,6 +32,12 @@ const labels: ChartLabels = {
   curveG: "curveG",
   diffY: "diffY",
   systemError: "systemError",
+  curveFixedX: "curveFixedX",
+  curveFixedY: "curveFixedY",
+  diffZ: "diffZ",
+  componentX: "componentX",
+  componentY: "componentY",
+  componentZ: "componentZ",
 };
 
 interface Trace {
@@ -621,6 +628,93 @@ describe("buildPathChart", () => {
   });
 });
 
+describe("buildPathChart for a fixed-point system", () => {
+  // Ex. 2's system near (2, 1): x = √(5 − y²), y = 2/x.
+  const plot: SystemPlot = {
+    kind: "fixed-point",
+    F: (x, y) => Math.sqrt(5 - y * y),
+    G: (x) => 2 / x,
+  };
+  const fixedRow = (n: number, x: number, y: number): SystemIterationRow => ({
+    n,
+    x,
+    y,
+    dx: n === 0 ? null : 1,
+    dy: n === 0 ? null : 1,
+  });
+  const rows = [fixedRow(0, 1.5, 1.5), fixedRow(1, 1.66, 1.33), fixedRow(2, 2, 1)];
+
+  it("draws x = F(x, y) and y = G(x, y) as the zero contours of x − F and y − G", () => {
+    const spec = buildPathChart(plot, rows, labels);
+    const curveX = trace(spec, "curveFixedX") as Trace & { z: (number | null)[][] };
+    const curveY = trace(spec, "curveFixedY") as Trace & { z: (number | null)[][] };
+    const [i, j] = [10, 70];
+    const [x, y] = [curveX.x[i] as number, curveX.y[j] as number];
+    expect(curveX.z[j][i]).toBeCloseTo(x - plot.F(x, y), 12);
+    expect(curveY.z[j][i]).toBeCloseTo(y - plot.G(x, y), 12);
+    expect(spec?.traces.some((t) => (t as Trace).name === "curveF")).toBe(false);
+    expect(trace(spec, "path").x).toEqual([1.5, 1.66, 2]);
+  });
+
+  it("draws no zero contour along a pole: x = 2/y across y = 0 leaves no straddling pair", () => {
+    // Ex. 2's form near (−1, −2), x = 2/y, y = −√(5 − x²), with iterates on both sides of y = 0.
+    const poleRows = [fixedRow(0, 1.5, 1.5), fixedRow(1, 1.33, -1.66), fixedRow(2, -1.2, -1.8)];
+    const pole: SystemPlot = {
+      kind: "fixed-point",
+      F: (x, y) => 2 / y,
+      G: (x) => -Math.sqrt(5 - x * x),
+    };
+    const curve = trace(buildPathChart(pole, poleRows, labels), "curveFixedX") as Trace & {
+      z: (number | null)[][];
+    };
+    const ys = curve.y as number[];
+    let straddles = 0;
+    for (let j = 0; j + 1 < ys.length; j++) {
+      if (!(ys[j] < 0 && ys[j + 1] > 0)) continue;
+      straddles++;
+      curve.z[j].forEach((below, i) => {
+        const above = curve.z[j + 1][i];
+        if (below !== null && above !== null) expect(below * above).toBeGreaterThanOrEqual(0);
+      });
+    }
+    expect(straddles).toBe(1);
+    // The real curve x = 2/y, away from the pole, is still drawn: x − 2/y takes both signs.
+    expect(curve.z.flat().some((v) => v !== null && v < 0)).toBe(true);
+    expect(curve.z.flat().some((v) => v !== null && v > 0)).toBe(true);
+  });
+
+  it("gives no path chart for three unknowns", () => {
+    const row3 = { ...fixedRow(0, 10, 10), z: 10, dz: null };
+    expect(buildPathChart({ kind: "fixed-point-3d" }, [row3], labels)).toBeNull();
+  });
+});
+
+describe("buildComponentsChart", () => {
+  const row3 = (n: number, x: number, y: number, z: number): SystemIterationRow => ({
+    n,
+    x,
+    y,
+    z,
+    dx: null,
+    dy: null,
+    dz: null,
+  });
+
+  it("plots xₙ, yₙ and zₙ against n, leaving out non-finite values", () => {
+    const rows = [row3(0, 10, 10, 10), row3(1, 9, 8, 7), row3(2, 5, Number.NaN, 6)];
+    const spec = buildComponentsChart(rows, labels);
+    expect(spec?.xTitle).toBe("n");
+    expect(spec?.yLog).toBeUndefined();
+    expect(trace(spec, "componentX")).toMatchObject({ x: [0, 1, 2], y: [10, 9, 5] });
+    expect(trace(spec, "componentY")).toMatchObject({ x: [0, 1], y: [10, 8] });
+    expect(trace(spec, "componentZ")).toMatchObject({ x: [0, 1, 2], y: [10, 7, 6] });
+  });
+
+  it("gives no chart without rows", () => {
+    expect(buildComponentsChart([], labels)).toBeNull();
+  });
+});
+
 describe("buildSystemConvergenceChart", () => {
   const systemRow = (n: number, dx: number | null, dy: number | null, x = 1, y = 3) => ({
     n,
@@ -656,5 +750,22 @@ describe("buildSystemConvergenceChart", () => {
 
   it("gives no chart when no difference is positive", () => {
     expect(buildSystemConvergenceChart([systemRow(0, null, null)], 1e-4, labels)).toBeNull();
+  });
+
+  it("has no |zₙ − zₙ₋₁| trace for two unknowns", () => {
+    const rows = [systemRow(0, null, null), systemRow(1, 0.1, 0.1)];
+    const spec = buildSystemConvergenceChart(rows, 1e-4, labels);
+    expect(spec?.traces.some((t) => (t as Trace).name === "diffZ")).toBe(false);
+  });
+
+  it("adds |zₙ − zₙ₋₁| for three unknowns, dropping its zero points", () => {
+    const rows: SystemIterationRow[] = [
+      { n: 0, x: 1, y: 1, z: 1, dx: null, dy: null, dz: null },
+      { n: 1, x: 1, y: 1, z: 2, dx: 0.1, dy: 0.1, dz: 1 },
+      { n: 2, x: 1, y: 1, z: 2, dx: 1e-3, dy: 1e-3, dz: 0 },
+      { n: 3, x: 1, y: 1, z: 2, dx: 1e-5, dy: 1e-5, dz: 1e-6 },
+    ];
+    const spec = buildSystemConvergenceChart(rows, 1e-4, labels);
+    expect(trace(spec, "diffZ")).toMatchObject({ x: [1, 3], y: [1, 1e-6] });
   });
 });

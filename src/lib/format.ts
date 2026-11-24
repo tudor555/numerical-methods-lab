@@ -7,9 +7,18 @@ export function formatValue(x: number): string {
   return String(Number(x.toPrecision(15)));
 }
 
-/** A point (x, y) for display, each part through {@link formatValue}: `(1.23, 1.66)`, or `(1.23; 1.66)` in RO. */
-export function formatPoint(x: number, y: number, separator = ","): string {
-  return `(${formatValue(x)}${separator} ${formatValue(y)})`;
+/**
+ * A point (x, y) or (x, y, z) for display, each part through {@link formatValue}: `(1.23, 1.66)`,
+ * or `(1.23; 1.66)` in RO.
+ */
+export function formatPoint(values: readonly number[], separator = ","): string {
+  return `(${values.map(formatValue).join(`${separator} `)})`;
+}
+
+/** The components of a point for {@link formatPoint}: [x, y] or [x, y, z]; NaNs when it is missing. */
+export function pointValues(point?: { x: number; y: number; z?: number }): number[] {
+  if (!point) return [Number.NaN, Number.NaN];
+  return point.z === undefined ? [point.x, point.y] : [point.x, point.y, point.z];
 }
 
 /** Small quantities such as |xₙ − xₙ₋₁| or f(xₙ), in scientific notation. */

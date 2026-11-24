@@ -12,7 +12,7 @@ import {
   type ComparisonCell as Cell,
 } from "@/labs/compare";
 import type { Comparison, MethodDefinition, ReadyLab } from "@/labs/types";
-import { formatEpsTex, formatPoint, formatValue } from "@/lib/format";
+import { formatEpsTex, formatPoint, formatValue, pointValues } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Tex } from "./formula";
 import { runErrorKey, STATUS_STYLE, systemErrorKey } from "./status";
@@ -54,13 +54,9 @@ function ResultCell({
   if (run.status === "error") {
     const detail =
       cell.kind === "system"
-        ? t(systemErrorKey(cell.result.error?.code), {
+        ? t(systemErrorKey(cell.result.error?.code, cell.result.error?.z !== undefined), {
             n: cell.result.error?.n ?? 0,
-            point: formatPoint(
-              cell.result.error?.x ?? Number.NaN,
-              cell.result.error?.y ?? Number.NaN,
-              separator,
-            ),
+            point: formatPoint(pointValues(cell.result.error), separator),
           })
         : t(runErrorKey(cell.result.error?.code, errorKeys), {
             n: cell.result.error?.n ?? 0,
@@ -81,7 +77,7 @@ function ResultCell({
   let value: string;
   if (cell.kind === "system") {
     const point = cell.result.result;
-    value = point ? formatPoint(point.x, point.y, separator) : "—";
+    value = point ? formatPoint(pointValues(point), separator) : "—";
   } else {
     value = formatValue(cell.result.result ?? Number.NaN);
   }

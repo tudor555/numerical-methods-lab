@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatEpsTex, formatLimit, formatPoint, formatSmall, formatValue } from "./format";
+import {
+  formatEpsTex,
+  formatLimit,
+  formatPoint,
+  formatSmall,
+  formatValue,
+  pointValues,
+} from "./format";
 
 describe("formatLimit", () => {
   it("writes large and tiny powers of ten with superscripts", () => {
@@ -79,11 +86,27 @@ describe("formatEpsTex", () => {
 
 describe("formatPoint", () => {
   it("joins both parts, each formatted as a value", () => {
-    expect(formatPoint(1.234274484114495, 3)).toBe("(1.2342744841145, 3)");
-    expect(formatPoint(1e-7, -2.5)).toBe("(1e-7, -2.5)");
+    expect(formatPoint([1.234274484114495, 3])).toBe("(1.2342744841145, 3)");
+    expect(formatPoint([1e-7, -2.5])).toBe("(1e-7, -2.5)");
+  });
+
+  it("joins three parts for a point (x, y, z)", () => {
+    expect(formatPoint([4.529851229017474, 3.5, -10])).toBe("(4.52985122901747, 3.5, -10)");
   });
 
   it("uses the separator it is given", () => {
-    expect(formatPoint(0.9, 3.1, ";")).toBe("(0.9; 3.1)");
+    expect(formatPoint([0.9, 3.1], ";")).toBe("(0.9; 3.1)");
+    expect(formatPoint([10, 10, 10], ";")).toBe("(10; 10; 10)");
+  });
+});
+
+describe("pointValues", () => {
+  it("lists the components of a point with two or three unknowns", () => {
+    expect(pointValues({ x: 1, y: 2 })).toEqual([1, 2]);
+    expect(pointValues({ x: 1, y: 2, z: 3 })).toEqual([1, 2, 3]);
+  });
+
+  it("gives two NaNs for a missing point", () => {
+    expect(pointValues(undefined)).toEqual([Number.NaN, Number.NaN]);
   });
 });
