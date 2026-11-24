@@ -14,9 +14,9 @@ export type ScalarErrorCode =
   "zero-derivative" | "zero-denominator" | "undefined-value" | "overflow" | "diverged";
 
 /**
- * Why a 2×2 system run stopped without a valid result.
- * - `zero-jacobian`: the Jacobian J = Fₓ·G_y − F_y·Gₓ is exactly 0.
- * - `undefined-value`, `overflow`, `diverged`: as for scalar runs, in either component.
+ * Why a system run stopped without a valid result.
+ * - `zero-jacobian`: the Jacobian J = Fₓ·G_y − F_y·Gₓ is exactly 0 (Newton's method only).
+ * - `undefined-value`, `overflow`, `diverged`: as for scalar runs, in any component.
  */
 export type SystemErrorCode = "zero-jacobian" | "undefined-value" | "overflow" | "diverged";
 
@@ -70,29 +70,39 @@ export interface RunResult<
 
 export type ScalarRunResult = RunResult<ScalarIterationRow, number>;
 
-/** One row of a 2×2 system iteration: n, (xₙ, yₙ), F and G there, and both differences. */
+/**
+ * One row of a system iteration: n, the point (xₙ, yₙ) or (xₙ, yₙ, zₙ), and each difference. A 2×2
+ * system solved as F = G = 0 also has F and G there; a fixed-point system x = F(x, y), y = G(x, y)
+ * has none, since F(xₙ, yₙ) would only repeat the next iterate.
+ */
 export interface SystemIterationRow {
   n: number;
   x: number;
   y: number;
+  /** zₙ, only in a run with three unknowns. */
+  z?: number;
   /** F(xₙ, yₙ); null when F is undefined there. */
-  F: number | null;
+  F?: number | null;
   /** G(xₙ, yₙ); null when G is undefined there. */
-  G: number | null;
+  G?: number | null;
   /** |xₙ − xₙ₋₁|; null for n = 0. */
   dx: number | null;
   /** |yₙ − yₙ₋₁|; null for n = 0. */
   dy: number | null;
+  /** |zₙ − zₙ₋₁|; null for n = 0; only in a run with three unknowns. */
+  dz?: number | null;
 }
 
 export interface SystemPoint {
   x: number;
   y: number;
+  z?: number;
 }
 
-/** A system error names the whole point (xₙ, yₙ). */
+/** A system error names the whole point (xₙ, yₙ) or (xₙ, yₙ, zₙ). */
 export interface SystemMethodError extends MethodError<SystemErrorCode> {
   y: number;
+  z?: number;
 }
 
 export interface SystemRunResult extends RunResult<
