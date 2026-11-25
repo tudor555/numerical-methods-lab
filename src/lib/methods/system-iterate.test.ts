@@ -44,6 +44,20 @@ describe("systemIterate", () => {
     expect(r.iterations[1]).toMatchObject({ F: 5, G: 2, dx: 0, dy: 8 });
   });
 
+  it("leaves a cell empty where F or G returns NaN or ±∞ without throwing", () => {
+    const r = systemIterate({
+      ...base,
+      F: (x) => 1 / (x - 1),
+      G: () => Number.NaN,
+      x0: 1,
+      y0: 0,
+      eps: 2,
+      step: (x, y) => [x + 1, y],
+    });
+    expect(r.iterations[0]).toMatchObject({ F: null, G: null });
+    expect(r.iterations[1]).toMatchObject({ F: 1, G: null });
+  });
+
   it("re-throws an unexpected error from F or from a step", () => {
     const bug = () => {
       throw new Error("bug");
