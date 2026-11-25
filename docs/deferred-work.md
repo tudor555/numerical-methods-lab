@@ -16,3 +16,7 @@
 - source_spec: `docs/spec-lab-5-newton-systems.md`
   summary: Give every "Derive from …" button an accessible name that says which field it fills (for example via `aria-describedby` to the field's label), so two buttons in one form don't read the same.
   evidence: Lab 5's ∂F/∂x and ∂F/∂y buttons are both "Derive from F" (and both G buttons "Derive from G"). Lab 1 already has the same pattern (f′ and dda both read "Derive from f"), so it predates this lab and needs a label id in `MethodForm`.
+
+- source_spec: `docs/spec-lab-6-successive-approximations-gauss-seidel.md`
+  summary: Accept or explain implicit multiplication before a parenthesis after a variable (`x(y+5)`), which math.js reads as a call to a function named `x`.
+  evidence: Lab 6 ex. 1's lab form is F = √((x(y+5) − 1)/2); typing it literally gives "unknown function" next to the field. The preset uses `x * (y + 5)`. The behavior comes from the shared compile layer (`src/lib/expressions/compile.ts`), so every lab has it.

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { comparisonInputs, findComparisonPreset } from "./compare";
 import { lab1, newtonMethod } from "./lab-1";
 import { lab4 } from "./lab-4";
+import { lab6 } from "./lab-6";
 import type { MethodDefinition } from "./types";
 
 const method = (id: string): MethodDefinition => {
@@ -56,6 +57,21 @@ describe("comparisonInputs", () => {
     const inputs = comparisonInputs(newtonMethod, { ...newton, f: "x +", x0Mode: "other" });
     expect(inputs[0]).toEqual({ kind: "tex", tex: "f(x) = x +" });
     expect(inputs.some((input) => input.kind === "choice")).toBe(false);
+  });
+
+  it("folds x₀, y₀ and z₀ into one point (x₀, y₀, z₀)", () => {
+    const gaussSeidel3 = lab6.methods.find((m) => m.id === "6b");
+    if (!gaussSeidel3) throw new Error("6b");
+    const inputs = comparisonInputs(gaussSeidel3, gaussSeidel3.defaults, ";");
+    expect(inputs.slice(3)).toEqual([
+      { kind: "tex", tex: "(x_0;\\ y_0;\\ z_0) = (10;\\ 10;\\ 10)" },
+    ]);
+    expect(inputs.map((input) => (input.kind === "tex" ? input.tex.slice(0, 3) : ""))).toEqual([
+      "F_1",
+      "F_2",
+      "F_3",
+      "(x_",
+    ]);
   });
 
   it("shows an empty value for a field the preset leaves out", () => {

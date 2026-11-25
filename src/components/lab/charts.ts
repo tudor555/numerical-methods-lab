@@ -29,6 +29,12 @@ export interface ChartLabels {
   curveG: string;
   diffY: string;
   systemError: string;
+  curveFixedX: string;
+  curveFixedY: string;
+  diffZ: string;
+  componentX: string;
+  componentY: string;
+  componentZ: string;
 }
 
 const COLORS = {
@@ -389,22 +395,45 @@ function errorTrace(rows: readonly ScalarIterationRow[], exact: number, labels: 
 /** Grid points per axis for the F = 0 and G = 0 contours. */
 const GRID = 80;
 
-/** F or G on the grid, row by row (z[j][i] at xs[i], ys[j]); a throwing or non-finite value is a gap. */
+/** fn at (x, y), or null when it throws or is not finite. */
+function finiteAt(fn: (x: number, y: number) => number, x: number, y: number): number | null {
+  try {
+    const z = fn(x, y);
+    return Number.isFinite(z) ? z : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * F or G on the grid, row by row (z[j][i] at xs[i], ys[j]); a throwing or non-finite value is a
+ * gap. A sign change between neighbouring cells that jumps through a pole (2/y across y = 0) is no
+ * zero: when the midpoint is undefined or larger than both ends, both cells become gaps, so no
+ * contour is drawn along the pole.
+ */
 function grid(
   fn: (x: number, y: number) => number,
   xs: readonly number[],
   ys: readonly number[],
 ): (number | null)[][] {
-  return ys.map((y) =>
-    xs.map((x) => {
-      try {
-        const z = fn(x, y);
-        return Number.isFinite(z) ? z : null;
-      } catch {
-        return null;
-      }
-    }),
-  );
+  const z = ys.map((y) => xs.map((x) => finiteAt(fn, x, y)));
+  const blank: [number, number][] = [];
+  const check = (j: number, i: number, j2: number, i2: number) => {
+    const [a, b] = [z[j][i], z[j2][i2]];
+    if (a === null || b === null || a * b >= 0) return;
+    const mid = finiteAt(fn, (xs[i] + xs[i2]) / 2, (ys[j] + ys[j2]) / 2);
+    if (mid === null || Math.abs(mid) > Math.max(Math.abs(a), Math.abs(b))) {
+      blank.push([j, i], [j2, i2]);
+    }
+  };
+  for (let j = 0; j < ys.length; j++) {
+    for (let i = 0; i < xs.length; i++) {
+      if (i + 1 < xs.length) check(j, i, j, i + 1);
+      if (j + 1 < ys.length) check(j, i, j + 1, i);
+    }
+  }
+  for (const [j, i] of blank) z[j][i] = null;
+  return z;
 }
 
 function axis([lo, hi]: [number, number]): number[] {
@@ -412,14 +441,17 @@ function axis([lo, hi]: [number, number]): number[] {
 }
 
 /**
- * The iteration path in the (x, y) plane over the curves F = 0 and G = 0, drawn as the zero
- * contours of F and G on a grid around the iterates. The solution is where the two curves cross.
+ * The iteration path in the (x, y) plane over two curves whose crossing is the solution, drawn as
+ * zero contours on a grid around the iterates: F = 0 and G = 0 for a system F = G = 0, or x = F(x, y)
+ * and y = G(x, y) (the zero contours of x − F and y − G) for a fixed-point system. A system with
+ * three unknowns has no such chart.
  */
 export function buildPathChart(
   plot: SystemPlot,
   rows: readonly SystemIterationRow[],
   labels: ChartLabels,
 ): ChartSpec | null {
+  if (plot.kind === "fixed-point-3d") return null;
   const points = rows.filter(
     (r) =>
       Number.isFinite(r.x) &&
@@ -430,7 +462,7 @@ export function buildPathChart(
   if (points.length === 0) return null;
   const xs = axis(xRange(points.map((r) => r.x)));
   const ys = axis(xRange(points.map((r) => r.y)));
-  const curve = (fn: SystemPlot["F"], name: string, color: string): Data => ({
+  const curve = (fn: (x: number, y: number) => number, name: string, color: string): Data => ({
     type: "contour",
     name,
     x: xs,
@@ -462,8 +494,15 @@ export function buildPathChart(
     xTitle: "x",
     yTitle: "y",
     traces: [
-      curve(plot.F, labels.curveF, COLORS.accent),
-      curve(plot.G, labels.curveG, COLORS.secondary),
+      ...(plot.kind === "system"
+        ? [
+            curve(plot.F, labels.curveF, COLORS.accent),
+            curve(plot.G, labels.curveG, COLORS.secondary),
+          ]
+        : [
+            curve((x, y) => x - plot.F(x, y), labels.curveFixedX, COLORS.accent),
+            curve((x, y) => y - plot.G(x, y), labels.curveFixedY, COLORS.secondary),
+          ]),
       {
         type: "scatter",
         mode: "lines+markers",
@@ -480,8 +519,8 @@ export function buildPathChart(
 }
 
 /**
- * |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| per iteration on a log scale, with ε as a reference line and, when
- * the exact solution is known, max(|xₙ − x*|, |yₙ − y*|).
+ * |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| (and |zₙ − zₙ₋₁| with three unknowns) per iteration on a log scale, with
+ * ε as a reference line and, when the exact solution is known, max(|xₙ − x*|, |yₙ − y*|).
  */
 export function buildSystemConvergenceChart(
   rows: readonly SystemIterationRow[],
@@ -499,7 +538,9 @@ export function buildSystemConvergenceChart(
       );
   const dx = positive((r) => r.dx);
   const dy = positive((r) => r.dy);
-  if (dx.length === 0 && dy.length === 0) return null;
+  const hasZ = rows.some((r) => r.z !== undefined);
+  const dz = hasZ ? positive((r) => r.dz ?? null) : [];
+  if (dx.length === 0 && dy.length === 0 && dz.length === 0) return null;
   const lastN = rows[rows.length - 1].n;
   const epsSpan = lastN > 1 ? [1, lastN] : [0.5, 1.5];
   const series = (
@@ -521,6 +562,7 @@ export function buildSystemConvergenceChart(
   const traces: Data[] = [
     series(dx, labels.diff, COLORS.accent, "|xₙ − xₙ₋₁|"),
     series(dy, labels.diffY, COLORS.text, "|yₙ − yₙ₋₁|"),
+    ...(hasZ ? [series(dz, labels.diffZ, COLORS.secondary, "|zₙ − zₙ₋₁|", "dot")] : []),
     {
       type: "scatter",
       mode: "lines",
@@ -536,6 +578,48 @@ export function buildSystemConvergenceChart(
     traces.push(series(error, labels.systemError, COLORS.secondary, "max(|xₙ − x*|, |yₙ − y*|)"));
   }
   return { xTitle: "n", yLog: true, traces };
+}
+
+/**
+ * xₙ, yₙ and zₙ against n, for a system with three unknowns, where no path chart fits on a plane.
+ * Non-finite values are left out of their line.
+ */
+export function buildComponentsChart(
+  rows: readonly SystemIterationRow[],
+  labels: ChartLabels,
+): ChartSpec | null {
+  if (rows.length === 0) return null;
+  const component = (
+    pick: (r: SystemIterationRow) => number | undefined,
+    name: string,
+    color: string,
+    symbol: string,
+  ): Data => {
+    const points = rows.flatMap((r) => {
+      const value = pick(r);
+      return value !== undefined && Number.isFinite(value) && Math.abs(value) <= PLOT_LIMIT
+        ? [{ n: r.n, value }]
+        : [];
+    });
+    return {
+      type: "scatter",
+      mode: "lines+markers",
+      name,
+      x: points.map((p) => p.n),
+      y: points.map((p) => p.value),
+      line: { color, width: 2 },
+      marker: { color, size: 6 },
+      hovertemplate: `n = %{x}<br>${symbol} = %{y:.12g}<extra></extra>`,
+    };
+  };
+  return {
+    xTitle: "n",
+    traces: [
+      component((r) => r.x, labels.componentX, COLORS.accent, "xₙ"),
+      component((r) => r.y, labels.componentY, COLORS.text, "yₙ"),
+      component((r) => r.z, labels.componentZ, COLORS.secondary, "zₙ"),
+    ],
+  };
 }
 
 /** Scales a [lo, hi] range around its centre: a factor below 1 zooms in, above 1 zooms out. */

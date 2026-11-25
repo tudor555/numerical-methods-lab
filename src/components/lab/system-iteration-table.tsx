@@ -22,19 +22,21 @@ import { splitRows } from "./iteration-table";
 /** TeX of the max-norm error against the exact solution (x*, y*). */
 export const SYSTEM_ERROR_TEX = "\\max(|x_n - x^*|, |y_n - y^*|)";
 
-/** Two values stacked in one cell: the x one on top, the y one below. */
-function Pair({ top, bottom }: { top: ReactNode; bottom: ReactNode }) {
+/** Two or three values stacked in one cell: x on top, then y, then z. */
+function Stack({ values }: { values: readonly ReactNode[] }) {
   return (
     <span className="flex flex-col">
-      <span>{top}</span>
-      <span>{bottom}</span>
+      {values.map((value, i) => (
+        <span key={i}>{value}</span>
+      ))}
     </span>
   );
 }
 
 /**
- * One column: its header and how a row fills it. Pairs stack x over y in one column, so the table
- * fits the results column without scrolling sideways and every value keeps its full precision.
+ * One column: its header and how a row fills it. Stacks put x over y (over z) in one column, so
+ * the table fits the results column without scrolling sideways and every value keeps its full
+ * precision.
  */
 type Column = {
   id: string;
@@ -43,30 +45,56 @@ type Column = {
   muted?: boolean;
 };
 
-const pairColumn = (
-  top: string,
-  bottom: string,
-  value: (row: SystemIterationRow) => [ReactNode, ReactNode],
+const stackColumn = (
+  headers: readonly string[],
+  value: (row: SystemIterationRow) => readonly ReactNode[],
 ): Column => ({
-  id: top,
-  header: <Pair top={<Tex tex={top} />} bottom={<Tex tex={bottom} />} />,
-  value: (row) => {
-    const [x, y] = value(row);
-    return <Pair top={x} bottom={y} />;
-  },
+  id: headers[0],
+  header: (
+    <Stack
+      values={headers.map((tex) => (
+        <Tex key={tex} tex={tex} />
+      ))}
+    />
+  ),
+  value: (row) => <Stack values={value(row)} />,
 });
 
-const COLUMNS: readonly Column[] = [
-  { id: "n", header: <Tex tex="n" />, value: (row) => row.n, muted: true },
-  pairColumn("x_n", "y_n", (row) => [formatValue(row.x), formatValue(row.y)]),
-  pairColumn("F(x_n, y_n)", "G(x_n, y_n)", (row) => [formatSmall(row.F), formatSmall(row.G)]),
-  pairColumn("|x_n - x_{n-1}|", "|y_n - y_{n-1}|", (row) => [
-    formatSmall(row.dx),
-    formatSmall(row.dy),
-  ]),
-];
+/**
+ * The columns for a run: n, the point and the differences, with zₙ when there are three unknowns,
+ * and F, G only when the rows carry them (a system F = G = 0, not a fixed-point one).
+ */
+function columnsFor(threeUnknowns: boolean, residuals: boolean): Column[] {
+  const point = threeUnknowns ? ["x_n", "y_n", "z_n"] : ["x_n", "y_n"];
+  const differences = ["|x_n - x_{n-1}|", "|y_n - y_{n-1}|"];
+  if (threeUnknowns) differences.push("|z_n - z_{n-1}|");
+  return [
+    { id: "n", header: <Tex tex="n" />, value: (row) => row.n, muted: true },
+    stackColumn(point, (row) => [
+      formatValue(row.x),
+      formatValue(row.y),
+      ...(threeUnknowns ? [formatValue(row.z ?? Number.NaN)] : []),
+    ]),
+    ...(residuals
+      ? [
+          stackColumn(["F(x_n, y_n)", "G(x_n, y_n)"], (row) => [
+            formatSmall(row.F ?? null),
+            formatSmall(row.G ?? null),
+          ]),
+        ]
+      : []),
+    stackColumn(differences, (row) => [
+      formatSmall(row.dx),
+      formatSmall(row.dy),
+      ...(threeUnknowns ? [formatSmall(row.dz ?? null)] : []),
+    ]),
+  ];
+}
 
-/** The table of a 2×2 system run: n, (xₙ, yₙ), F and G there, and both differences, each pair in one column. */
+/**
+ * The table of a system run: n, the point, F and G there when the system is F = G = 0, and the
+ * differences, each group stacked in one column.
+ */
 export function SystemIterationTable({
   rows,
   errorAt,
@@ -83,9 +111,11 @@ export function SystemIterationTable({
   // "Show all" belongs to the run it was clicked for; a new run starts shortened again.
   const [shownInFull, setShownInFull] = useState<readonly SystemIterationRow[] | null>(null);
   const { head, tail, hidden } = splitRows(rows, shownInFull === rows ? Infinity : undefined);
+  const first = rows[0];
+  const base = columnsFor(first?.z !== undefined, first?.F !== undefined);
   const columns: readonly Column[] = exact
     ? [
-        ...COLUMNS,
+        ...base,
         {
           id: "error",
           header: <Tex tex={SYSTEM_ERROR_TEX} />,
@@ -93,7 +123,7 @@ export function SystemIterationTable({
             formatSmall(Math.max(Math.abs(row.x - exact.x), Math.abs(row.y - exact.y))),
         },
       ]
-    : COLUMNS;
+    : base;
   const renderRow = (row: SystemIterationRow) => (
     <TableRow
       key={row.n}

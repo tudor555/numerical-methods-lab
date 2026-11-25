@@ -3,9 +3,10 @@ import { lab2 } from "./lab-2";
 import { lab3 } from "./lab-3";
 import { lab4 } from "./lab-4";
 import { lab5 } from "./lab-5";
+import { lab6 } from "./lab-6";
 import type { LabDefinition, ReadyLab } from "./types";
 
-type PlannedNumber = 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
+type PlannedNumber = 7 | 8 | 9 | 10 | 11 | 12 | 13;
 
 const planned = <N extends PlannedNumber>(number: N, slug: string): LabDefinition => ({
   number,
@@ -22,7 +23,7 @@ export const labs: readonly LabDefinition[] = [
   lab3,
   lab4,
   lab5,
-  planned(6, "nonlinear-systems"),
+  lab6,
   planned(7, "euler"),
   planned(8, "runge-kutta-2-3"),
   planned(9, "runge-kutta-4"),

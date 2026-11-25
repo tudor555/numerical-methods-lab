@@ -37,6 +37,12 @@ export function useChartLabels(): ChartLabels {
       curveG: t("chart.trace.curveG"),
       diffY: t("chart.trace.diffY"),
       systemError: t("chart.trace.systemError"),
+      curveFixedX: t("chart.trace.curveFixedX"),
+      curveFixedY: t("chart.trace.curveFixedY"),
+      diffZ: t("chart.trace.diffZ"),
+      componentX: t("chart.trace.componentX"),
+      componentY: t("chart.trace.componentY"),
+      componentZ: t("chart.trace.componentZ"),
     }),
     [t],
   );

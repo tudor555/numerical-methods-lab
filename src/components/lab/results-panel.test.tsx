@@ -4,6 +4,7 @@ import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
+import { lab6 } from "@/labs/lab-6";
 import { toRunView, type RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
@@ -426,5 +427,107 @@ describe("ResultsPanel for a 2×2 system", () => {
   it("says when the cap stops a system run", () => {
     const html = panel(systemRun("5b", { ...ex2, eps: "1e-12", maxIter: "2" }));
     expect(message(html)).toMatch(/^Stopped at the cap of 2 iterations while \|xₙ − xₙ₋₁\| or/);
+  });
+});
+
+describe("ResultsPanel for Lab 6", () => {
+  const run = (methodId: string, patch: FieldValues = {}) => {
+    const method = lab6.methods.find((m) => m.id === methodId);
+    if (!method) throw new Error(methodId);
+    const prepared = method.prepare({ ...method.defaults, ...patch });
+    if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
+    return systemView(toRunView(prepared.prepared));
+  };
+  const headers = (html: string) => texOf(elements(html, "thead")[0] ?? "");
+  const rowValues = (html: string) =>
+    elements(html.slice(html.indexOf("<tbody")), "tr").map((row) =>
+      elements(row, "td").flatMap((cell) => {
+        const lines = elements(cell, "span");
+        return lines.length > 0 ? lines.map(textOf) : [textOf(cell)];
+      }),
+    );
+  const convergenceTraces = (html: string) => [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
+
+  it("6a ex. 1: the point, n, the fixed-point curves and a table without F and G", () => {
+    const html = panel(run("6a"));
+    expect(message(html)).toBe("|xₙ − xₙ₋₁| < ε and |yₙ − yₙ₋₁| < ε after n = 9 iterations.");
+    const [x, y, n, start] = stats(html);
+    expect(x.value).toMatch(/^3\.4872672/);
+    expect(y.value).toMatch(/^2\.2615452/);
+    expect(n.value).toBe("9");
+    expect(start.value).toBe("(3.5, 2.2)");
+    expect(stats(html)).toHaveLength(4);
+    expect(figures(html)).toEqual([
+      "x = F(x, y) and y = G(x, y) with the iteration path",
+      "Convergence: |xₙ − xₙ₋₁| and |yₙ − yₙ₋₁| on a log scale",
+    ]);
+    expect(traceNames(html)).toEqual(["x = F(x, y)", "y = G(x, y)", "Iteration path"]);
+    expect(headers(html)).toEqual(["n", "x_n", "y_n", "|x_n - x_{n-1}|", "|y_n - y_{n-1}|"]);
+    expect(rowValues(html)[0]).toEqual(["0", "3.5", "2.2", "—", "—"]);
+  });
+
+  it("6c ex. 4 shows the exact solution (2; 1) and the error, in Romanian", () => {
+    const html = panel(run("6c"), "ro");
+    expect(message(html)).toBe(
+      "Precizia dorită a fost atinsă la iterația n = 9: |xₙ − xₙ₋₁| < ε și |yₙ − yₙ₋₁| < ε.",
+    );
+    const tiles = stats(html);
+    expect(tiles).toHaveLength(6);
+    expect(tiles[3].value).toBe("(1.5; 1.5)");
+    expect(tiles[4]).toEqual({ label: expect.stringContaining("Soluția exactă"), value: "(2; 1)" });
+    expect(tiles[5].value).toMatch(/e-5$/);
+    expect(figures(html)[0]).toBe("Curbele x = F(x, y) și y = G(x, y) și traseul iterațiilor");
+    expect(headers(html).at(-1)).toBe("\\max(|x_n - x^*|, |y_n - y^*|)");
+    expect(convergenceTraces(html)).toBe("|xₙ − xₙ₋₁|||yₙ − yₙ₋₁||ε|max(|xₙ − x*|, |yₙ − y*|)");
+  });
+
+  it("6b ex. 3: xₙ, yₙ, zₙ, n, the start (x₀, y₀, z₀), the components chart and zₙ in the table", () => {
+    const html = panel(run("6b"));
+    expect(message(html)).toBe(
+      "|xₙ − xₙ₋₁| < ε, |yₙ − yₙ₋₁| < ε and |zₙ − zₙ₋₁| < ε after n = 14 iterations.",
+    );
+    const tiles = stats(html);
+    expect(tiles).toHaveLength(5);
+    expect(tiles.map((t) => t.value.slice(0, 9))).toEqual([
+      "4.5298512",
+      "3.2913483",
+      "5.8897792",
+      "14",
+      "(10, 10, ",
+    ]);
+    expect(tiles[2].label).toContain("z_n");
+    expect(tiles[4].value).toBe("(10, 10, 10)");
+    expect(figures(html)).toEqual([
+      "xₙ, yₙ and zₙ at each iteration",
+      "Convergence: |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| and |zₙ − zₙ₋₁| on a log scale",
+    ]);
+    expect(traceNames(html)).toEqual(["xₙ", "yₙ", "zₙ"]);
+    expect(convergenceTraces(html)).toBe("|xₙ − xₙ₋₁|||yₙ − yₙ₋₁|||zₙ − zₙ₋₁||ε");
+    expect(headers(html)).toEqual([
+      "n",
+      "x_n",
+      "y_n",
+      "z_n",
+      "|x_n - x_{n-1}|",
+      "|y_n - y_{n-1}|",
+      "|z_n - z_{n-1}|",
+    ]);
+    expect(rowValues(html)[0]).toEqual(["0", "10", "10", "10", "—", "—", "—"]);
+  });
+
+  it("6b names the whole point (xₙ, yₙ, zₙ) when a step fails, and keeps row 0", () => {
+    const html = panel(run("6b", { x0: "-10", y0: "-10", z0: "-10" }));
+    expect(html).toContain('role="alert"');
+    expect(message(html)).toBe(
+      "A value is undefined (NaN) in the step from n = 0, (xₙ, yₙ, zₙ) = (-10, -10, -10). Check the domain of the functions (√ of a negative number, ln of a non-positive one). The iterations computed before the error are kept below.",
+    );
+    expect(rowValues(html)).toHaveLength(1);
+  });
+
+  it("6b says when the cap stops it, in Romanian", () => {
+    const html = panel(run("6b", { maxIter: "2" }), "ro");
+    expect(message(html)).toMatch(
+      /^Calculul s-a oprit la limita de iterații \(n = 2\), înainte ca \|xₙ − xₙ₋₁\|, \|yₙ − yₙ₋₁\| și \|zₙ − zₙ₋₁\|/,
+    );
   });
 });

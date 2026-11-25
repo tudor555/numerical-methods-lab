@@ -44,6 +44,20 @@ describe("systemIterate", () => {
     expect(r.iterations[1]).toMatchObject({ F: 5, G: 2, dx: 0, dy: 8 });
   });
 
+  it("leaves a cell empty where F or G returns NaN or ±∞ without throwing", () => {
+    const r = systemIterate({
+      ...base,
+      F: (x) => 1 / (x - 1),
+      G: () => Number.NaN,
+      x0: 1,
+      y0: 0,
+      eps: 2,
+      step: (x, y) => [x + 1, y],
+    });
+    expect(r.iterations[0]).toMatchObject({ F: null, G: null });
+    expect(r.iterations[1]).toMatchObject({ F: 1, G: null });
+  });
+
   it("re-throws an unexpected error from F or from a step", () => {
     const bug = () => {
       throw new Error("bug");
@@ -119,5 +133,86 @@ describe("systemIterate", () => {
     expect(r.status).toBe("max-iterations");
     expect(r.n).toBe(3);
     expect(r.result).toEqual({ x: 1 / 8, y: 1 });
+  });
+});
+
+describe("systemIterate without F and G columns", () => {
+  it("leaves the F and G cells out of every row", () => {
+    const r = systemIterate({ x0: 1, y0: 1, eps: 0.1, maxIter: 1000, step: (x, y) => [x / 2, y] });
+    expect(r.iterations[0]).toEqual({ n: 0, x: 1, y: 1, dx: null, dy: null });
+    for (const row of r.iterations) {
+      expect(row).not.toHaveProperty("F");
+      expect(row).not.toHaveProperty("G");
+      expect(row).not.toHaveProperty("z");
+    }
+  });
+});
+
+describe("systemIterate with three unknowns", () => {
+  const base3 = { x0: 1, y0: 1, maxIter: 1000 };
+
+  it("adds zₙ and |zₙ − zₙ₋₁| to every row and keeps going while only dz is ≥ ε", () => {
+    const r = systemIterate({
+      ...base3,
+      z0: 1,
+      eps: 0.1,
+      step: (x, y, z) => [x / 16, y / 16, z / 2],
+    });
+    expect(r.status).toBe("converged");
+    expect(r.n).toBe(4);
+    expect(r.result).toEqual({ x: 1 / 65536, y: 1 / 65536, z: 1 / 16 });
+    expect(r.iterations[0]).toEqual({ n: 0, x: 1, y: 1, z: 1, dx: null, dy: null, dz: null });
+    expect(r.iterations[4]).toMatchObject({ z: 1 / 16, dz: 1 / 16 });
+    expect(r.iterations[4].dx).toBeLessThan(0.1);
+  });
+
+  it("passes zₙ to the step and names the whole point (xₙ, yₙ, zₙ) in an error", () => {
+    const seen: number[][] = [];
+    const r = systemIterate({
+      ...base3,
+      z0: 3,
+      eps: 1e-12,
+      step: (x, y, z) => {
+        seen.push([x, y, z]);
+        if (x < 0.3) throw new MethodStepError("undefined-value");
+        return [x / 2, y / 2, z / 2];
+      },
+    });
+    expect(seen[0]).toEqual([1, 1, 3]);
+    expect(r.error).toEqual({ code: "undefined-value", n: 2, x: 0.25, y: 0.25, z: 0.75 });
+    expect(r.iterations).toHaveLength(3);
+  });
+
+  it.each([
+    [[1, 1, Number.NaN], "undefined-value"],
+    [[1, 1, Number.POSITIVE_INFINITY], "overflow"],
+  ] as const)("stops on %j in z → %s", (bad, code) => {
+    const r = systemIterate({
+      ...base3,
+      z0: 1,
+      eps: 1e-4,
+      step: (x, y, z) => (x < 0.6 ? bad : [x / 2, y / 2, z / 2]),
+    });
+    expect(r.error).toEqual({ code, n: 1, x: 0.5, y: 0.5, z: 0.5 });
+  });
+
+  it("detects divergence past 1e100 in z", () => {
+    const r = systemIterate({ ...base3, z0: 1, eps: 1e-4, step: (x, y, z) => [x, y, 2 * z + 1] });
+    expect(r.error?.code).toBe("diverged");
+    const last = r.iterations[r.iterations.length - 1];
+    expect(last.z).toBeGreaterThan(1e100);
+    expect(r.error).toEqual({ code: "diverged", n: last.n, x: 1, y: 1, z: last.z });
+  });
+
+  it("stops at the cap with the last point (xₙ, yₙ, zₙ)", () => {
+    const r = systemIterate({
+      ...base3,
+      z0: 1,
+      eps: 1e-12,
+      maxIter: 3,
+      step: (x, y, z) => [x, y, z / 2],
+    });
+    expect(r.status).toBe("max-iterations");
+    expect(r.result).toEqual({ x: 1, y: 1, z: 1 / 8 });
   });
 });

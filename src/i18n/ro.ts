@@ -64,6 +64,8 @@ export const ro: Record<MessageKey, string> = {
     "Criteriul de oprire: primul pas, de la $x_0$ la $x_1$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, adică până când două iterații consecutive diferă cu mai puțin de $\\varepsilon$. Se afișează $n$ și $x_n$.",
   "common.systemStopping":
     "Criteriul de oprire: primul pas, de la $(x_0; y_0)$ la $(x_1; y_1)$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$ sau $|y_n - y_{n-1}| \\ge \\varepsilon$, adică până când ambele coordonate se modifică cu mai puțin de $\\varepsilon$. Se afișează $n$ și $(x_n; y_n)$.",
+  "common.system3Stopping":
+    "Criteriul de oprire: primul pas, de la $(x_0; y_0; z_0)$ la $(x_1; y_1; z_1)$, se face întotdeauna. Apoi, începând cu $n = 1$, iterațiile continuă cât timp $|x_n - x_{n-1}| \\ge \\varepsilon$, $|y_n - y_{n-1}| \\ge \\varepsilon$ sau $|z_n - z_{n-1}| \\ge \\varepsilon$, adică până când toate cele trei coordonate se modifică cu mai puțin de $\\varepsilon$. Se afișează $n$ și $(x_n; y_n; z_n)$.",
 
   "math.if": "dacă",
 
@@ -95,6 +97,10 @@ export const ro: Record<MessageKey, string> = {
   "field.partial": "Derivata parțială",
   "field.startX": "Punctul inițial, x",
   "field.startY": "Punctul inițial, y",
+  "field.F1": "Funcția F₁",
+  "field.F2": "Funcția F₂",
+  "field.F3": "Funcția F₃",
+  "field.startZ": "Punctul inițial, z",
 
   "field.error.empty": "Câmpul este obligatoriu.",
   "field.error.syntax": "Expresia nu este scrisă corect. Verifică operatorii și parantezele.",
@@ -135,6 +141,10 @@ export const ro: Record<MessageKey, string> = {
     "Precizia dorită a fost atinsă la iterația n = {n}: |xₙ − xₙ₋₁| < ε și |yₙ − yₙ₋₁| < ε.",
   "result.system.maxIterations":
     "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
+  "result.system3.converged":
+    "Precizia dorită a fost atinsă la iterația n = {n}: |xₙ − xₙ₋₁| < ε, |yₙ − yₙ₋₁| < ε și |zₙ − zₙ₋₁| < ε.",
+  "result.system3.maxIterations":
+    "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| și |zₙ − zₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
   "result.startPoint": "Punctul inițial",
   "result.exactSolution": "Soluția exactă",
 
@@ -155,6 +165,12 @@ export const ro: Record<MessageKey, string> = {
     "La pasul care pornește din n = {n}, (xₙ; yₙ) = {point}, o valoare a devenit infinită (±∞).",
   "run.systemError.diverged":
     "Șirul iterațiilor diverge: la n = {n}, în (xₙ; yₙ) = {point}, |xₙ| sau |yₙ| a depășit 10¹⁰⁰.",
+  "run.system3Error.undefined-value":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ; zₙ) = {point}, o valoare nu este definită (NaN). Verifică domeniul de definiție al funcțiilor (radical dintr-un număr negativ, logaritm dintr-un număr nepozitiv).",
+  "run.system3Error.overflow":
+    "La pasul care pornește din n = {n}, (xₙ; yₙ; zₙ) = {point}, o valoare a devenit infinită (±∞).",
+  "run.system3Error.diverged":
+    "Șirul iterațiilor diverge: la n = {n}, în (xₙ; yₙ; zₙ) = {point}, |xₙ|, |yₙ| sau |zₙ| a depășit 10¹⁰⁰.",
 
   "table.title": "Tabelul iterațiilor",
   "table.hidden": "Iterații ascunse: {count}",
@@ -170,6 +186,10 @@ export const ro: Record<MessageKey, string> = {
   "chart.convergence": "Convergența: |xₙ − xₙ₋₁| pe scară logaritmică",
   "chart.path": "Curbele F = 0 și G = 0 și traseul iterațiilor",
   "chart.systemConvergence": "Convergența: |xₙ − xₙ₋₁| și |yₙ − yₙ₋₁| pe scară logaritmică",
+  "chart.fixedPointPath": "Curbele x = F(x, y) și y = G(x, y) și traseul iterațiilor",
+  "chart.components": "xₙ, yₙ și zₙ la fiecare iterație",
+  "chart.system3Convergence":
+    "Convergența: |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| și |zₙ − zₙ₋₁| pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
   "chart.tool.zoom": "Mărește o zonă",
   "chart.tool.pan": "Deplasează graficul",
@@ -195,6 +215,12 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.curveG": "G(x, y) = 0",
   "chart.trace.diffY": "|yₙ − yₙ₋₁|",
   "chart.trace.systemError": "max(|xₙ − x*|, |yₙ − y*|)",
+  "chart.trace.curveFixedX": "x = F(x, y)",
+  "chart.trace.curveFixedY": "y = G(x, y)",
+  "chart.trace.diffZ": "|zₙ − zₙ₋₁|",
+  "chart.trace.componentX": "xₙ",
+  "chart.trace.componentY": "yₙ",
+  "chart.trace.componentZ": "zₙ",
 
   "compare.run": "Compară",
   "compare.method": "Metoda",
@@ -417,7 +443,58 @@ export const ro: Record<MessageKey, string> = {
   "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
   "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
 
-  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru x² + y² = 10, √(x + y) = 2",
   "lab5.compare.ex3.task":
-    "Aplică metoda lui Newton modificată sistemului din ex. 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se folosesc ambele puncte inițiale din ex. 2, fiecare cu cele trei precizii.",
+    "Aplică metoda lui Newton modificată sistemului x² + y² = 10, √(x + y) = 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se pornește din (0,9; 3,1) și din (2,9; 1,1), fiecare cu cele trei precizii.",
+
+  "lab6.intro":
+    "Rezolvă sisteme neliniare scrise sub forma x = F(x, y), y = G(x, y) prin metoda aproximațiilor succesive și prin metoda Gauss–Seidel, care folosește fiecare coordonată nouă imediat ce a fost calculată, pentru sisteme cu trei și cu două ecuații. Compară apoi numărul de iterații necesar celor două metode.",
+  "lab6.method.successive.tab": "6a · Aproximații succesive",
+  "lab6.method.successive.title": "Metoda aproximațiilor succesive pentru sisteme neliniare",
+  "lab6.method.successive.name": "Metoda aproximațiilor succesive",
+  "lab6.method.successive.idea":
+    "Sistemul se rescrie mai întâi sub forma $x = F(x, y)$, $y = G(x, y)$, astfel încât soluția lui este un punct pe care $F$ și $G$ îl lasă neschimbat. Pornind din $(x_0; y_0)$, la fiecare pas ambele funcții se calculează în punctul curent:",
+  "lab6.method.successive.start":
+    "Primul pas, $(x_1; y_1) = (F(x_0, y_0); G(x_0, y_0))$, folosește doar punctul inițial. Metoda converge dacă, într-o vecinătate a soluției care conține $(x_0; y_0)$, aplicația $(x; y) \\mapsto (F(x, y); G(x, y))$ este o contracție, cu o constantă $M < 1$. Convergența este liniară: la fiecare pas eroarea scade de aproximativ $M$ ori, deci cu cât $M$ este mai mic, cu atât sunt necesare mai puține iterații.",
+  "lab6.method.successive.failure":
+    "Dacă $F$ sau $G$ nu este definită într-o iterație, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare. Dacă aplicația nu este o contracție în jurul soluției, iterațiile se pot îndepărta de ea, iar când o coordonată depășește $10^{100}$ metoda se oprește: șirul iterațiilor diverge.",
+  "lab6.method.successive.chart":
+    "Primul grafic desenează curbele $x = F(x, y)$ și $y = G(x, y)$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
+
+  "lab6.method.gaussSeidel3.tab": "6b · Gauss–Seidel, 3 ecuații",
+  "lab6.method.gaussSeidel3.title": "Metoda Gauss–Seidel pentru sisteme cu trei ecuații",
+  "lab6.method.gaussSeidel3.name": "Metoda Gauss–Seidel, 3 ecuații",
+  "lab6.method.gaussSeidel3.idea":
+    "Sistemul se scrie sub forma $x = F_1(x, y, z)$, $y = F_2(x, y, z)$, $z = F_3(x, y, z)$. Metoda Gauss–Seidel lucrează ca metoda aproximațiilor succesive, cu o singură diferență: fiecare coordonată nouă este folosită imediat ce a fost calculată. Astfel, $y_{n+1}$ se calculează deja cu $x_{n+1}$, iar $z_{n+1}$ cu $x_{n+1}$ și $y_{n+1}$:",
+  "lab6.method.gaussSeidel3.start":
+    "Primul pas folosește doar punctul inițial: $x_1$, $y_1$ și $z_1$ sunt valorile lui $F_1$, $F_2$ și $F_3$ în $(x_0; y_0; z_0)$. Începând cu $n = 1$, se aplică formulele de mai sus. Ca la metoda aproximațiilor succesive, metoda converge dacă aplicația este o contracție în jurul soluției și punctul inițial este suficient de aproape de ea, iar convergența este liniară. Folosirea celor mai noi valori economisește de obicei iterații.",
+  "lab6.method.gaussSeidel3.failure":
+    "Dacă $F_1$, $F_2$ sau $F_3$ nu este definită într-o iterație, de pildă din cauza unui radical dintr-un număr negativ sau a unui logaritm dintr-un număr nepozitiv, metoda se oprește cu eroare. Dacă iterațiile se îndepărtează de soluție și o coordonată depășește $10^{100}$, metoda se oprește: șirul iterațiilor diverge.",
+  "lab6.method.gaussSeidel3.chart":
+    "Cu trei necunoscute, traseul iterațiilor nu mai încape într-un plan, așa că primul grafic urmărește de la un pas la altul cum se stabilizează $x_n$, $y_n$ și $z_n$ în jurul soluției. Al doilea grafic arată, pe scară logaritmică, cum scad cele trei diferențe până când toate ajung sub $\\varepsilon$.",
+
+  "lab6.method.gaussSeidel2.tab": "6c · Gauss–Seidel, 2 ecuații",
+  "lab6.method.gaussSeidel2.title": "Metoda Gauss–Seidel pentru sisteme cu două ecuații",
+  "lab6.method.gaussSeidel2.name": "Metoda Gauss–Seidel",
+  "lab6.method.gaussSeidel2.idea":
+    "Sistemul se scrie sub forma $x = F(x, y)$, $y = G(x, y)$, ca la metoda aproximațiilor succesive, cu o singură diferență: $y_{n+1}$ se calculează cu noul $x_{n+1}$, nu cu $x_n$. Cea mai nouă valoare este folosită imediat:",
+  "lab6.method.gaussSeidel2.start":
+    "Primul pas folosește doar punctul inițial, $(x_1; y_1) = (F(x_0, y_0); G(x_0, y_0))$, ca la metoda aproximațiilor succesive. Începând cu $n = 1$, se aplică formulele de mai sus. Metoda converge în aceleași condiții de contracție în jurul soluției, iar convergența rămâne liniară, dar de obicei cu un factor mai mic, deci sunt necesare mai puține iterații.",
+  "lab6.method.gaussSeidel2.failure":
+    "Dacă $F$ sau $G$ nu este definită într-o iterație, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare. Dacă iterațiile se îndepărtează de soluție și o coordonată depășește $10^{100}$, metoda se oprește: șirul iterațiilor diverge.",
+  "lab6.method.gaussSeidel2.chart":
+    "Primul grafic desenează curbele $x = F(x, y)$ și $y = G(x, y)$. Soluția sistemului este punctul în care ele se intersectează, iar traseul iterațiilor arată cum se apropie metoda de acest punct. Al doilea grafic arată, pe scară logaritmică, cum scad de la un pas la altul diferențele $|x_n - x_{n-1}|$ și $|y_n - y_{n-1}|$ până sub $\\varepsilon$.",
+
+  "lab6.preset.ex1": "Ex. 1: 2x² − xy − 5x + 1 = 0, x + 3 lg x − y² = 0, din (3,5; 2,2)",
+  "lab6.preset.ex2Near21": "Ex. 2: x² + y² = 5, xy = 2, în jurul lui (2; 1)",
+  "lab6.preset.ex2Near12": "Ex. 2: x² + y² = 5, xy = 2, în jurul lui (1; 2)",
+  "lab6.preset.ex2NearMinus1Minus2": "Ex. 2: x² + y² = 5, xy = 2, în jurul lui (−1; −2)",
+  "lab6.preset.ex2NearMinus2Minus1": "Ex. 2: x² + y² = 5, xy = 2, în jurul lui (−2; −1)",
+  "lab6.preset.ex3":
+    "Ex. 3: 2x² − yz − 5x + 1 = 0, y² − 2x − ln z = 0, z² − xy − 2z − 8 = 0, din (10; 10; 10)",
+  "lab6.preset.ex4": "Ex. 4: x² + y² = 5, xy = 2, în jurul lui (2; 1)",
+
+  "lab6.compare.ex4": "Ex. 4: metoda Gauss–Seidel pentru x² + y² = 5, xy = 2",
+  "lab6.compare.ex4.task":
+    "Aplică metoda Gauss–Seidel sistemului x² + y² = 5, xy = 2, în jurul lui (2; 1), pornind din (1,5; 1,5), și compară numărul de iterații cu cel obținut prin metoda aproximațiilor succesive. Ambele metode se aplică cu cele trei precizii.",
 };

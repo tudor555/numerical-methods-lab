@@ -75,12 +75,19 @@ export interface ExactSolution {
   tex: string;
 }
 
-/** What the path chart draws for a 2×2 system: the curves F = 0 and G = 0 under the iterates. */
-export interface SystemPlot {
-  kind: "system";
-  F: (x: number, y: number) => number;
-  G: (x: number, y: number) => number;
-}
+/**
+ * What the charts draw for a system. `system`: F(x, y) = 0, G(x, y) = 0, so the path chart shows
+ * the curves F = 0 and G = 0. `fixed-point`: x = F(x, y), y = G(x, y), so it shows the curves
+ * x = F and y = G. `fixed-point-3d`: three unknowns, so there is no path chart, only the
+ * components against n.
+ */
+export type SystemPlot =
+  | {
+      kind: "system" | "fixed-point";
+      F: (x: number, y: number) => number;
+      G: (x: number, y: number) => number;
+    }
+  | { kind: "fixed-point-3d" };
 
 /** A known exact solution (x*, y*) of a 2×2 system. */
 export interface SystemExactSolution {
@@ -98,7 +105,7 @@ export interface ScalarPreparedRun {
   exact?: ExactSolution;
 }
 
-/** A run whose iterate is a point (xₙ, yₙ). */
+/** A run whose iterate is a point (xₙ, yₙ) or (xₙ, yₙ, zₙ). */
 export interface SystemPreparedRun {
   kind: "system";
   run: () => SystemRunResult;

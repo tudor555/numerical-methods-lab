@@ -26,9 +26,19 @@ export function runErrorKey(
   return errorKeys?.[shared] ?? (`run.error.${shared}` satisfies MessageKey);
 }
 
-/** The message key for a system run error; its params are `n` and `point` (see `formatPoint`). */
-export function systemErrorKey(code: SystemErrorCode | undefined): MessageKey {
-  return `run.systemError.${code ?? "undefined-value"}` satisfies MessageKey;
+/**
+ * The message key for a system run error; its params are `n` and `point` (see `formatPoint`). A
+ * run with three unknowns names (xₙ, yₙ, zₙ); only Newton's method, with two, has a Jacobian.
+ */
+export function systemErrorKey(
+  code: SystemErrorCode | undefined,
+  threeUnknowns = false,
+): MessageKey {
+  const shared = code ?? "undefined-value";
+  if (threeUnknowns && shared !== "zero-jacobian") {
+    return `run.system3Error.${shared}` satisfies MessageKey;
+  }
+  return `run.systemError.${shared}` satisfies MessageKey;
 }
 
 /** Status pill: color, icon and text, so it never relies on color alone. */

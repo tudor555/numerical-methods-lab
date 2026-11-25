@@ -50,8 +50,9 @@ const NOT_LISTED = new Set(["eps", "maxIter"]);
 
 /**
  * The inputs a comparison row runs with, in form order, so a card can show them before it runs.
- * Hidden fields are left out, [a, b] is one interval, (x₀, y₀) is one point, and a choice shows
- * only when no visible field already gives its value (x₀ typed in replaces "x₀: rule R0").
+ * Hidden fields are left out, [a, b] is one interval, (x₀, y₀) or (x₀, y₀, z₀) is one point, and a
+ * choice shows only when no visible field already gives its value (x₀ typed in replaces "x₀: rule
+ * R0").
  */
 export function comparisonInputs(
   method: MethodDefinition,
@@ -66,6 +67,7 @@ export function comparisonInputs(
   const end = byId("b");
   const intervalEnd = byId("a") && end?.labelKey === "field.b" ? end : undefined;
   const pointEnd = byId("x0") ? byId("y0") : undefined;
+  const pointZ = pointEnd ? byId("z0") : undefined;
   const asTex = (field: FieldDefinition): string => {
     const raw = values[field.id] ?? "";
     try {
@@ -87,12 +89,13 @@ export function comparisonInputs(
       const [a, b] = [asTex(field), asTex(intervalEnd)];
       inputs.push({ kind: "tex", tex: `[a${separator}\\ b] = [${a}${separator}\\ ${b}]` });
     } else if (pointEnd && field.id === "x0") {
-      const [x, y] = [asTex(field), asTex(pointEnd)];
+      const parts = [field, pointEnd, ...(pointZ ? [pointZ] : [])];
+      const join = (texts: string[]) => texts.join(`${separator}\\ `);
       inputs.push({
         kind: "tex",
-        tex: `(x_0${separator}\\ y_0) = (${x}${separator}\\ ${y})`,
+        tex: `(${join(parts.map((p) => p.symbol))}) = (${join(parts.map(asTex))})`,
       });
-    } else if (field !== intervalEnd && field !== pointEnd) {
+    } else if (field !== intervalEnd && field !== pointEnd && field !== pointZ) {
       inputs.push({ kind: "tex", tex: `${field.symbol} = ${asTex(field)}` });
     }
   }

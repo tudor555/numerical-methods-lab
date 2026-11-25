@@ -50,9 +50,16 @@ describe("/labs/[slug]", () => {
     expect(html).toContain('id="field-y0"');
   });
 
+  it("renders the lab page for the ready fixed-point systems lab /labs/nonlinear-systems", async () => {
+    const html = render(await LabRoute(props("nonlinear-systems")));
+    expect(textOf(html)).toContain("Successive approximations and Gauss–Seidel");
+    expect(html).toContain('id="field-F"');
+    expect(html).toContain('id="field-y0"');
+  });
+
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "nonlinear-systems"],
+    ["a lab that is not built yet", "euler"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -100,6 +107,18 @@ describe("/labs/[slug] metadata", () => {
     });
   });
 
+  it("names Lab 6 in its metadata, in both languages", async () => {
+    await expect(generateMetadata(props("nonlinear-systems"))).resolves.toEqual({
+      title: "Lab 6: Successive approximations and Gauss–Seidel",
+      description: "Fixed-point iteration for 2-D and 3-D nonlinear systems",
+    });
+    cookieJar.set(LANG_COOKIE, "ro");
+    await expect(generateMetadata(props("nonlinear-systems"))).resolves.toEqual({
+      title: "Laboratorul 6: Aproximații succesive și metoda Gauss–Seidel",
+      description: "Sisteme neliniare cu două și trei necunoscute",
+    });
+  });
+
   it("is in Romanian when the language cookie is ro", async () => {
     cookieJar.set(LANG_COOKIE, "ro");
     await expect(generateMetadata(props("newton"))).resolves.toEqual({
@@ -109,6 +128,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("nonlinear-systems"))).resolves.toEqual({});
+    await expect(generateMetadata(props("euler"))).resolves.toEqual({});
   });
 });

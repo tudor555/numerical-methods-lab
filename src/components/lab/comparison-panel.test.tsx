@@ -4,6 +4,7 @@ import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
+import { lab6 } from "@/labs/lab-6";
 import { runComparison } from "@/labs/compare";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
@@ -336,7 +337,7 @@ describe("ComparisonPanel for Lab 5", () => {
   it("shows ex. 3 with its task and lists each row's system and start", () => {
     const html = render(<ComparisonPanel lab={lab5} />, "ro");
     expect(elements(html, "h3").map(textOf)).toEqual([
-      "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+      "Ex. 3: metoda lui Newton modificată pentru x² + y² = 10, √(x + y) = 2",
     ]);
     const [card] = cards(html);
     expect(textOf(card)).toContain("Cerința:");
@@ -393,5 +394,62 @@ describe("ComparisonPanel for Lab 5", () => {
     expect(textOf(html)).toContain("The Jacobian J is zero at n = 0, (xₙ, yₙ) = (0, 0).");
     // Rows whose presets failed do not turn the hint back into the scalar one.
     expect(textOf(html)).toContain("the final point (xₙ, yₙ).");
+  });
+});
+
+describe("ComparisonPanel for Lab 6", () => {
+  const ex4 = lab6.comparisons[0];
+
+  it("shows ex. 4 with its task and lists Gauss–Seidel and successive approximations", () => {
+    const html = render(<ComparisonPanel lab={lab6} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 4: metoda Gauss–Seidel pentru x² + y² = 5, xy = 2",
+    ]);
+    const [card] = cards(html);
+    expect(textOf(card)).toContain("Cerința:");
+    expect(textOf(card)).toContain("cele trei precizii");
+    expect(elements(card, "dt").map(textOf)).toEqual([
+      "Metoda Gauss–Seidel",
+      "Metoda aproximațiilor succesive",
+      "Precizia",
+    ]);
+    const inputs = texOf(card);
+    expect(inputs.filter((tex) => tex.startsWith("(x_0;"))).toEqual([
+      "(x_0;\\ y_0) = (1.5;\\ 1.5)",
+      "(x_0;\\ y_0) = (1.5;\\ 1.5)",
+    ]);
+  });
+
+  it("shows n and the point in each cell: 9, 16, 22 for Gauss–Seidel, 14, 27, 40 for 6a", () => {
+    const html = render(
+      <ComparisonResults lab={lab6} comparison={ex4} cells={runComparison(lab6, ex4)} />,
+    );
+    const text = textOf(html);
+    for (const n of [9, 16, 22, 14, 27, 40]) expect(text).toContain(`n = ${n}`);
+    expect(text).toContain("final point (xₙ, yₙ)");
+  });
+
+  it("names (xₙ, yₙ, zₙ) in a failed tile with three unknowns", () => {
+    const failed = {
+      kind: "system" as const,
+      result: {
+        status: "error" as const,
+        result: null,
+        n: 0,
+        iterations: [{ n: 0, x: -10, y: -10, z: -10, dx: null, dy: null, dz: null }],
+        error: { code: "undefined-value" as const, n: 0, x: -10, y: -10, z: -10 },
+      },
+    };
+    const html = render(
+      <ComparisonResults
+        lab={lab6}
+        comparison={ex4}
+        cells={[
+          [failed, null, null],
+          [null, null, null],
+        ]}
+      />,
+    );
+    expect(textOf(html)).toContain("(xₙ, yₙ, zₙ) = (-10, -10, -10)");
   });
 });

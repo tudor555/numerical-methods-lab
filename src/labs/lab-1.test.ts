@@ -18,7 +18,7 @@ const preset = (id: string) => {
 };
 
 describe("registry", () => {
-  it("lists all 13 labs, Labs 1–5 ready, Lab 1 at /labs/newton", () => {
+  it("lists all 13 labs, Labs 1–6 ready, Lab 1 at /labs/newton", () => {
     expect(labs.map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(labs.filter((l) => l.status === "ready").map((l) => l.slug)).toEqual([
       "newton",
@@ -26,9 +26,9 @@ describe("registry", () => {
       "halley-chebyshev",
       "third-order",
       "newton-systems",
+      "nonlinear-systems",
     ]);
     expect(findReadyLab("newton")).toBe(lab1);
-    expect(findReadyLab("nonlinear-systems")).toBeUndefined();
     expect(findReadyLab("euler")).toBeUndefined();
     expect(new Set(labs.map((l) => l.slug)).size).toBe(13);
   });

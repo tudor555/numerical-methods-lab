@@ -79,11 +79,20 @@ describe("Lab 5 messages", () => {
     }
   });
 
-  it("states in the ex. 3 task that both starts and the three precisions are used", () => {
-    expect(en["lab5.compare.ex3.task"]).toMatch(/both starting points of ex\. 2/i);
+  it("names the system, both starts and the three precisions in the ex. 3 task", () => {
+    expect(en["lab5.compare.ex3.task"]).toContain("x² + y² = 10, √(x + y) = 2");
+    expect(en["lab5.compare.ex3.task"]).toMatch(/from \(0\.9, 3\.1\) and from \(2\.9, 1\.1\)/);
     expect(en["lab5.compare.ex3.task"]).toMatch(/three precisions/);
-    expect(ro["lab5.compare.ex3.task"]).toMatch(/ambele puncte inițiale din ex\. 2/);
+    expect(ro["lab5.compare.ex3.task"]).toContain("x² + y² = 10, √(x + y) = 2");
+    expect(ro["lab5.compare.ex3.task"]).toMatch(/din \(0,9; 3,1\) și din \(2,9; 1,1\)/);
     expect(ro["lab5.compare.ex3.task"]).toMatch(/cele trei precizii/);
+  });
+
+  it("does not send the reader back to ex. 2 in the ex. 3 comparison", () => {
+    for (const key of ["lab5.compare.ex3", "lab5.compare.ex3.task"] as const) {
+      expect(en[key]).not.toMatch(/ex\. 2/);
+      expect(ro[key]).not.toMatch(/ex\. 2/);
+    }
   });
 });
 
@@ -262,7 +271,7 @@ describe("Lab 5 runs", () => {
 
   it("plots F and G, the curves the path chart draws", () => {
     const { plot } = prepare("5a");
-    expect(plot.kind).toBe("system");
+    if (plot.kind !== "system") throw new Error("expected the curves F = 0 and G = 0");
     expect(plot.F(1, 1)).toBe(0);
     expect(plot.G(1, 1)).toBe(-4);
   });
