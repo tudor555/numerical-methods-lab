@@ -141,6 +141,8 @@ context:
 
 ## Spec Change Log
 
+- **2026-11-25, user-directed copy change (made during Lab 6, see `spec-lab-6-successive-approximations-gauss-seidel.md`).** The ex. 3 comparison sent readers back to ex. 2 ("sistemul din ex. 2", "punctele inițiale din ex. 2"). Its title and Cerința now write out x² + y² = 10, √(x + y) = 2 and the starts (0.9, 3.1) and (2.9, 1.1), in RO and EN. The rows, counts and results are unchanged.
+
 - **2026-11-23, user-directed changes after review (human renegotiation).** They amend the frozen "Table:" line and the Never clause on Labs 1–4 copy; the Lab 5 math, presets, comparison and results are unchanged.
   - **Explanation copy.** The user found the Lab 5 explanation hard to follow and asked that it not tell readers which buttons to click ("the platform needs to explain itself"). Both methods' idea, start, failure and chart texts were rewritten in RO and EN to read in order: idea → formula → what the start needs (and quadratic vs linear convergence) → stopping rule → failure → charts. No "Calculează din F/G" mention. The shared stopping rules (`common.stopping`, `common.systemStopping`, and the secant's own) were reworded in the same style for all labs; their meaning is unchanged.
   - **One status icon.** The results box showed the status icon twice (beside and inside the badge). Now only the badge shows it, in every lab.
