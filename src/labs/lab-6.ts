@@ -54,12 +54,26 @@ const base = { eps: "1e-4", maxIter: "1000" };
 
 const ex1System = { F: "sqrt((x * (y + 5) - 1) / 2)", G: "sqrt(x + 3 lg(x))" };
 
-/** Ex. 2's system x² + y² = 5, xy = 2, written as x = F, y = G once per solution it is solved near. */
+/**
+ * Ex. 2's system x² + y² = 5, xy = 2, written as x = F, y = G once per solution it is solved near.
+ * The lab gives no start: the positive forms take ex. 4's (1.5, 1.5), the negative ones its mirror,
+ * so each run starts in its own solution's quadrant.
+ */
 const ex2Forms = {
-  near21: { F: "sqrt(5 - y^2)", G: "2 / x", exact: { x: 2, y: 1 } },
-  near12: { F: "2 / y", G: "sqrt(5 - x^2)", exact: { x: 1, y: 2 } },
-  nearMinus1Minus2: { F: "2 / y", G: "-sqrt(5 - x^2)", exact: { x: -1, y: -2 } },
-  nearMinus2Minus1: { F: "-sqrt(5 - y^2)", G: "2 / x", exact: { x: -2, y: -1 } },
+  near21: { F: "sqrt(5 - y^2)", G: "2 / x", exact: { x: 2, y: 1 }, start: [1.5, 1.5] },
+  near12: { F: "2 / y", G: "sqrt(5 - x^2)", exact: { x: 1, y: 2 }, start: [1.5, 1.5] },
+  nearMinus1Minus2: {
+    F: "2 / y",
+    G: "-sqrt(5 - x^2)",
+    exact: { x: -1, y: -2 },
+    start: [-1.5, -1.5],
+  },
+  nearMinus2Minus1: {
+    F: "-sqrt(5 - y^2)",
+    G: "2 / x",
+    exact: { x: -2, y: -1 },
+    start: [-1.5, -1.5],
+  },
 } as const;
 
 const ex3System = {
@@ -149,7 +163,7 @@ const ex1Values: FieldValues = { ...ex1System, ...startValues(3.5, 2.2), ...base
 const ex2Values = (form: keyof typeof ex2Forms): FieldValues => ({
   F: ex2Forms[form].F,
   G: ex2Forms[form].G,
-  ...startValues(1.5, 1.5),
+  ...startValues(...ex2Forms[form].start),
   ...base,
 });
 const ex3Values: FieldValues = {
@@ -211,7 +225,7 @@ const ex2Preset = (id: string, form: keyof typeof ex2Forms, labelKey: Preset["la
     id,
     methodId: "6a",
     labelKey,
-    tex: startTex(1.5, 1.5),
+    tex: startTex(...ex2Forms[form].start),
     values: ex2Values(form),
   }) satisfies Preset;
 

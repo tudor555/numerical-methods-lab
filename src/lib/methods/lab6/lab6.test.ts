@@ -18,12 +18,12 @@ const system = (F: string, G: string): System => ({ F: compile(F, xy), G: compil
 
 const ex1 = system("sqrt((x * (y + 5) - 1) / 2)", "sqrt(x + 3 lg(x))");
 
-/** Ex. 2's four ways of writing x² + y² = 5, xy = 2, one per solution. */
+/** Ex. 2's four ways of writing x² + y² = 5, xy = 2, one per solution, each from its preset start. */
 const ex2 = [
-  ["near (2, 1)", system("sqrt(5 - y^2)", "2 / x"), { x: 2, y: 1 }],
-  ["near (1, 2)", system("2 / y", "sqrt(5 - x^2)"), { x: 1, y: 2 }],
-  ["near (−1, −2)", system("2 / y", "-sqrt(5 - x^2)"), { x: -1, y: -2 }],
-  ["near (−2, −1)", system("-sqrt(5 - y^2)", "2 / x"), { x: -2, y: -1 }],
+  ["near (2, 1)", system("sqrt(5 - y^2)", "2 / x"), { x: 2, y: 1 }, 1.5],
+  ["near (1, 2)", system("2 / y", "sqrt(5 - x^2)"), { x: 1, y: 2 }, 1.5],
+  ["near (−1, −2)", system("2 / y", "-sqrt(5 - x^2)"), { x: -1, y: -2 }, -1.5],
+  ["near (−2, −1)", system("-sqrt(5 - y^2)", "2 / x"), { x: -2, y: -1 }, -1.5],
 ] as const;
 const near21 = ex2[0][1];
 
@@ -52,13 +52,19 @@ describe("6a successive approximations", () => {
     expect(r.iterations[1]).not.toHaveProperty("z");
   });
 
-  it.each(ex2)("ex. 2 %s from (1.5, 1.5) reaches it within 7·10⁻⁵ in n = 14", (_, sys, root) => {
-    const r = successiveApproximations({ ...sys, x0: 1.5, y0: 1.5, eps: 1e-4, maxIter: MAX });
-    expect(r.status).toBe("converged");
-    expect(r.n).toBe(14);
-    expect(Math.abs((r.result?.x ?? 0) - root.x)).toBeLessThan(7e-5);
-    expect(Math.abs((r.result?.y ?? 0) - root.y)).toBeLessThan(7e-5);
-  });
+  it.each(ex2)(
+    "ex. 2 %s reaches it within 7·10⁻⁵ in n = 14, every step in its quadrant",
+    (_, sys, root, start) => {
+      const r = successiveApproximations({ ...sys, x0: start, y0: start, eps: 1e-4, maxIter: MAX });
+      expect(r.status).toBe("converged");
+      expect(r.n).toBe(14);
+      expect(Math.abs((r.result?.x ?? 0) - root.x)).toBeLessThan(7e-5);
+      expect(Math.abs((r.result?.y ?? 0) - root.y)).toBeLessThan(7e-5);
+      for (const { x, y } of r.iterations) {
+        expect([Math.sign(x), Math.sign(y)]).toEqual([Math.sign(root.x), Math.sign(root.y)]);
+      }
+    },
+  );
 
   it("takes both new components from the old point", () => {
     const r = successiveApproximations({ ...near21, x0: 1.5, y0: 1.5, eps: 1e-4, maxIter: MAX });

@@ -129,7 +129,7 @@ describe("Lab 6 presets", () => {
     });
   });
 
-  it("gives ex. 2 the lab's four forms, each from (1.5, 1.5)", () => {
+  it("gives ex. 2 the lab's four forms, each from a start in its solution's quadrant", () => {
     expect(
       ["ex2-near-2-1", "ex2-near-1-2", "ex2-near-minus-1-minus-2", "ex2-near-minus-2-minus-1"].map(
         (id) => {
@@ -140,8 +140,8 @@ describe("Lab 6 presets", () => {
     ).toEqual([
       ["sqrt(5 - y^2)", "2 / x", "1.5", "1.5", "1e-4"],
       ["2 / y", "sqrt(5 - x^2)", "1.5", "1.5", "1e-4"],
-      ["2 / y", "-sqrt(5 - x^2)", "1.5", "1.5", "1e-4"],
-      ["-sqrt(5 - y^2)", "2 / x", "1.5", "1.5", "1e-4"],
+      ["2 / y", "-sqrt(5 - x^2)", "-1.5", "-1.5", "1e-4"],
+      ["-sqrt(5 - y^2)", "2 / x", "-1.5", "-1.5", "1e-4"],
     ]);
   });
 
@@ -164,6 +164,7 @@ describe("Lab 6 presets", () => {
 
   it("writes each preset's tag without a point, so it reads the same in both languages", () => {
     expect(preset("ex2-near-2-1").tex).toBe("x_0 = 1.5,\\ y_0 = 1.5");
+    expect(preset("ex2-near-minus-2-minus-1").tex).toBe("x_0 = -1.5,\\ y_0 = -1.5");
     expect(preset("ex3").tex).toBe("x_0 = 10,\\ y_0 = 10,\\ z_0 = 10");
   });
 
