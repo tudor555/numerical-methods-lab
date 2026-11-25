@@ -337,7 +337,7 @@ describe("ComparisonPanel for Lab 5", () => {
   it("shows ex. 3 with its task and lists each row's system and start", () => {
     const html = render(<ComparisonPanel lab={lab5} />, "ro");
     expect(elements(html, "h3").map(textOf)).toEqual([
-      "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+      "Ex. 3: metoda lui Newton modificată pentru x² + y² = 10, √(x + y) = 2",
     ]);
     const [card] = cards(html);
     expect(textOf(card)).toContain("Cerința:");
@@ -403,7 +403,7 @@ describe("ComparisonPanel for Lab 6", () => {
   it("shows ex. 4 with its task and lists Gauss–Seidel and successive approximations", () => {
     const html = render(<ComparisonPanel lab={lab6} />, "ro");
     expect(elements(html, "h3").map(textOf)).toEqual([
-      "Ex. 4: metoda Gauss–Seidel pentru sistemul din ex. 2",
+      "Ex. 4: metoda Gauss–Seidel pentru x² + y² = 5, xy = 2",
     ]);
     const [card] = cards(html);
     expect(textOf(card)).toContain("Cerința:");

@@ -443,9 +443,9 @@ export const ro: Record<MessageKey, string> = {
   "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (0,9; 3,1)",
   "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, din (2,9; 1,1)",
 
-  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru sistemul din ex. 2",
+  "lab5.compare.ex3": "Ex. 3: metoda lui Newton modificată pentru x² + y² = 10, √(x + y) = 2",
   "lab5.compare.ex3.task":
-    "Aplică metoda lui Newton modificată sistemului din ex. 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se folosesc ambele puncte inițiale din ex. 2, fiecare cu cele trei precizii.",
+    "Aplică metoda lui Newton modificată sistemului x² + y² = 10, √(x + y) = 2 și compară rezultatul și numărul de iterații cu cele obținute prin metoda lui Newton. Se pornește din (0,9; 3,1) și din (2,9; 1,1), fiecare cu cele trei precizii.",
 
   "lab6.intro":
     "Rezolvă sisteme neliniare scrise sub forma x = F(x, y), y = G(x, y) prin metoda aproximațiilor succesive și prin metoda Gauss–Seidel, care folosește fiecare coordonată nouă imediat ce a fost calculată, pentru sisteme cu trei și cu două ecuații. Compară apoi numărul de iterații necesar celor două metode.",
@@ -494,7 +494,7 @@ export const ro: Record<MessageKey, string> = {
     "Ex. 3: 2x² − yz − 5x + 1 = 0, y² − 2x − ln z = 0, z² − xy − 2z − 8 = 0, din (10; 10; 10)",
   "lab6.preset.ex4": "Ex. 4: x² + y² = 5, xy = 2, în jurul lui (2; 1)",
 
-  "lab6.compare.ex4": "Ex. 4: metoda Gauss–Seidel pentru sistemul din ex. 2",
+  "lab6.compare.ex4": "Ex. 4: metoda Gauss–Seidel pentru x² + y² = 5, xy = 2",
   "lab6.compare.ex4.task":
-    "Aplică metoda Gauss–Seidel sistemului din ex. 2, în jurul lui (2; 1), pornind din (1,5; 1,5), și compară numărul de iterații cu cel obținut prin metoda aproximațiilor succesive. Ambele metode se aplică cu cele trei precizii.",
+    "Aplică metoda Gauss–Seidel sistemului x² + y² = 5, xy = 2, în jurul lui (2; 1), pornind din (1,5; 1,5), și compară numărul de iterații cu cel obținut prin metoda aproximațiilor succesive. Ambele metode se aplică cu cele trei precizii.",
 };

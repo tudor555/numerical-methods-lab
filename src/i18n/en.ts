@@ -437,9 +437,9 @@ export const en = {
   "lab5.preset.ex3First": "Ex. 3: x² + y² = 10, √(x + y) = 2, from (0.9, 3.1)",
   "lab5.preset.ex3Second": "Ex. 3: x² + y² = 10, √(x + y) = 2, from (2.9, 1.1)",
 
-  "lab5.compare.ex3": "Ex. 3: modified Newton on the system of ex. 2",
+  "lab5.compare.ex3": "Ex. 3: modified Newton on x² + y² = 10, √(x + y) = 2",
   "lab5.compare.ex3.task":
-    "Apply modified Newton to the system of ex. 2 and compare the result and the number of iterations with Newton's method. Both starting points of ex. 2 are used, each with three precisions.",
+    "Apply modified Newton to the system x² + y² = 10, √(x + y) = 2 and compare the result and the number of iterations with Newton's method. It starts from (0.9, 3.1) and from (2.9, 1.1), each with three precisions.",
 
   "lab6.intro":
     "Solve nonlinear systems written as x = F(x, y), y = G(x, y) with successive approximations, and with the Gauss–Seidel method, which puts each new coordinate to work as soon as it is computed, for systems of three and of two equations. Then compare the iteration counts of the two methods.",
@@ -488,9 +488,9 @@ export const en = {
     "Ex. 3: 2x² − yz − 5x + 1 = 0, y² − 2x − ln z = 0, z² − xy − 2z − 8 = 0, from (10, 10, 10)",
   "lab6.preset.ex4": "Ex. 4: x² + y² = 5, xy = 2, near (2, 1)",
 
-  "lab6.compare.ex4": "Ex. 4: Gauss–Seidel on the system of ex. 2",
+  "lab6.compare.ex4": "Ex. 4: Gauss–Seidel on x² + y² = 5, xy = 2",
   "lab6.compare.ex4.task":
-    "Apply the Gauss–Seidel method to the system of ex. 2 near (2, 1), starting from (1.5, 1.5), and compare the number of iterations with successive approximations. Both methods run with three precisions.",
+    "Apply the Gauss–Seidel method to the system x² + y² = 5, xy = 2 near (2, 1), starting from (1.5, 1.5), and compare the number of iterations with successive approximations. Both methods run with three precisions.",
 } as const;
 
 export type MessageKey = keyof typeof en;

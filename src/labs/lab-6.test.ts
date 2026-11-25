@@ -89,6 +89,15 @@ describe("Lab 6 messages", () => {
     expect(en["lab6.compare.ex4.task"]).toMatch(/three precisions/);
     expect(ro["lab6.compare.ex4.task"]).toMatch(/cele trei precizii/);
   });
+
+  it("names the system in the ex. 4 comparison instead of sending the reader back to ex. 2", () => {
+    for (const key of ["lab6.compare.ex4", "lab6.compare.ex4.task"] as const) {
+      expect(en[key]).toContain("x² + y² = 5, xy = 2");
+      expect(ro[key]).toContain("x² + y² = 5, xy = 2");
+      expect(en[key]).not.toMatch(/ex\. 2/);
+      expect(ro[key]).not.toMatch(/ex\. 2/);
+    }
+  });
 });
 
 describe("Lab 6 presets", () => {
