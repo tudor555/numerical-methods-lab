@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 import type { FunctionPlot, SystemPlot } from "@/labs/types";
-import type { ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
+import type { CauchyNodeRow, ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
 import {
+  buildCauchyErrorChart,
+  buildCauchySolutionChart,
   buildComponentsChart,
   buildConvergenceChart,
   buildFunctionChart,
   buildPathChart,
   buildSystemConvergenceChart,
   fileName,
+  nodeError,
+  seriesStyle,
   zoomRange,
   type ChartLabels,
   type ChartSpec,
@@ -38,6 +42,9 @@ const labels: ChartLabels = {
   componentX: "componentX",
   componentY: "componentY",
   componentZ: "componentZ",
+  approximation: "approximation",
+  exactSolution: "exactSolution",
+  nodeError: "nodeError",
 };
 
 interface Trace {
@@ -767,5 +774,124 @@ describe("buildSystemConvergenceChart", () => {
     ];
     const spec = buildSystemConvergenceChart(rows, 1e-4, labels);
     expect(trace(spec, "diffZ")).toMatchObject({ x: [1, 3], y: [1, 1e-6] });
+  });
+});
+
+const nodes: CauchyNodeRow[] = [
+  { i: 0, x: 0, y: 1 },
+  { i: 1, x: 0.5, y: 1.5 },
+  { i: 2, x: 1, y: 2.5 },
+];
+
+describe("buildCauchySolutionChart", () => {
+  it("draws yᵢ at the nodes, with i as hover data", () => {
+    const spec = buildCauchySolutionChart(nodes, labels);
+    expect(spec?.traces).toHaveLength(1);
+    const approximation = trace(spec, "approximation");
+    expect(approximation.x).toEqual([0, 0.5, 1]);
+    expect(approximation.y).toEqual([1, 1.5, 2.5]);
+    expect(approximation.customdata).toEqual([0, 1, 2]);
+    expect(spec?.yLog).toBeUndefined();
+  });
+
+  it("samples the exact solution at 200 points over [x₀, end], under the nodes", () => {
+    const spec = buildCauchySolutionChart(nodes, labels, (x) => x * x, 2);
+    expect(spec?.traces.map((t) => (t as Trace).name)).toEqual(["exactSolution", "approximation"]);
+    const exact = trace(spec, "exactSolution");
+    expect(exact.x).toHaveLength(200);
+    expect(exact.x[0]).toBe(0);
+    expect(exact.x[199]).toBe(2);
+    expect(exact.y[199]).toBe(4);
+  });
+
+  it("ends the exact curve at the last node by default, with gaps where y(x) is undefined", () => {
+    const spec = buildCauchySolutionChart(nodes, labels, (x) => {
+      if (x > 0.5) throw new Error("undefined");
+      return x;
+    });
+    const exact = trace(spec, "exactSolution");
+    expect(exact.x[199]).toBe(1);
+    expect(exact.y[199]).toBeNull();
+    expect(exact.y[0]).toBe(0);
+  });
+
+  it("leaves out non-finite nodes and returns null when none is left", () => {
+    const spec = buildCauchySolutionChart([...nodes, { i: 3, x: 1.5, y: Infinity }], labels);
+    expect(trace(spec, "approximation").x).toEqual([0, 0.5, 1]);
+    expect(buildCauchySolutionChart([], labels)).toBeNull();
+  });
+});
+
+describe("buildCauchyErrorChart", () => {
+  it("draws |y(xᵢ) − yᵢ| against xᵢ on a log scale from i = 1, one line per run", () => {
+    const spec = buildCauchyErrorChart(
+      [
+        { name: "h = 1/2", rows: nodes, exact: (x) => 1 + x },
+        { name: "other", rows: nodes, exact: (x) => 1 + 2 * x },
+      ],
+      labels,
+    );
+    expect(spec?.yLog).toBe(true);
+    expect(spec?.yTitle).toBe("nodeError");
+    expect(spec?.traces).toHaveLength(2);
+    // Node 1 has no error against 1 + x, so only node 2 (|2 − 2.5|) is drawn.
+    expect(trace(spec, "h = 1/2").x).toEqual([1]);
+    expect(trace(spec, "h = 1/2").y).toEqual([0.5]);
+    expect(trace(spec, "other").y).toEqual([0.5, 0.5]);
+  });
+
+  it("drops undefined errors, and returns null when no run has a positive error", () => {
+    const throwing = (x: number) => {
+      if (x === 1) throw new Error("undefined");
+      return 1 + 2 * x;
+    };
+    const spec = buildCauchyErrorChart([{ name: "a", rows: nodes, exact: throwing }], labels);
+    expect(trace(spec, "a").x).toEqual([0.5]);
+    expect(
+      buildCauchyErrorChart([{ name: "a", rows: nodes.slice(0, 1), exact: () => 5 }], labels),
+    ).toBeNull();
+  });
+});
+
+describe("buildCauchyErrorChart with many runs", () => {
+  interface StyledTrace extends Trace {
+    line: { color: string; dash?: string };
+  }
+
+  it("keeps the first three styles and gives every one of five or more runs its own line", () => {
+    const series = Array.from({ length: 8 }, (_, k) => ({
+      name: `run ${k}`,
+      rows: nodes,
+      exact: (x: number) => 2 + x,
+    }));
+    const spec = buildCauchyErrorChart(series, labels);
+    const lines = (spec?.traces as StyledTrace[]).map((t) => t.line);
+    expect(lines.slice(0, 3)).toEqual([
+      { color: "#FF6A1A", width: 2, dash: undefined },
+      { color: "#7FD1FF", width: 2, dash: undefined },
+      { color: "#F3EEE9", width: 2, dash: "dot" },
+    ]);
+    const styles = lines.map((line) => `${line.color} ${line.dash ?? "solid"}`);
+    expect(new Set(styles).size).toBe(8);
+  });
+
+  it("stays distinct for the first 15 runs", () => {
+    const styles = Array.from({ length: 15 }, (_, k) => {
+      const { color, dash } = seriesStyle(k);
+      return `${color} ${dash ?? "solid"}`;
+    });
+    expect(new Set(styles).size).toBe(15);
+  });
+});
+
+describe("nodeError", () => {
+  it("is |y(xᵢ) − yᵢ|, or null where y(x) throws or is not finite", () => {
+    expect(nodeError({ i: 1, x: 2, y: 3 }, (x) => x * 2)).toBe(1);
+    expect(nodeError({ i: 1, x: 0, y: 3 }, (x) => 1 / x)).toBeNull();
+    expect(
+      nodeError({ i: 1, x: 0, y: 3 }, () => {
+        throw new Error("undefined");
+      }),
+    ).toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, textOf } from "@/test/render";
-import { runErrorKey, StatusBadge, systemErrorKey } from "./status";
+import { cauchyErrorKey, runErrorKey, StatusBadge, systemErrorKey } from "./status";
 
 describe("StatusBadge", () => {
   it.each([
@@ -13,6 +13,7 @@ describe("StatusBadge", () => {
       "Numărul maxim de iterații a fost atins",
     ],
     ["error", "lucide-octagon-x", "text-error", "Error", "Eroare"],
+    ["completed", "lucide-circle-check", "text-success", "Completed", "Calcul încheiat"],
   ] as const)("%s has its own icon, color and text", (status, icon, color, en, ro) => {
     const html = render(<StatusBadge status={status} />);
     expect(html).toContain(icon);
@@ -31,6 +32,12 @@ describe("StatusBadge", () => {
 });
 
 describe("error message keys", () => {
+  it("uses the node wording for a Cauchy run", () => {
+    expect(cauchyErrorKey("diverged")).toBe("run.cauchyError.diverged");
+    expect(cauchyErrorKey("overflow")).toBe("run.cauchyError.overflow");
+    expect(cauchyErrorKey(undefined)).toBe("run.cauchyError.undefined-value");
+  });
+
   it("uses the shared scalar wording unless the method has its own", () => {
     expect(runErrorKey("zero-derivative")).toBe("run.error.zero-derivative");
     expect(

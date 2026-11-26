@@ -1,6 +1,6 @@
 import type { Data } from "plotly.js-dist-min";
 import type { FunctionPlot, SystemExactSolution, SystemPlot } from "@/labs/types";
-import type { ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
+import type { CauchyNodeRow, ScalarIterationRow, SystemIterationRow } from "@/lib/methods/types";
 
 /** The data for one chart. Built here without Plotly so it can be tested; PlotlyInner draws it. */
 export interface ChartSpec {
@@ -35,6 +35,9 @@ export interface ChartLabels {
   componentX: string;
   componentY: string;
   componentZ: string;
+  approximation: string;
+  exactSolution: string;
+  nodeError: string;
 }
 
 const COLORS = {
@@ -619,6 +622,123 @@ export function buildComponentsChart(
       component((r) => r.y, labels.componentY, COLORS.text, "yₙ"),
       component((r) => r.z, labels.componentZ, COLORS.secondary, "zₙ"),
     ],
+  };
+}
+
+/** Points the exact solution y(x) is sampled at between x₀ and x₀ + T. */
+const EXACT_SAMPLES = 200;
+
+/**
+ * The nodes of a Cauchy run, yᵢ against xᵢ, over the exact solution y(x) when it is known, sampled
+ * on [x₀, end] (x₀ + T for the run; the last node by default). Where y(x) is undefined the curve
+ * has a gap.
+ */
+export function buildCauchySolutionChart(
+  rows: readonly CauchyNodeRow[],
+  labels: ChartLabels,
+  exact?: (x: number) => number,
+  end?: number,
+): ChartSpec | null {
+  const points = rows.filter((r) => Number.isFinite(r.x) && Number.isFinite(r.y));
+  if (points.length === 0) return null;
+  const traces: Data[] = [];
+  if (exact) {
+    const range: [number, number] = [points[0].x, end ?? points[points.length - 1].x];
+    const curve = sample(exact, range, EXACT_SAMPLES - 1);
+    traces.push({
+      type: "scatter",
+      mode: "lines",
+      name: labels.exactSolution,
+      x: curve.xs,
+      y: curve.ys,
+      line: { color: COLORS.secondary, width: 2 },
+      hovertemplate: "x = %{x:.6g}<br>y(x) = %{y:.12g}<extra></extra>",
+    });
+  }
+  traces.push({
+    type: "scatter",
+    mode: "lines+markers",
+    name: labels.approximation,
+    x: points.map((r) => r.x),
+    y: points.map((r) => r.y),
+    customdata: points.map((r) => r.i),
+    line: { color: COLORS.accent, width: 2 },
+    marker: { color: COLORS.text, size: 6, line: { color: COLORS.accent, width: 1.5 } },
+    hovertemplate: "i = %{customdata}<br>xᵢ = %{x:.12g}<br>yᵢ = %{y:.12g}<extra></extra>",
+  });
+  return { xTitle: "x", yTitle: "y", traces };
+}
+
+/** One line of the node error chart: a run's nodes, the exact solution and the line's name. */
+export interface CauchyErrorSeries {
+  name: string;
+  rows: readonly CauchyNodeRow[];
+  exact: (x: number) => number;
+}
+
+/** |y(xᵢ) − yᵢ|, or null where y(xᵢ) is undefined or the error is not finite. */
+export function nodeError(row: CauchyNodeRow, exact: (x: number) => number): number | null {
+  try {
+    const error = Math.abs(exact(row.x) - row.y);
+    return Number.isFinite(error) ? error : null;
+  } catch {
+    return null;
+  }
+}
+
+const SERIES_COLORS = [COLORS.accent, COLORS.secondary, COLORS.text];
+/** Dashes for the second and later rounds of colors; the first round is solid, solid, dotted. */
+const ROUND_DASHES = ["dash", "dashdot", "longdash", "longdashdot"] as const;
+
+/**
+ * The color and dash of the k-th run's line, distinct for the first 15 runs (Lab 8 compares five).
+ * The third run is dotted, so a line that matches another one (7b and 7c on y + x) still shows.
+ */
+export function seriesStyle(k: number): {
+  color: string;
+  dash?: (typeof ROUND_DASHES)[number] | "dot";
+} {
+  const color = SERIES_COLORS[k % SERIES_COLORS.length];
+  const round = Math.floor(k / SERIES_COLORS.length);
+  if (round === 0) return { color, dash: k === 2 ? "dot" : undefined };
+  return { color, dash: ROUND_DASHES[(round - 1) % ROUND_DASHES.length] };
+}
+
+/**
+ * |y(xᵢ) − yᵢ| against xᵢ on a log scale, one line per run, so runs with different steps share the
+ * x axis. Node 0 (y₀ is given, so its error is 0) and any zero or undefined error are left out.
+ */
+export function buildCauchyErrorChart(
+  series: readonly CauchyErrorSeries[],
+  labels: ChartLabels,
+): ChartSpec | null {
+  const lines = series.map(({ name, rows, exact }, k) => {
+    const points = rows.flatMap((row) => {
+      const error = row.i >= 1 ? nodeError(row, exact) : null;
+      return error !== null && error > 0 ? [{ i: row.i, x: row.x, error }] : [];
+    });
+    const { color, dash } = seriesStyle(k);
+    return {
+      count: points.length,
+      trace: {
+        type: "scatter",
+        mode: "lines+markers",
+        name,
+        x: points.map((p) => p.x),
+        y: points.map((p) => p.error),
+        customdata: points.map((p) => p.i),
+        line: { color, width: 2, dash },
+        marker: { color, size: 6 },
+        hovertemplate: `${name}<br>i = %{customdata}<br>xᵢ = %{x:.6g}<br>|y(xᵢ) − yᵢ| = %{y:.3e}<extra></extra>`,
+      } satisfies Data,
+    };
+  });
+  if (lines.every((line) => line.count === 0)) return null;
+  return {
+    xTitle: "x",
+    yTitle: labels.nodeError,
+    yLog: true,
+    traces: lines.map((line) => line.trace),
   };
 }
 

@@ -36,7 +36,10 @@ function FieldLabel({ field, htmlFor }: { field: FieldDefinition; htmlFor?: stri
   return (
     <Tag htmlFor={htmlFor} className="flex flex-wrap items-baseline gap-x-2 text-base font-medium">
       <Tex tex={field.symbol} />
-      <span className="text-muted-foreground text-sm font-normal">{t(field.labelKey)}</span>
+      <span className="text-muted-foreground text-sm font-normal">
+        {t(field.labelKey)}
+        {field.kind === "expression" && field.optional && <> ({t("field.optional")})</>}
+      </span>
     </Tag>
   );
 }
