@@ -33,3 +33,24 @@ describe("CauchyNodeTable for a very long run", () => {
     expect(textOf(html)).not.toContain("Hidden nodes");
   });
 });
+
+describe("CauchyNodeTable with an exact solution", () => {
+  const rows: CauchyNodeRow[] = [
+    { i: 0, x: 0, y: 1 },
+    { i: 1, x: 1, y: 2 },
+  ];
+
+  it("shows y(xᵢ) and the error at each node", () => {
+    const trs = elements(
+      body(render(<CauchyNodeTable rows={rows} exact={(x) => x + 1.5} />)),
+      "tr",
+    );
+    expect(cells(trs[1])).toEqual(["1", "1", "2", "2.5", "5.000e-1"]);
+  });
+
+  it("puts a dash where the exact solution is undefined, such as ln x at x = 0", () => {
+    const trs = elements(body(render(<CauchyNodeTable rows={rows} exact={Math.log} />)), "tr");
+    expect(cells(trs[0]).slice(3)).toEqual(["—", "—"]);
+    expect(cells(trs[1]).slice(3)).toEqual(["0", "2.000e+0"]);
+  });
+});

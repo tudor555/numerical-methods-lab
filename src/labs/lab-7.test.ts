@@ -289,6 +289,15 @@ describe("Lab 7 comparisons", () => {
     expect(errors[2]).toBeCloseTo(0.0593, 4);
   });
 
+  it("ex. 1 has its largest error at the last node, x = 4, for every h, as its note says", () => {
+    for (const cell of runNodeComparison(lab7, comparison("ex1"))) {
+      const exact = cell?.exact;
+      if (!cell || !exact) throw new Error("no exact solution");
+      const errors = cell.result.rows.map((row) => Math.abs(exact(row.x) - row.y));
+      expect(Math.max(...errors)).toBe(errors[cell.result.n]);
+    }
+  });
+
   it("the numerical example runs all three methods with n = 10; 7b and 7c agree", () => {
     const [eulerCell, modified, heun] = runNodeComparison(lab7, comparison("example"));
     expect(eulerCell?.result.result).toBeCloseTo(3.1874849, 7);
