@@ -155,6 +155,7 @@ export const lab7: ReadyLab = {
       id: "ex1",
       titleKey: "lab7.compare.ex1",
       taskKey: "lab7.compare.ex1.task",
+      noteKey: "lab7.compare.ex1.note",
       rows: [
         { methodId: "7a", presetId: "ex1-h-1-4" },
         { methodId: "7a", presetId: "ex1-h-1-8" },

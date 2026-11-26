@@ -104,6 +104,12 @@ describe("Lab 7 messages", () => {
     expect(en["lab7.compare.example.note"]).toContain("1 + h + h²/2");
     expect(ro["lab7.compare.example.note"]).toContain("1 + h + h²/2");
   });
+
+  it("analyses ex. 1, as the lab asks: the error halves with h", () => {
+    expect(comparison("ex1").noteKey).toBe("lab7.compare.ex1.note");
+    expect(en["lab7.compare.ex1.note"]).toContain("0.239");
+    expect(ro["lab7.compare.ex1.note"]).toContain("0,239");
+  });
 });
 
 describe("Lab 7 presets", () => {

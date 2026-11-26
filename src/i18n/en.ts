@@ -566,6 +566,8 @@ export const en = {
   "lab7.compare.ex1": "Ex. 1: y′ = x² − y with h = 1/4, 1/8 and 1/16",
   "lab7.compare.ex1.task":
     "Solve y′ = x² − y, y(0) = 1 on [0, 4] with Euler's method for h = 1/4, 1/8 and 1/16, and show the exact value y = x² − 2x + 2 − e⁻ˣ, the approximation and the error at each node. The table lists the nodes all three steps share, x = 0.25, 0.5, …, 4.",
+  "lab7.compare.ex1.note":
+    "The error halves each time h is halved: at x = 4 it is about 0.239 for h = 1/4, 0.119 for h = 1/8 and 0.059 for h = 1/16. This is what an order-one method does. In all three runs the error is largest at the last node, x = 4.",
   "lab7.compare.example": "Numerical example: Euler, modified Euler and Euler–Heun on y′ = y + x",
   "lab7.compare.example.task":
     "Solve y′ = y + x, y(0) = 1 on [0, 1] with h = 0.1 by Euler's method, the modified Euler method and the Euler–Heun method, and compare the three approximations with the exact solution y = 2eˣ − x − 1 at each node.",

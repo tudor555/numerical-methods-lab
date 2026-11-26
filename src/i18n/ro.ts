@@ -572,6 +572,8 @@ export const ro: Record<MessageKey, string> = {
   "lab7.compare.ex1": "Ex. 1: y′ = x² − y cu h = 1/4, 1/8 și 1/16",
   "lab7.compare.ex1.task":
     "Rezolvă problema y′ = x² − y, y(0) = 1 pe [0; 4] prin metoda lui Euler, cu h = 1/4, 1/8 și 1/16, și afișează în fiecare nod valoarea exactă y = x² − 2x + 2 − e⁻ˣ, aproximația și eroarea. Tabelul cuprinde nodurile comune celor trei pași, x = 0,25; 0,5; …; 4.",
+  "lab7.compare.ex1.note":
+    "Eroarea scade la jumătate de fiecare dată când pasul h se înjumătățește: în x = 4 este de aproximativ 0,239 pentru h = 1/4, 0,119 pentru h = 1/8 și 0,059 pentru h = 1/16. Așa se comportă o metodă de ordinul întâi. În toate cele trei cazuri, eroarea este cea mai mare în ultimul nod, x = 4.",
   "lab7.compare.example":
     "Exemplu numeric: metoda lui Euler, metoda modificată și metoda Euler–Heun pentru y′ = y + x",
   "lab7.compare.example.task":
