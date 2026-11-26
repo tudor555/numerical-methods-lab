@@ -540,7 +540,7 @@ export const ro: Record<MessageKey, string> = {
   "lab7.method.euler.failure":
     "Dacă $f$ nu este definită într-un nod, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
   "lab7.method.euler.chart":
-    "Primul grafic desenează valorile $y_i$ în noduri, peste soluția exactă $y(x)$, dacă o introduci. Dacă soluția exactă este dată, un al doilea grafic arată, pe scară logaritmică, cum se acumulează eroarea $|y(x_i) - y_i|$ de la un nod la altul.",
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
   "lab7.method.modified.tab": "7b · Euler modificată",
   "lab7.method.modified.title": "Metoda modificată a lui Euler (metoda mid-point)",
   "lab7.method.modified.name": "Metoda modificată a lui Euler",
@@ -551,7 +551,7 @@ export const ro: Record<MessageKey, string> = {
   "lab7.method.modified.failure":
     "Dacă $f$ nu este definită într-un nod sau în punctul de mijloc $(x_{i-1} + h/2; y_{i-1} + (h/2)K)$, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
   "lab7.method.modified.chart":
-    "Primul grafic desenează valorile $y_i$ în noduri, peste soluția exactă $y(x)$, dacă o introduci. Dacă soluția exactă este dată, un al doilea grafic arată, pe scară logaritmică, cum se acumulează eroarea $|y(x_i) - y_i|$ de la un nod la altul.",
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
   "lab7.method.heun.tab": "7c · Euler–Heun",
   "lab7.method.heun.title": "Metoda Euler–Heun",
   "lab7.method.heun.name": "Metoda Euler–Heun",
@@ -562,7 +562,7 @@ export const ro: Record<MessageKey, string> = {
   "lab7.method.heun.failure":
     "Dacă $f$ nu este definită într-un nod sau în punctul estimat $(x_{i-1} + h; y_{i-1} + hK_1)$, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
   "lab7.method.heun.chart":
-    "Primul grafic desenează valorile $y_i$ în noduri, peste soluția exactă $y(x)$, dacă o introduci. Dacă soluția exactă este dată, un al doilea grafic arată, pe scară logaritmică, cum se acumulează eroarea $|y(x_i) - y_i|$ de la un nod la altul.",
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
   "lab7.preset.ex1H4": "Ex. 1: y′ = x² − y, h = 1/4",
   "lab7.preset.ex1H8": "Ex. 1: y′ = x² − y, h = 1/8",
   "lab7.preset.ex1H16": "Ex. 1: y′ = x² − y, h = 1/16",

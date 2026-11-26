@@ -534,7 +534,7 @@ export const en = {
   "lab7.method.euler.failure":
     "If $f$ is undefined at a node, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
   "lab7.method.euler.chart":
-    "The first chart draws $y_i$ at the nodes, over the exact solution $y(x)$ when you enter it. With the exact solution, a second chart shows, on a log scale, how the error $|y(x_i) - y_i|$ builds up from node to node.",
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
   "lab7.method.modified.tab": "7b · Modified Euler",
   "lab7.method.modified.title": "The modified Euler method (midpoint method)",
   "lab7.method.modified.name": "Modified Euler method",
@@ -545,7 +545,7 @@ export const en = {
   "lab7.method.modified.failure":
     "If $f$ is undefined at a node or at the midpoint $(x_{i-1} + h/2, y_{i-1} + (h/2)K)$, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
   "lab7.method.modified.chart":
-    "The first chart draws $y_i$ at the nodes, over the exact solution $y(x)$ when you enter it. With the exact solution, a second chart shows, on a log scale, how the error $|y(x_i) - y_i|$ builds up from node to node.",
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
   "lab7.method.heun.tab": "7c · Euler–Heun",
   "lab7.method.heun.title": "The Euler–Heun method",
   "lab7.method.heun.name": "Euler–Heun method",
@@ -556,7 +556,7 @@ export const en = {
   "lab7.method.heun.failure":
     "If $f$ is undefined at a node or at the predicted point $(x_{i-1} + h, y_{i-1} + hK_1)$, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
   "lab7.method.heun.chart":
-    "The first chart draws $y_i$ at the nodes, over the exact solution $y(x)$ when you enter it. With the exact solution, a second chart shows, on a log scale, how the error $|y(x_i) - y_i|$ builds up from node to node.",
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
   "lab7.preset.ex1H4": "Ex. 1: y′ = x² − y, h = 1/4",
   "lab7.preset.ex1H8": "Ex. 1: y′ = x² − y, h = 1/8",
   "lab7.preset.ex1H16": "Ex. 1: y′ = x² − y, h = 1/16",
