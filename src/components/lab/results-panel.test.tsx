@@ -5,18 +5,28 @@ import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
 import { lab6 } from "@/labs/lab-6";
+import { lab7 } from "@/labs/lab-7";
 import { toRunView, type RunView } from "@/labs/lab-state";
 import type { FieldValues } from "@/labs/types";
 import { formatValue } from "@/lib/format";
 import { count, elements, render, texOf, textOf } from "@/test/render";
-import { scalarView, systemView } from "@/test/runs";
+import { cauchyView, scalarView, systemView } from "@/test/runs";
 import type { ChartSpec } from "./charts";
 import { ResultsPanel } from "./results-panel";
 
-// Plotly needs a browser: the stub renders the chart title, and the trace names as an attribute.
+// Plotly needs a browser: the stub renders the chart title, the trace names as an attribute, and
+// each trace's first and last x.
 vi.mock("./plotly-chart", () => ({
   PlotlyChart: ({ title, spec }: { title: string; spec: ChartSpec }) => (
-    <figure data-traces={spec.traces.map((t) => (t as { name?: string }).name ?? "").join("|")}>
+    <figure
+      data-traces={spec.traces.map((t) => (t as { name?: string }).name ?? "").join("|")}
+      data-spans={spec.traces
+        .map((t) => {
+          const xs = ((t as { x?: unknown[] }).x ?? []) as unknown[];
+          return `${String(xs[0])}..${String(xs[xs.length - 1])}`;
+        })
+        .join("|")}
+    >
       {title}
     </figure>
   ),
@@ -529,5 +539,117 @@ describe("ResultsPanel for Lab 6", () => {
     expect(message(html)).toMatch(
       /^Calculul s-a oprit la limita de iterații \(n = 2\), înainte ca \|xₙ − xₙ₋₁\|, \|yₙ − yₙ₋₁\| și \|zₙ − zₙ₋₁\|/,
     );
+  });
+});
+
+describe("ResultsPanel for a Cauchy problem", () => {
+  const run = (methodId: string, patch: FieldValues = {}) => {
+    const method = lab7.methods.find((m) => m.id === methodId);
+    if (!method) throw new Error(methodId);
+    const prepared = method.prepare({ ...method.defaults, ...patch });
+    if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
+    return cauchyView(toRunView(prepared.prepared));
+  };
+  const headers = (html: string) => texOf(elements(html, "thead")[0] ?? "");
+  const rowValues = (html: string) =>
+    elements(html.slice(html.indexOf("<tbody")), "tr").map((row) =>
+      elements(row, "td").map((cell) => textOf(cell)),
+    );
+  const errorTraces = (html: string) => [...html.matchAll(/data-traces="([^"]*)"/g)][1]?.[1];
+
+  it("7a ex. 1: yₙ, h, n, the exact value, the errors, both charts and the node table", () => {
+    const html = panel(run("7a"));
+    expect(html).toContain('role="status"');
+    expect(textOf(html)).toContain("Completed");
+    expect(message(html)).toBe(
+      "Computed y₁, …, yₙ at the nodes x₁, …, xₙ with the step h = 0.25 (n = 16).",
+    );
+    const tiles = stats(html);
+    expect(tiles.map((t) => t.label)).toEqual([
+      expect.stringContaining("Approximation at x₀ + T"),
+      expect.stringContaining("Step"),
+      expect.stringContaining("Number of steps"),
+      expect.stringContaining("Exact value"),
+      expect.stringContaining("Error"),
+      expect.stringContaining("Largest error at the nodes"),
+    ]);
+    expect(tiles[0].value).toMatch(/^9\.7424830/);
+    expect(tiles[1].value).toBe("0.25");
+    expect(tiles[2].value).toBe("16");
+    expect(tiles[3].value).toMatch(/^9\.98168436/);
+    expect(tiles[4].value).toBe("2.392e-1");
+    expect(tiles[5].value).toMatch(/e-1$/);
+    expect(figures(html)).toEqual([
+      "The approximate solution at the nodes",
+      "Error |y(xᵢ) − yᵢ| at the nodes, on a log scale",
+    ]);
+    expect(traceNames(html)).toEqual(["Exact solution y(x)", "Approximation yᵢ"]);
+    expect(errorTraces(html)).toBe("|y(xᵢ) − yᵢ|");
+    expect(textOf(html)).toContain("Values at the nodes");
+    expect(headers(html)).toEqual(["i", "x_i", "y_i", "y(x_i)", "|y(x_i) - y_i|"]);
+    const rows = rowValues(html);
+    expect(rows).toHaveLength(17);
+    expect(rows[0]).toEqual(["0", "0", "1", "1", "0"]);
+    expect(rows[16].slice(0, 2)).toEqual(["16", "4"]);
+  });
+
+  it("shows only yₙ, h, n, the plain table and the solution chart without an exact solution", () => {
+    const html = panel(run("7a", { ...lab7.presets[3].values, exact: "" }));
+    expect(stats(html)).toHaveLength(3);
+    expect(stats(html)[0].value).toMatch(/^3\.18748492/);
+    expect(figures(html)).toEqual(["The approximate solution at the nodes"]);
+    expect(traceNames(html)).toEqual(["Approximation yᵢ"]);
+    expect(headers(html)).toEqual(["i", "x_i", "y_i"]);
+    expect(rowValues(html)[1]).toEqual(["1", "0.1", "1.1"]);
+  });
+
+  it("names the node a step failed from, keeps row 0 and highlights it", () => {
+    const html = panel(run("7a", { f: "sqrt(y - 2)" }));
+    expect(html).toContain('role="alert"');
+    expect(message(html)).toBe(
+      "A value is undefined (NaN) in the step from node i = 0, where xᵢ = 0 and yᵢ = 1. Check the domain of f (√ of a negative number, ln of a non-positive one). The nodes computed before the error are kept below.",
+    );
+    expect(stats(html)[0].value).toBe("—");
+    expect(stats(html)[4].value).toBe("—");
+    // The exact curve still covers [x₀, x₀ + T] = [0, 4], though only node 0 was computed.
+    expect(traceNames(html)).toEqual(["Exact solution y(x)", "Approximation yᵢ"]);
+    expect(/data-spans="([^"]*)"/.exec(html)?.[1]).toBe("0..4|0..0");
+    const rows = elements(html.slice(html.indexOf("<tbody")), "tr");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toContain("bg-error/10");
+  });
+
+  it("names the first node past 10¹⁰⁰ when the approximation blows up, in Romanian", () => {
+    const html = panel(run("7a", { f: "y^2", T: "10", n: "10", exact: "" }), "ro");
+    expect(message(html)).toMatch(
+      /^Aproximațiile cresc nemărginit: \|yᵢ\| a depășit 10¹⁰⁰ în nodul i = 9 \(xᵢ = 9, yᵢ = 1\.65506647\d*e\+104\)\. Nodurile calculate/,
+    );
+    const rows = elements(html.slice(html.indexOf("<tbody")), "tr");
+    expect(rows).toHaveLength(10);
+    expect(rows[9]).toContain("bg-error/10");
+  });
+
+  it("speaks Romanian for 7b", () => {
+    const html = panel(run("7b"), "ro");
+    expect(textOf(html)).toContain("Calcul încheiat");
+    expect(message(html)).toBe(
+      "Au fost calculate y₁, …, yₙ în nodurile x₁, …, xₙ, cu pasul h = 0.1 (n = 10).",
+    );
+    expect(stats(html).map((t) => t.label.split(" ")[0])).toEqual([
+      "Aproximația",
+      "Pasul",
+      "Numărul",
+      "Valoarea",
+      "Eroarea",
+      "Eroarea",
+    ]);
+    expect(figures(html)[0]).toBe("Soluția aproximativă în noduri");
+    expect(textOf(html)).toContain("Valorile în noduri");
+  });
+
+  it("shows a dash for y(xᵢ) where the exact solution is undefined", () => {
+    const html = panel(run("7a", { ...lab7.presets[3].values, exact: "sqrt(0.5 - x)" }));
+    expect(rowValues(html)[10].slice(3)).toEqual(["—", "—"]);
+    expect(stats(html)[3].value).toBe("—");
   });
 });

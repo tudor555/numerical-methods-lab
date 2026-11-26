@@ -57,9 +57,16 @@ describe("/labs/[slug]", () => {
     expect(html).toContain('id="field-y0"');
   });
 
+  it("renders the lab page for the ready Cauchy-problem lab /labs/euler", async () => {
+    const html = render(await LabRoute(props("euler")));
+    expect(textOf(html)).toContain("Euler-type methods");
+    expect(html).toContain('id="field-f"');
+    expect(html).toContain('id="field-exact"');
+  });
+
   it.each([
     ["an unknown slug", "nope"],
-    ["a lab that is not built yet", "euler"],
+    ["a lab that is not built yet", "runge-kutta-2-3"],
   ])("calls notFound() for %s", async (_, slug) => {
     const { notFound } = await import("next/navigation");
     vi.mocked(notFound).mockClear();
@@ -119,6 +126,18 @@ describe("/labs/[slug] metadata", () => {
     });
   });
 
+  it("names Lab 7 in its metadata, in both languages", async () => {
+    await expect(generateMetadata(props("euler"))).resolves.toEqual({
+      title: "Lab 7: Euler-type methods",
+      description: "Euler, modified Euler and Euler–Heun for y′ = f(x, y)",
+    });
+    cookieJar.set(LANG_COOKIE, "ro");
+    await expect(generateMetadata(props("euler"))).resolves.toEqual({
+      title: "Laboratorul 7: Metode de tip Euler",
+      description: "Metoda lui Euler, Euler modificată și Euler–Heun pentru y′ = f(x, y)",
+    });
+  });
+
   it("is in Romanian when the language cookie is ro", async () => {
     cookieJar.set(LANG_COOKIE, "ro");
     await expect(generateMetadata(props("newton"))).resolves.toEqual({
@@ -128,6 +147,6 @@ describe("/labs/[slug] metadata", () => {
   });
 
   it("is empty for a slug that is not a ready lab", async () => {
-    await expect(generateMetadata(props("euler"))).resolves.toEqual({});
+    await expect(generateMetadata(props("runge-kutta-2-3"))).resolves.toEqual({});
   });
 });

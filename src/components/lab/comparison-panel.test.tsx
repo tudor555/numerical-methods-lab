@@ -1,14 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { lab1 } from "@/labs/lab-1";
 import { lab2 } from "@/labs/lab-2";
 import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
 import { lab6 } from "@/labs/lab-6";
-import { runComparison } from "@/labs/compare";
+import { lab7 } from "@/labs/lab-7";
+import { runComparison, runNodeComparison, type NodeComparisonCell } from "@/labs/compare";
+import type { NodeComparison } from "@/labs/types";
 import type { ScalarRunResult } from "@/lib/methods/types";
 import { count, elements, render, texOf, textOf } from "@/test/render";
-import { ComparisonPanel, ComparisonResults } from "./comparison-panel";
+
+vi.mock("./plotly-chart", () => ({
+  PlotlyChart: ({ title, spec }: { title: string; spec: { traces: { name?: string }[] } }) => (
+    <figure data-traces={spec.traces.map((t) => t.name ?? "").join("|")}>{title}</figure>
+  ),
+}));
+import {
+  ComparisonPanel,
+  ComparisonResults,
+  NodeComparisonResults,
+  sharedNodes,
+} from "./comparison-panel";
 
 const cards = (html: string) =>
   html.split('<div class="border-border bg-card flex min-w-0 flex-col gap-4').slice(1);
@@ -451,5 +464,146 @@ describe("ComparisonPanel for Lab 6", () => {
       />,
     );
     expect(textOf(html)).toContain("(xₙ, yₙ, zₙ) = (-10, -10, -10)");
+  });
+});
+
+describe("ComparisonPanel for Lab 7", () => {
+  const nodeComparison = (id: string): NodeComparison => {
+    const found = lab7.comparisons.find((c) => c.id === id);
+    if (found?.kind !== "nodes") throw new Error(id);
+    return found;
+  };
+  const results = (id: string, lang: "en" | "ro" = "en") =>
+    render(
+      <NodeComparisonResults
+        lab={lab7}
+        comparison={nodeComparison(id)}
+        cells={runNodeComparison(lab7, nodeComparison(id))}
+      />,
+      lang,
+    );
+  const bodyRows = (html: string) => elements(html.slice(html.indexOf("<tbody")), "tr");
+  const cellTexts = (row: string) => elements(row, "td").map((cell) => textOf(cell));
+
+  it("shows ex. 1, then the numerical example, each with its task and inputs, but no precision", () => {
+    const html = render(<ComparisonPanel lab={lab7} />, "ro");
+    expect(elements(html, "h3").map(textOf)).toEqual([
+      "Ex. 1: y′ = x² − y cu h = 1/4, 1/8 și 1/16",
+      "Exemplu numeric: metoda lui Euler, metoda modificată și metoda Euler–Heun pentru y′ = y + x",
+    ]);
+    const [ex1, example] = cards(html);
+    for (const card of [ex1, example]) {
+      expect(textOf(card)).toContain("Cerința:");
+      expect(textOf(card)).not.toContain("Precizia");
+      expect(elements(card, "button")).toHaveLength(1);
+    }
+    expect(elements(ex1, "dt").map(textOf)).toEqual([
+      "Metoda lui Euler",
+      "Metoda lui Euler",
+      "Metoda lui Euler",
+    ]);
+    expect(elements(example, "dt").map(textOf)).toEqual([
+      "Metoda lui Euler",
+      "Metoda modificată a lui Euler",
+      "Metoda Euler–Heun",
+    ]);
+    expect(texOf(ex1).filter((tex) => tex.startsWith("n = "))).toEqual([
+      "n = 16",
+      "n = 32",
+      "n = 64",
+    ]);
+    expect(texOf(ex1)).toContain("(x_0;\\ y_0) = (0;\\ 1)");
+  });
+
+  it("ex. 1 reads the three runs at the 16 nodes they share, with the exact value", () => {
+    const html = results("ex1");
+    const headers = elements(elements(html, "thead")[0], "th");
+    expect(headers.map((h) => texOf(h)[0])).toEqual([
+      "x_i",
+      "y(x_i)",
+      "h = \\frac{1}{4},\\ n = 16",
+      "h = \\frac{1}{8},\\ n = 32",
+      "h = \\frac{1}{16},\\ n = 64",
+    ]);
+    const rows = bodyRows(html);
+    expect(rows).toHaveLength(16);
+    expect(cellTexts(rows[0]).slice(0, 1)).toEqual(["0.25"]);
+    const last = cellTexts(rows[15]);
+    expect(last[0]).toBe("4");
+    expect(last[1]).toMatch(/^9\.98168436/);
+    expect(last[2]).toMatch(/^9\.74248305\d*2\.392e-1$/);
+    expect(last[3]).toMatch(/1\.189e-1$/);
+    expect(last[4]).toMatch(/5\.926e-2$/);
+  });
+
+  it("ex. 1 charts the three errors against x and explains the table", () => {
+    const html = results("ex1");
+    expect(elements(html, "figure").map(textOf)).toEqual([
+      "Error |y(xᵢ) − yᵢ| at the nodes, on a log scale",
+    ]);
+    expect(textOf(/data-traces="([^"]*)"/.exec(html)?.[1] ?? "")).toBe(
+      "Euler's method, h = 0.25|Euler's method, h = 0.125|Euler's method, h = 0.0625",
+    );
+    expect(textOf(html)).toContain("Each row is a node xᵢ");
+    expect(textOf(html)).not.toContain("1 + h + h²/2");
+  });
+
+  it("the numerical example shows every method's yᵢ and error at x₁…x₁₀, and why 7b and 7c match", () => {
+    const html = results("example", "ro");
+    const rows = bodyRows(html);
+    expect(rows).toHaveLength(10);
+    const [x, exact, euler, modified, heun] = cellTexts(rows[0]);
+    expect([x, exact]).toEqual(["0.1", expect.stringMatching(/^1\.110341836/)]);
+    expect(euler).toMatch(/^1\.1/);
+    // y₁ = 1.11 over its error 3.418e-4, stacked in one cell.
+    expect(modified).toBe("1.113.418e-4");
+    expect(heun).toBe(modified);
+    expect(cellTexts(rows[9])[3]).toMatch(/^3\.4281616932\d*8\.402e-3$/);
+    expect(textOf(html)).toContain("Fiecare rând este un nod xᵢ");
+    expect(textOf(html)).toContain("1 + h + h²/2");
+  });
+
+  it("shows a dash where a run has no node, and leaves out the exact column and chart without y(x)", () => {
+    const [first] = runNodeComparison(lab7, nodeComparison("example"));
+    if (!first) throw new Error("no run");
+    const cells: NodeComparisonCell[] = [
+      { result: first.result },
+      null,
+      {
+        result: {
+          ...first.result,
+          status: "error",
+          result: null,
+          rows: first.result.rows.slice(0, 3),
+        },
+      },
+    ];
+    const html = render(
+      <NodeComparisonResults lab={lab7} comparison={nodeComparison("example")} cells={cells} />,
+    );
+    const headers = elements(elements(html, "thead")[0], "th").map((h) => texOf(h)[0]);
+    expect(headers[1]).not.toBe("y(x_i)");
+    expect(elements(html, "figure")).toHaveLength(0);
+    const rows = bodyRows(html);
+    expect(cellTexts(rows[0])).toEqual(["0.1", "1.1", "—", "1.1"]);
+    expect(cellTexts(rows[5])[3]).toBe("—");
+  });
+});
+
+describe("sharedNodes", () => {
+  it("is empty without a run, and skips a run whose steps do not divide evenly", () => {
+    expect(sharedNodes([null])).toEqual([]);
+    const run = (n: number) => ({
+      result: {
+        status: "completed" as const,
+        result: 1,
+        n,
+        h: 1 / n,
+        rows: Array.from({ length: n + 1 }, (_, i) => ({ i, x: i / n, y: i })),
+      },
+    });
+    const nodes = sharedNodes([run(2), run(3), run(4)]);
+    expect(nodes.map((node) => node.x)).toEqual([0.5, 1]);
+    expect(nodes[1].values.map((row) => row?.i ?? null)).toEqual([2, null, 4]);
   });
 });
