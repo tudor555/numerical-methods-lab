@@ -101,7 +101,7 @@ Uses the shared node rules for the Cauchy problem.
 
 Examples (show exact value, approximation and error at each node). The exact solution is an optional input y(x); the presets fill it with the lab's solution, and a blank field leaves out the exact value, the error and the error chart.
 
-1. 7a: y′ = x² − y, y(0) = 1, x ∈ [0, 4], h ∈ {1/4, 1/8, 1/16} (n = 16, 32, 64; one preset each). Exact y = x² − 2x + 2 − e⁻ˣ. y₁₆ = 9.7424831, y₃₂ = 9.8628026, y₆₄ = 9.9224293; the error at x = 4 is 0.2392 / 0.1189 / 0.0593. Compared as one card at the nodes the three runs share, x = 0.25, 0.5, …, 4.
+1. 7a: y′ = x² − y, y(0) = 1, x ∈ [0, 4], h ∈ {1/4, 1/8, 1/16} (n = 16, 32, 64; one preset each). Exact y = x² − 2x + 2 − e⁻ˣ. y₁₆ = 9.7424831, y₃₂ = 9.8628026, y₆₄ = 9.9224293; the error at x = 4 is 0.2392 / 0.1189 / 0.0593. Compared as one card at the nodes the three runs share, x = 0.25, 0.5, …, 4; the card's note gives the analysis the lab asks for: the error halves with h, as an order-one method should, and is largest at x = 4 for every h.
 2. 7a: y′ = y + x, y(0) = 1, x ∈ [0, 1], h = 0.1 (n = 10). Exact y = 2eˣ − x − 1. y₁ = 1.1, y₁₀ = 3.1874849, error 0.2490787.
 
 Numerical example (7b and 7c, unnumbered in the lab): the problem of ex. 2. Both give y₁ = 1.11, y₁₀ = 3.4281617, error 0.0084020; on this linear f every two-stage second-order method gives the same yᵢ. Its last request, comparing all three methods, is one card: 7a ex. 2, 7b and 7c at x₁ … x₁₀, with the exact value.

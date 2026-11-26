@@ -85,7 +85,7 @@ context:
 
 **Ids and keys**
 
-- Methods `lab7.method.{euler,modified,heun}.{tab,title,name,idea,steps,failure,chart}`; `lab7.intro`; keep `lab7.title`, `lab7.topic`; presets `lab7.preset.{ex1H4,ex1H8,ex1H16,ex2,exampleModified,exampleHeun}`; `lab7.compare.{ex1,example}` + `.task`. Shared: `result.status.completed`, `result.cauchy.completed` ("y computed at the n nodes with h = …"), `result.{stepH,steps,valueAtEnd,maxError}`, `run.cauchyError.*`, `table.node`, `chart.{cauchySolution,cauchyError}`.
+- Methods `lab7.method.{euler,modified,heun}.{tab,title,name,idea,steps,failure,chart}`; `lab7.intro`; keep `lab7.title`, `lab7.topic`; presets `lab7.preset.{ex1H4,ex1H8,ex1H16,ex2,exampleModified,exampleHeun}`; `lab7.compare.{ex1,example}` + `.task` + `.note`. Shared: `result.status.completed`, `result.cauchy.completed` ("y computed at the n nodes with h = …"), `result.{stepH,steps,valueAtEnd,maxError}`, `run.cauchyError.*`, `table.node`, `chart.{cauchySolution,cauchyError}`.
 
 **Tests to update** (Lab 7 ready, Lab 8 `runge-kutta-2-3` the unbuilt example): `src/labs/lab-1.test.ts:32`, `src/app/labs/[slug]/page.test.tsx:62,131`, `src/components/lab/lab-page.test.tsx:100`, `src/components/hub.test.tsx`, `charts.test.ts`, `results-panel.test.tsx`, `comparison-panel.test.tsx`, `compare.test.ts`, `fields.test.ts`, `i18n.test.ts` (key parity, KaTeX parse).
 
@@ -114,11 +114,24 @@ context:
 - For y′ = y + x, 7b and 7c give the same yᵢ (every two-stage second-order method does on this linear f): 1 + h + h²/2 per step on y + x + 1. The comparison hint says so, so matching columns don't look like a bug. Tests compare them with `toBeCloseTo`, not `toBe`.
 - `CauchyRunResult` also carries `h`, so the tiles and the chart range (x₀ + n·h) need no second source.
 - `runNodeComparison` returns `{ result, exact? } | null` per row instead of a bare `CauchyRunResult`: the node table's y(xᵢ) column needs the exact solution the preset gives, and the method layer must not know it.
-- `NodeComparison` has `eps?: never` and an optional `noteKey`. The first keeps `comparison.eps` readable on the union in the Lab 1–6 tests; the second carries the 7b = 7c remark (`lab7.compare.example.note`) only on the numerical example's card, since `compare.nodesHint` is shared with ex. 1 and Labs 8–9. `runComparison` throws for a node comparison.
+- `NodeComparison` has `eps?: never` and an optional `noteKey`. The first keeps `comparison.eps` readable on the union in the Lab 1–6 tests; the second carries a card's own remark, since `compare.nodesHint` is shared with Labs 8–9: the 7b = 7c remark on the numerical example (`lab7.compare.example.note`) and, added after delivery, ex. 1's analysis (`lab7.compare.ex1.note`). `runComparison` throws for a node comparison.
 - Keys beyond the Code Map: `result.cauchy.partial` ("The nodes computed before the error are kept below"), `table.hiddenNodes`, `field.optional`, `lab7.compare.example.note`.
 - The node comparison's error chart names each line "method, h = …" in plain text, since a Plotly legend can't show the preset's TeX tag; the third line is dotted so 7c stays visible on top of 7b.
 - Ex. 2's error at x = 1 is 0.24907874, so it rounds to 0.2490787; the matrix's 0.2490788 is the difference of the two rounded values. Tests check it to 6 decimals.
 - Adding the `cauchy` kind to `PreparedRun` made `run().iterations` and `.plot` unreadable on the union in a few Lab 1–4 tests; they now narrow with `scalarRun` (no behavior change).
+
+- Ex. 1 ends with "Să se analizeze rezultatele obținute". The `ex1` card's note answers it with the numbers the tests lock: at x = 4 the error is 0.239 / 0.119 / 0.059, halving with h as an order-one method does, and every run's largest error is at x = 4. Missed in the first delivery; found by a line-by-line check against the lab PDF.
+
+## Changes After Delivery
+
+Made on user feedback after the review, 2026-11-26. Each is its own commit.
+
+| Commit    | Change                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `d369ea2` | `lab7.method.*.chart` rewritten in short sentences, one idea each: what the first chart shows, when the exact curve and the error chart appear, and why the error axis is logarithmic (so very small errors stay visible). The user found the earlier text hard to read.                                                                                                                                                                             |
+| `fb8afca` | Charts no longer widen the page while the window resizes. Cause: Plotly redraws a chart a beat after its box changes size, so during a drag the SVG keeps its old width; a headless drag from 1366 to 400 px overflowed in 64 of 81 frames, by up to 491 px. The chart box and its card now clip (`overflow-hidden`); the same drag gives 0 frames. Shared component, so Labs 1–6 get the fix too. Not a cache issue: the app has no service worker. |
+| `e9de8d8` | The `ex1` comparison card gets the analysis note above (EN/RO) and a test for its key and numbers.                                                                                                                                                                                                                                                                                                                                                   |
+| `dc10256` | Tests for gaps found by a coverage run: an exact solution undefined at a node (ln x at x = 0) shows "—" for y(xᵢ) and the error; the chart card's clip classes; ex. 1's largest error at x = 4 for every h, as its note says.                                                                                                                                                                                                                        |
 
 ## Review Triage Log
 
@@ -163,3 +176,10 @@ Review pass 1 (2026-11-26; blind = B, edge-case = E, verification-gap = VG).
 **Results after review pass 1 (2026-11-26):**
 
 - Six patches applied (triage rows 6, 10, 12–15); `bun run typecheck` clean; `bun run test` 44 files, 984 tests pass; `bun run format:check` clean; `bun run build` succeeds. Nothing deferred. The browser checks are still open.
+
+**Results after the changes after delivery (2026-11-26):**
+
+- `bun run typecheck` clean; `bun run test` 45 files, 989 tests pass; `bun run format:check` clean; `bun run build` succeeds.
+- Coverage (v8) of the files this branch touches: lines and branches 100% in `cauchy.ts`, `lab7/euler.ts`, `lab-7.ts`, `fields.ts`, `shared-fields.ts`, `lab-state.ts`; `compare.ts` 100% lines. Left uncovered by design: `plotly-inner.tsx` (needs a browser; tests render to static HTML in Node) and the "Show all" click (state change, no DOM in tests).
+- Browser checks, headless Chromium against the dev server: every page and lab, after running all presets and comparisons, at 10 widths from 320 to 1366 px in EN and RO, has no horizontal overflow; the Lab 7 solution, error and comparison charts render on desktop and phone (screenshots checked). Still open: a real browser with always-visible scrollbars, where the user saw the scroll persist after a hard reload; the headless browser has overlay scrollbars, so that case could not be reproduced.
+- Dependencies: `next` 16.4.5 and `react` 19.3.0 have no GitHub advisories. `next` 16.4.6 (2026-11-09) and `react` 19.3.1 are bug-fix releases with no security notes. `bun audit`: one moderate advisory in `minimatch`, pulled in by the `shadcn` CLI (dev-only, not shipped to the browser).
