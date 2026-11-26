@@ -11,7 +11,7 @@ const PlotlyInner = dynamic(() => import("./plotly-inner"), {
 
 export function PlotlyChart({ title, spec }: { title: string; spec: ChartSpec }) {
   return (
-    <figure className="border-border bg-card min-w-0 rounded-xl border p-4">
+    <figure className="border-border bg-card min-w-0 overflow-hidden rounded-xl border p-4">
       <PlotlyInner title={title} spec={spec} />
     </figure>
   );
