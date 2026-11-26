@@ -1,7 +1,7 @@
 import type { ParsedFields } from "./fields";
 import type { ExplanationBlock, FieldDefinition, FieldValues, NumberField } from "./types";
 
-// Form fields and checks shared by the labs that solve f(x) = 0.
+// Form fields and checks shared by the labs.
 
 export const X = ["x"] as const;
 
@@ -115,6 +115,46 @@ export const maxIterField: FieldDefinition = {
 
 /** The precisions the labs' comparisons run over: ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}. */
 export const EPS_SET = [1e-4, 1e-8, 1e-12] as const;
+
+// Form fields shared by the Cauchy-problem labs (7–9): y′ = f(x, y), y(x₀) = y₀ on [x₀, x₀ + T].
+
+/** Most steps n a Cauchy run may take: runs are synchronous, and a table of 10⁴ nodes stays usable. */
+export const NODE_LIMIT = 10000;
+
+/** The lab's inputs x₀, y₀, T, n and f, then the optional exact solution y(x). */
+export const cauchyFields: readonly FieldDefinition[] = [
+  { id: "x0", kind: "number", symbol: "x_0", labelKey: "field.cauchyX0", rule: valueRule },
+  {
+    id: "y0",
+    kind: "number",
+    symbol: "y_0 = y(x_0)",
+    labelKey: "field.cauchyY0",
+    rule: valueRule,
+  },
+  {
+    id: "T",
+    kind: "number",
+    symbol: "T",
+    labelKey: "field.T",
+    rule: { positive: true, max: VALUE_LIMIT },
+  },
+  {
+    id: "n",
+    kind: "number",
+    symbol: "n",
+    labelKey: "field.steps",
+    rule: { integer: true, min: 1, max: NODE_LIMIT },
+  },
+  { id: "f", kind: "expression", symbol: "f(x, y)", labelKey: "field.fxy", variables: XY },
+  {
+    id: "exact",
+    kind: "expression",
+    symbol: "y(x)",
+    labelKey: "field.exactY",
+    variables: X,
+    optional: true,
+  },
+];
 
 /** Adds the "b must be greater than a" error when both ends parsed. */
 export function checkInterval({ numbers, errors }: ParsedFields): void {

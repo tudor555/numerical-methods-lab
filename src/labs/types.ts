@@ -1,5 +1,10 @@
 import type { MessageKey } from "@/i18n/en";
-import type { ScalarErrorCode, ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
+import type {
+  CauchyRunResult,
+  ScalarErrorCode,
+  ScalarRunResult,
+  SystemRunResult,
+} from "@/lib/methods/types";
 
 /** Raw text of every form field, keyed by field id. */
 export type FieldValues = Record<string, string>;
@@ -31,6 +36,8 @@ export interface NumberField extends FieldBase {
 export interface ExpressionField extends FieldBase {
   kind: "expression";
   variables: readonly string[];
+  /** A blank optional field is skipped instead of rejected, like the exact solution y(x). */
+  optional?: true;
   /**
    * "Derive from f": the symbolic derivative of field `from`, of the given order (default 1), in
    * `variable` (default: the source's first variable, as ∂F/∂y needs y).
@@ -114,7 +121,15 @@ export interface SystemPreparedRun {
   exact?: SystemExactSolution;
 }
 
-export type PreparedRun = ScalarPreparedRun | SystemPreparedRun;
+/** A run that computes y at the nodes of a Cauchy problem y′ = f(x, y), y(x₀) = y₀. */
+export interface CauchyPreparedRun {
+  kind: "cauchy";
+  run: () => CauchyRunResult;
+  /** The exact solution y(x), when the user gives one; it may throw where it is undefined. */
+  exact?: (x: number) => number;
+}
+
+export type PreparedRun = ScalarPreparedRun | SystemPreparedRun | CauchyPreparedRun;
 
 export type PrepareResult =
   { ok: true; prepared: PreparedRun } | { ok: false; errors: FieldErrors };
@@ -159,15 +174,31 @@ export interface Preset extends ComparisonPreset {
   labelKey: MessageKey;
 }
 
-/** A comparison the lab asks for, in the lab's order. */
-export interface Comparison {
+interface ComparisonBase {
   id: string;
   titleKey: MessageKey;
   /** What the lab asks for here, paraphrased; shown under the title so its source is clear. */
   taskKey: MessageKey;
-  eps: readonly number[];
   rows: readonly { methodId: string; presetId: string }[];
 }
+
+/** A comparison of iteration counts, one column per ε. `kind` may be left out (Labs 1–6). */
+export interface PrecisionComparison extends ComparisonBase {
+  kind?: "precision";
+  eps: readonly number[];
+}
+
+/** A comparison of Cauchy-problem runs node by node, with the exact value and each row's error. */
+export interface NodeComparison extends ComparisonBase {
+  kind: "nodes";
+  /** No ε: the runs compute y at fixed nodes. */
+  eps?: never;
+  /** A remark shown after the hint, for a result that could otherwise look like a bug. */
+  noteKey?: MessageKey;
+}
+
+/** A comparison the lab asks for, in the lab's order. */
+export type Comparison = PrecisionComparison | NodeComparison;
 
 interface LabBase {
   number: number;

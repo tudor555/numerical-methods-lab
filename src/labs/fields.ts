@@ -61,7 +61,10 @@ export interface ParsedFields {
   errors: FieldErrors;
 }
 
-/** Parses every visible field: numbers as constant expressions, expressions with their declared variables. */
+/**
+ * Parses every visible field: numbers as constant expressions, expressions with their declared
+ * variables. A blank optional expression is left out of `functions` instead of failing.
+ */
 export function parseFields(fields: readonly FieldDefinition[], values: FieldValues): ParsedFields {
   const parsed: ParsedFields = { numbers: {}, functions: {}, choices: {}, errors: {} };
   for (const field of fields) {
@@ -77,7 +80,7 @@ export function parseFields(fields: readonly FieldDefinition[], values: FieldVal
         const issue = checkRule(field, value);
         if (issue) parsed.errors[field.id] = issue;
         else parsed.numbers[field.id] = value;
-      } else {
+      } else if (!(field.optional && raw.trim() === "")) {
         parsed.functions[field.id] = compile(raw, field.variables);
       }
     } catch (error) {
