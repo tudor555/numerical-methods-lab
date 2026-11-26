@@ -5,6 +5,7 @@ import { lab3 } from "@/labs/lab-3";
 import { lab4 } from "@/labs/lab-4";
 import { lab5 } from "@/labs/lab-5";
 import { lab6 } from "@/labs/lab-6";
+import { lab7 } from "@/labs/lab-7";
 import { elements, render, texOf, textOf } from "@/test/render";
 import { LabPage } from "./lab-page";
 
@@ -97,7 +98,9 @@ describe("LabPage", () => {
   });
 
   it("throws for a slug that is not a ready lab", () => {
-    expect(() => render(<LabPage slug="euler" />)).toThrow("Unknown lab: euler");
+    expect(() => render(<LabPage slug="runge-kutta-2-3" />)).toThrow(
+      "Unknown lab: runge-kutta-2-3",
+    );
   });
 });
 
@@ -387,5 +390,78 @@ describe("LabPage, Lab 6", () => {
     openTab.id = "6c";
     const html = render(<LabPage slug="nonlinear-systems" />);
     expect(pressedPresets(html)).toEqual(["Ex. 4: x² + y² = 5, xy = 2, near (2, 1)"]);
+  });
+});
+
+describe("LabPage, Lab 7", () => {
+  const pressedPresets = (html: string) =>
+    elements(html, "button")
+      .filter((b) => b.includes("min-h-8") && b.includes('aria-pressed="true"'))
+      .map(textOf);
+  const labelOf = (html: string, id: string) =>
+    textOf(elements(html, "label").find((l) => l.includes(`for="field-${id}"`)) ?? "");
+
+  it.each([
+    [
+      "en",
+      "Lab 7",
+      "Euler-type methods",
+      "Solve the Cauchy problem y′ = f(x, y), y(x₀) = y₀",
+      ["7a · Euler", "7b · Modified Euler", "7c · Euler–Heun"],
+      "How it works: Euler's method",
+      "Ex. 1: y′ = x² − y, h = 1/4",
+      "Exact solution (optional)",
+    ],
+    [
+      "ro",
+      "Laboratorul 7",
+      "Metode de tip Euler",
+      "Rezolvă problema Cauchy y′ = f(x, y), y(x₀) = y₀",
+      ["7a · Euler", "7b · Euler modificată", "7c · Euler–Heun"],
+      "Cum funcționează: Metoda lui Euler",
+      "Ex. 1: y′ = x² − y, h = 1/4",
+      "Soluția exactă (opțional)",
+    ],
+  ] as const)(
+    "first render in %s",
+    (lang, chip, title, intro, methodTabs, heading, preset, exactLabel) => {
+      const html = render(<LabPage slug="euler" />, lang);
+      const header = html.slice(0, html.indexOf("</header>"));
+      expect(
+        textOf(elements(header, "span").find((s) => s.includes('data-slot="badge"')) ?? ""),
+      ).toBe(chip);
+      expect(textOf(elements(header, "h1")[0])).toBe(title);
+      expect(textOf(elements(header, "p")[0])).toContain(intro);
+      expect(textOf(elements(header, "p")[0])).not.toContain(chip);
+      expect(tabs(html).map(textOf)).toEqual(methodTabs);
+      expect(textOf(elements(html, "h2")[0])).toBe(heading);
+      const fieldIds = [...html.matchAll(/id="field-([\w]+)"/g)].map((m) => m[1]);
+      expect(fieldIds).toEqual(["x0", "y0", "T", "n", "f", "exact"]);
+      expect(html).toContain('value="x^2 - y"');
+      expect(html).toContain('value="x^2 - 2x + 2 - e^(-x)"');
+      expect(labelOf(html, "exact")).toContain(exactLabel);
+      expect(labelOf(html, "f")).not.toMatch(/optional|opțional/);
+      expect(pressedPresets(html)).toEqual([preset]);
+      expect(elements(html, "h3").filter((h) => h.includes("text-balance"))).toHaveLength(
+        lab7.comparisons.length,
+      );
+    },
+  );
+
+  it("explains Euler's step and the nodes with formulas", () => {
+    const tex = texOf(render(<LabPage slug="euler" />));
+    expect(tex).toContain("y_i = y_{i-1} + h\\,f(x_{i-1}, y_{i-1}), \\quad i = 1, \\dots, n");
+    expect(tex.some((t) => t.startsWith("h = \\frac{T}{n}"))).toBe(true);
+  });
+
+  it.each([
+    ["7b", "How it works: The modified Euler method (midpoint method)", "U &= f"],
+    ["7c", "How it works: The Euler–Heun method", "K_2 &= f(x_{i-1} + h"],
+  ])("opens %s on the numerical example", (id, heading, formula) => {
+    openTab.id = id;
+    const html = render(<LabPage slug="euler" />);
+    expect(pressedPresets(html)).toEqual(["Numerical example: y′ = y + x, h = 0.1"]);
+    expect(textOf(elements(html, "h2")[0])).toBe(heading);
+    expect(texOf(html).some((tex) => tex.includes(formula))).toBe(true);
   });
 });

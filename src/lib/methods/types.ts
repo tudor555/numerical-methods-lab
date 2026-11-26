@@ -1,4 +1,8 @@
-export type RunStatus = "converged" | "max-iterations" | "error";
+/**
+ * How a run ended. `completed` is for methods with no convergence to wait for, such as the
+ * Cauchy-problem methods, which compute y at a fixed set of nodes.
+ */
+export type RunStatus = "converged" | "max-iterations" | "error" | "completed";
 
 /**
  * Why a scalar run stopped without a valid result.
@@ -111,6 +115,44 @@ export interface SystemRunResult extends RunResult<
   SystemErrorCode
 > {
   error?: SystemMethodError;
+}
+
+/** One node of a Cauchy problem: i, xᵢ = x₀ + i·h and the approximation yᵢ ≈ y(xᵢ). */
+export interface CauchyNodeRow {
+  i: number;
+  x: number;
+  y: number;
+}
+
+/** Why a Cauchy run stopped before the last node: as for scalar runs, in some yᵢ. */
+export type CauchyErrorCode = "undefined-value" | "overflow" | "diverged";
+
+/**
+ * The node a Cauchy run failed at. For `undefined-value` and `overflow` it is the last valid node,
+ * the one the failing step started from; for `diverged` it is the first node whose |yᵢ| passed
+ * {@link DIVERGENCE_LIMIT}, which is kept as a row.
+ */
+export interface CauchyMethodError {
+  code: CauchyErrorCode;
+  i: number;
+  x: number;
+  y: number;
+}
+
+/**
+ * Result of a Cauchy-problem method. `rows` holds every node computed so far, from i = 0, also
+ * when the run ends in an error.
+ */
+export interface CauchyRunResult {
+  status: "completed" | "error";
+  /** yₙ, the approximation at x₀ + T. Null when status is `error`. */
+  result: number | null;
+  /** The number of steps n asked for, so the last node is i = n. */
+  n: number;
+  /** The step h = T/n. */
+  h: number;
+  rows: CauchyNodeRow[];
+  error?: CauchyMethodError;
 }
 
 /** Thrown by a step function to stop a run with a specific error code. */

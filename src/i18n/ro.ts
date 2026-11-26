@@ -101,6 +101,13 @@ export const ro: Record<MessageKey, string> = {
   "field.F2": "Funcția F₂",
   "field.F3": "Funcția F₃",
   "field.startZ": "Punctul inițial, z",
+  "field.cauchyX0": "Punctul inițial",
+  "field.cauchyY0": "Valoarea inițială",
+  "field.T": "Lungimea intervalului",
+  "field.steps": "Numărul de pași, h = T/n",
+  "field.fxy": "Membrul drept al ecuației y′ = f(x, y)",
+  "field.exactY": "Soluția exactă",
+  "field.optional": "opțional",
 
   "field.error.empty": "Câmpul este obligatoriu.",
   "field.error.syntax": "Expresia nu este scrisă corect. Verifică operatorii și parantezele.",
@@ -147,6 +154,14 @@ export const ro: Record<MessageKey, string> = {
     "Calculul s-a oprit la limita de iterații (n = {n}), înainte ca |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| și |zₙ − zₙ₋₁| să scadă sub ε. Ultima iterație este afișată, dar nu atinge precizia dorită.",
   "result.startPoint": "Punctul inițial",
   "result.exactSolution": "Soluția exactă",
+  "result.status.completed": "Calcul încheiat",
+  "result.cauchy.completed":
+    "Au fost calculate y₁, …, yₙ în nodurile x₁, …, xₙ, cu pasul h = {h} (n = {n}).",
+  "result.cauchy.partial": "Nodurile calculate până la eroare sunt afișate mai jos.",
+  "result.stepH": "Pasul",
+  "result.steps": "Numărul de pași",
+  "result.valueAtEnd": "Aproximația în x₀ + T",
+  "result.maxError": "Eroarea maximă în noduri",
 
   "run.error.zero-derivative":
     "Derivata se anulează la n = {n}, în xₙ = {x}: tangenta este orizontală, deci xₙ₊₁ nu poate fi calculat.",
@@ -171,10 +186,18 @@ export const ro: Record<MessageKey, string> = {
     "La pasul care pornește din n = {n}, (xₙ; yₙ; zₙ) = {point}, o valoare a devenit infinită (±∞).",
   "run.system3Error.diverged":
     "Șirul iterațiilor diverge: la n = {n}, în (xₙ; yₙ; zₙ) = {point}, |xₙ|, |yₙ| sau |zₙ| a depășit 10¹⁰⁰.",
+  "run.cauchyError.undefined-value":
+    "La pasul care pornește din nodul i = {i}, cu xᵢ = {x} și yᵢ = {y}, o valoare nu este definită (NaN). Verifică domeniul de definiție al lui f (radical dintr-un număr negativ, logaritm dintr-un număr nepozitiv).",
+  "run.cauchyError.overflow":
+    "La pasul care pornește din nodul i = {i}, cu xᵢ = {x} și yᵢ = {y}, o valoare a devenit infinită (±∞).",
+  "run.cauchyError.diverged":
+    "Aproximațiile cresc nemărginit: |yᵢ| a depășit 10¹⁰⁰ în nodul i = {i} (xᵢ = {x}, yᵢ = {y}).",
 
   "table.title": "Tabelul iterațiilor",
   "table.hidden": "Iterații ascunse: {count}",
   "table.showAll": "Arată toate",
+  "table.hiddenNodes": "Noduri ascunse: {count}",
+  "table.node": "Valorile în noduri",
 
   "chart.tangent": "Graficul lui f și tangentele succesive",
   "chart.secant": "Graficul lui f și secantele succesive",
@@ -190,6 +213,8 @@ export const ro: Record<MessageKey, string> = {
   "chart.components": "xₙ, yₙ și zₙ la fiecare iterație",
   "chart.system3Convergence":
     "Convergența: |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| și |zₙ − zₙ₋₁| pe scară logaritmică",
+  "chart.cauchySolution": "Soluția aproximativă în noduri",
+  "chart.cauchyError": "Eroarea |y(xᵢ) − yᵢ| în noduri, pe scară logaritmică",
   "chart.toolbar": "Instrumente pentru grafic",
   "chart.tool.zoom": "Mărește o zonă",
   "chart.tool.pan": "Deplasează graficul",
@@ -221,6 +246,9 @@ export const ro: Record<MessageKey, string> = {
   "chart.trace.componentX": "xₙ",
   "chart.trace.componentY": "yₙ",
   "chart.trace.componentZ": "zₙ",
+  "chart.trace.approximation": "Aproximația yᵢ",
+  "chart.trace.exactSolution": "Soluția exactă y(x)",
+  "chart.trace.nodeError": "|y(xᵢ) − yᵢ|",
 
   "compare.run": "Compară",
   "compare.method": "Metoda",
@@ -230,6 +258,8 @@ export const ro: Record<MessageKey, string> = {
   "compare.cell.max": "Limită atinsă",
   "compare.inputs": "Date de intrare",
   "compare.precisions": "Precizia",
+  "compare.nodesHint":
+    "Fiecare rând este un nod xᵢ: valoarea exactă y(xᵢ), apoi, pentru fiecare calcul, yᵢ și, sub ea, eroarea |y(xᵢ) − yᵢ|.",
 
   "lab1.intro":
     "Rezolvă ecuația f(x) = 0 prin metoda tangentei a lui Newton, calculează rădăcinile de ordinul k folosind aceeași idee și compară rezultatele cu cele obținute prin metoda aproximațiilor succesive.",
@@ -497,4 +527,57 @@ export const ro: Record<MessageKey, string> = {
   "lab6.compare.ex4": "Ex. 4: metoda Gauss–Seidel pentru x² + y² = 5, xy = 2",
   "lab6.compare.ex4.task":
     "Aplică metoda Gauss–Seidel sistemului x² + y² = 5, xy = 2, în jurul lui (2; 1), pornind din (1,5; 1,5), și compară numărul de iterații cu cel obținut prin metoda aproximațiilor succesive. Ambele metode se aplică cu cele trei precizii.",
+
+  "lab7.intro":
+    "Rezolvă problema Cauchy y′ = f(x, y), y(x₀) = y₀ pas cu pas, în noduri echidistante, prin metoda lui Euler, metoda modificată a lui Euler (metoda mid-point) și metoda Euler–Heun. Compară apoi aproximațiile cu soluția exactă, nod cu nod.",
+  "lab7.method.euler.tab": "7a · Euler",
+  "lab7.method.euler.title": "Metoda lui Euler",
+  "lab7.method.euler.name": "Metoda lui Euler",
+  "lab7.method.euler.idea":
+    "Din nodul $(x_{i-1}; y_{i-1})$, soluția este urmărită de-a lungul tangentei. Panta ei în acest punct este $f(x_{i-1}, y_{i-1})$, iar un pas de lungime $h$ pe tangentă dă $y_i$:",
+  "lab7.method.euler.steps":
+    "Intervalul $[x_0; x_0 + T]$ se împarte în $n$ pași egali, iar formula se aplică pentru $i = 1, \\dots, n$, pornind de la $y_0 = y(x_0)$. Se afișează $y_1, \\dots, y_n$, aproximațiile valorilor $y(x_1), \\dots, y(x_n)$. Un pas costă o singură valoare a lui $f$, iar metoda este de ordinul întâi: dacă pasul $h$ se înjumătățește, eroarea într-un punct $x$ dat scade cam la jumătate.",
+  "lab7.method.euler.failure":
+    "Dacă $f$ nu este definită într-un nod, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
+  "lab7.method.euler.chart":
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
+  "lab7.method.modified.tab": "7b · Euler modificată",
+  "lab7.method.modified.title": "Metoda modificată a lui Euler (metoda mid-point)",
+  "lab7.method.modified.name": "Metoda modificată a lui Euler",
+  "lab7.method.modified.idea":
+    "Metoda lui Euler folosește doar panta de la începutul pasului. Metoda modificată face mai întâi o jumătate de pas pe această pantă, până la mijlocul $x_{i-1} + h/2$, apoi folosește panta $U$ găsită acolo pentru întregul pas:",
+  "lab7.method.modified.steps":
+    "Ca la metoda lui Euler, intervalul $[x_0; x_0 + T]$ se împarte în $n$ pași egali, iar pasul se aplică pentru $i = 1, \\dots, n$, pornind de la $y_0 = y(x_0)$. Un pas costă două valori ale lui $f$, iar metoda este de ordinul doi: dacă pasul $h$ se înjumătățește, eroarea scade de aproximativ patru ori.",
+  "lab7.method.modified.failure":
+    "Dacă $f$ nu este definită într-un nod sau în punctul de mijloc $(x_{i-1} + h/2; y_{i-1} + (h/2)K)$, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
+  "lab7.method.modified.chart":
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
+  "lab7.method.heun.tab": "7c · Euler–Heun",
+  "lab7.method.heun.title": "Metoda Euler–Heun",
+  "lab7.method.heun.name": "Metoda Euler–Heun",
+  "lab7.method.heun.idea":
+    "Un pas Euler estimează mai întâi valoarea de la capătul pasului, iar acolo se calculează panta $K_2$. Pasul folosește apoi media celor două pante, $K_1$ la început și $K_2$ la sfârșit, ca în formula trapezelor:",
+  "lab7.method.heun.steps":
+    "Ca la metoda lui Euler, intervalul $[x_0; x_0 + T]$ se împarte în $n$ pași egali, iar pasul se aplică pentru $i = 1, \\dots, n$, pornind de la $y_0 = y(x_0)$. Un pas costă două valori ale lui $f$, iar metoda este de ordinul doi: dacă pasul $h$ se înjumătățește, eroarea scade de aproximativ patru ori.",
+  "lab7.method.heun.failure":
+    "Dacă $f$ nu este definită într-un nod sau în punctul estimat $(x_{i-1} + h; y_{i-1} + hK_1)$, de pildă din cauza unui radical dintr-un număr negativ, metoda se oprește cu eroare și păstrează nodurile calculate până atunci. Dacă $|y_i|$ depășește $10^{100}$, aproximațiile cresc nemărginit, iar metoda se oprește de asemenea.",
+  "lab7.method.heun.chart":
+    "Primul grafic arată valorile $y_i$ calculate în fiecare nod. Dacă introduci soluția exactă $y(x)$, ea apare pe același grafic, ca să vezi cât de aproape sunt punctele de curbă. Tot atunci apare un al doilea grafic, cu eroarea $|y(x_i) - y_i|$ din fiecare nod. Axa lui verticală este pe scară logaritmică, ca să se vadă și erorile foarte mici.",
+  "lab7.preset.ex1H4": "Ex. 1: y′ = x² − y, h = 1/4",
+  "lab7.preset.ex1H8": "Ex. 1: y′ = x² − y, h = 1/8",
+  "lab7.preset.ex1H16": "Ex. 1: y′ = x² − y, h = 1/16",
+  "lab7.preset.ex2": "Ex. 2: y′ = y + x, h = 0,1",
+  "lab7.preset.exampleModified": "Exemplu numeric: y′ = y + x, h = 0,1",
+  "lab7.preset.exampleHeun": "Exemplu numeric: y′ = y + x, h = 0,1",
+  "lab7.compare.ex1": "Ex. 1: y′ = x² − y cu h = 1/4, 1/8 și 1/16",
+  "lab7.compare.ex1.task":
+    "Rezolvă problema y′ = x² − y, y(0) = 1 pe [0; 4] prin metoda lui Euler, cu h = 1/4, 1/8 și 1/16, și afișează în fiecare nod valoarea exactă y = x² − 2x + 2 − e⁻ˣ, aproximația și eroarea. Tabelul cuprinde nodurile comune celor trei pași, x = 0,25; 0,5; …; 4.",
+  "lab7.compare.ex1.note":
+    "Eroarea scade la jumătate de fiecare dată când pasul h se înjumătățește: în x = 4 este de aproximativ 0,239 pentru h = 1/4, 0,119 pentru h = 1/8 și 0,059 pentru h = 1/16. Așa se comportă o metodă de ordinul întâi. În toate cele trei cazuri, eroarea este cea mai mare în ultimul nod, x = 4.",
+  "lab7.compare.example":
+    "Exemplu numeric: metoda lui Euler, metoda modificată și metoda Euler–Heun pentru y′ = y + x",
+  "lab7.compare.example.task":
+    "Rezolvă problema y′ = y + x, y(0) = 1 pe [0; 1], cu h = 0,1, prin metoda lui Euler, metoda modificată a lui Euler și metoda Euler–Heun și compară, în fiecare nod, cele trei aproximații cu soluția exactă y = 2eˣ − x − 1.",
+  "lab7.compare.example.note":
+    "Coloanele metodei modificate și ale metodei Euler–Heun coincid, așa cum e de așteptat: pentru un f liniar, cum este y + x, ambele metode înmulțesc la fiecare pas y + x + 1 cu 1 + h + h²/2, deci dau aceleași valori yᵢ.",
 };

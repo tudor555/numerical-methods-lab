@@ -9,7 +9,7 @@ The methods, inputs, algorithm steps and worked examples for each of the 13 labs
 - **Rule R0 (choosing x₀):** x₀ = a if f(a)·f″(a) > 0, otherwise x₀ = b. Here f″(a) is either the input value `dda` or the expression `ddf` evaluated at a.
 - **Cauchy problem nodes (Labs 7–9):** inputs x₀, y₀, T, n; h = T/n; xᵢ = x₀ + i·h; output yᵢ for i = 1..n.
 - **ε presets:** "ε ∈ {10⁻⁴, 10⁻⁸, 10⁻¹²}" means run once per value and compare the iteration counts (CAP-7).
-- **Input limits:** interval ends and starting values (including Lab 5's x₀ and y₀) lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. In Lab 4, 4b's a is in (0, 10⁶]. The limits live in `src/labs/shared-fields.ts`.
+- **Input limits:** interval ends and starting values (including Lab 5's x₀ and y₀) lie in [−10⁶, 10⁶]; ε in [10⁻¹⁵, 1]; the iteration cap is an integer from 1 to 100 000. Values outside are rejected next to the field. A value used only for its sign (`dda`) has no limit. In Lab 1, c is in (0, 10⁶] and k is an integer from 2 to 100. In Lab 4, 4b's a is in (0, 10⁶]. In Labs 7–9, x₀ and y₀ lie in [−10⁶, 10⁶], T is in (0, 10⁶] and n is an integer from 1 to 10 000; there is no ε and no iteration cap. The limits live in `src/labs/shared-fields.ts`.
 
 ---
 
@@ -99,10 +99,12 @@ Uses the shared node rules for the Cauchy problem.
 **7b. Modified Euler (midpoint).** K = f(xᵢ₋₁, yᵢ₋₁), U = f(xᵢ₋₁ + h/2, yᵢ₋₁ + (h/2)K), yᵢ = yᵢ₋₁ + hU.
 **7c. Euler–Heun.** K₁ = f(xᵢ₋₁, yᵢ₋₁), K₂ = f(xᵢ₋₁ + h, yᵢ₋₁ + hK₁), yᵢ = yᵢ₋₁ + (h/2)(K₁ + K₂).
 
-Examples (show exact value, approximation and error at each node):
+Examples (show exact value, approximation and error at each node). The exact solution is an optional input y(x); the presets fill it with the lab's solution, and a blank field leaves out the exact value, the error and the error chart.
 
-1. 7a: y′ = x² − y, y(0) = 1, x ∈ [0, 4], h ∈ {1/4, 1/8, 1/16}. Exact y = x² − 2x + 2 − e⁻ˣ.
-2. 7a, 7b, 7c: y′ = y + x, y(0) = 1, x ∈ [0, 1], h = 0.1 (n = 10). Exact y = 2eˣ − x − 1. Compare all three methods.
+1. 7a: y′ = x² − y, y(0) = 1, x ∈ [0, 4], h ∈ {1/4, 1/8, 1/16} (n = 16, 32, 64; one preset each). Exact y = x² − 2x + 2 − e⁻ˣ. y₁₆ = 9.7424831, y₃₂ = 9.8628026, y₆₄ = 9.9224293; the error at x = 4 is 0.2392 / 0.1189 / 0.0593. Compared as one card at the nodes the three runs share, x = 0.25, 0.5, …, 4; the card's note gives the analysis the lab asks for: the error halves with h, as an order-one method should, and is largest at x = 4 for every h.
+2. 7a: y′ = y + x, y(0) = 1, x ∈ [0, 1], h = 0.1 (n = 10). Exact y = 2eˣ − x − 1. y₁ = 1.1, y₁₀ = 3.1874849, error 0.2490787.
+
+Numerical example (7b and 7c, unnumbered in the lab): the problem of ex. 2. Both give y₁ = 1.11, y₁₀ = 3.4281617, error 0.0084020; on this linear f every two-stage second-order method gives the same yᵢ. Its last request, comparing all three methods, is one card: 7a ex. 2, 7b and 7c at x₁ … x₁₀, with the exact value.
 
 ## Lab 8: Runge–Kutta methods of order 2 and 3
 

@@ -97,6 +97,13 @@ export const en = {
   "field.F2": "Function F₂",
   "field.F3": "Function F₃",
   "field.startZ": "Starting point, z",
+  "field.cauchyX0": "Initial point",
+  "field.cauchyY0": "Initial value",
+  "field.T": "Length of the interval",
+  "field.steps": "Number of steps, h = T/n",
+  "field.fxy": "Right-hand side of y′ = f(x, y)",
+  "field.exactY": "Exact solution",
+  "field.optional": "optional",
 
   "field.error.empty": "Required.",
   "field.error.syntax": "Cannot read this expression. Check the operators and parentheses.",
@@ -142,6 +149,14 @@ export const en = {
     "Stopped at the cap of {n} iterations while |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| or |zₙ − zₙ₋₁| was still ≥ ε. The last iterate is shown, but it does not meet the tolerance.",
   "result.startPoint": "Starting point",
   "result.exactSolution": "Exact solution",
+  "result.status.completed": "Completed",
+  "result.cauchy.completed":
+    "Computed y₁, …, yₙ at the nodes x₁, …, xₙ with the step h = {h} (n = {n}).",
+  "result.cauchy.partial": "The nodes computed before the error are kept below.",
+  "result.stepH": "Step",
+  "result.steps": "Number of steps",
+  "result.valueAtEnd": "Approximation at x₀ + T",
+  "result.maxError": "Largest error at the nodes",
 
   "run.error.zero-derivative":
     "The derivative is zero at n = {n}, xₙ = {x}. The step divides by zero, so xₙ₊₁ is undefined.",
@@ -165,10 +180,18 @@ export const en = {
     "A value overflowed to ±∞ in the step from n = {n}, (xₙ, yₙ, zₙ) = {point}.",
   "run.system3Error.diverged":
     "The iteration diverges: at n = {n}, (xₙ, yₙ, zₙ) = {point}, |xₙ|, |yₙ| or |zₙ| passed 10¹⁰⁰.",
+  "run.cauchyError.undefined-value":
+    "A value is undefined (NaN) in the step from node i = {i}, where xᵢ = {x} and yᵢ = {y}. Check the domain of f (√ of a negative number, ln of a non-positive one).",
+  "run.cauchyError.overflow":
+    "A value overflowed to ±∞ in the step from node i = {i}, where xᵢ = {x} and yᵢ = {y}.",
+  "run.cauchyError.diverged":
+    "The approximation blows up: |yᵢ| passed 10¹⁰⁰ at node i = {i} (xᵢ = {x}, yᵢ = {y}).",
 
   "table.title": "Iterations",
   "table.hidden": "Hidden iterations: {count}",
   "table.showAll": "Show all",
+  "table.hiddenNodes": "Hidden nodes: {count}",
+  "table.node": "Values at the nodes",
 
   "chart.tangent": "f(x) with the tangent steps",
   "chart.secant": "f(x) with the secant lines",
@@ -184,6 +207,8 @@ export const en = {
   "chart.components": "xₙ, yₙ and zₙ at each iteration",
   "chart.system3Convergence":
     "Convergence: |xₙ − xₙ₋₁|, |yₙ − yₙ₋₁| and |zₙ − zₙ₋₁| on a log scale",
+  "chart.cauchySolution": "The approximate solution at the nodes",
+  "chart.cauchyError": "Error |y(xᵢ) − yᵢ| at the nodes, on a log scale",
   "chart.toolbar": "Chart tools",
   "chart.tool.zoom": "Zoom to an area",
   "chart.tool.pan": "Pan",
@@ -215,6 +240,9 @@ export const en = {
   "chart.trace.componentX": "xₙ",
   "chart.trace.componentY": "yₙ",
   "chart.trace.componentZ": "zₙ",
+  "chart.trace.approximation": "Approximation yᵢ",
+  "chart.trace.exactSolution": "Exact solution y(x)",
+  "chart.trace.nodeError": "|y(xᵢ) − yᵢ|",
 
   "compare.run": "Run comparison",
   "compare.method": "Method",
@@ -224,6 +252,8 @@ export const en = {
   "compare.cell.max": "Cap reached",
   "compare.inputs": "Inputs",
   "compare.precisions": "Precision",
+  "compare.nodesHint":
+    "Each row is a node xᵢ: the exact value y(xᵢ), then each run's yᵢ with its error |y(xᵢ) − yᵢ| below it.",
 
   "lab1.intro":
     "Solve f(x) = 0 with Newton's tangent method, compute k-th roots with the same idea, and see how both compare with successive approximations.",
@@ -491,6 +521,58 @@ export const en = {
   "lab6.compare.ex4": "Ex. 4: Gauss–Seidel on x² + y² = 5, xy = 2",
   "lab6.compare.ex4.task":
     "Apply the Gauss–Seidel method to the system x² + y² = 5, xy = 2 near (2, 1), starting from (1.5, 1.5), and compare the number of iterations with successive approximations. Both methods run with three precisions.",
+
+  "lab7.intro":
+    "Solve the Cauchy problem y′ = f(x, y), y(x₀) = y₀ step by step on equally spaced nodes, with Euler's method, the modified Euler (midpoint) method and the Euler–Heun method. Then compare the approximations with the exact solution, node by node.",
+  "lab7.method.euler.tab": "7a · Euler",
+  "lab7.method.euler.title": "Euler's method",
+  "lab7.method.euler.name": "Euler's method",
+  "lab7.method.euler.idea":
+    "From the node $(x_{i-1}, y_{i-1})$, the solution is followed along its tangent line. Its slope there is $f(x_{i-1}, y_{i-1})$, and one step of length $h$ along it gives $y_i$:",
+  "lab7.method.euler.steps":
+    "The interval $[x_0, x_0 + T]$ is split into $n$ equal steps, and the formula runs for $i = 1, \\dots, n$, starting from $y_0 = y(x_0)$. The output is $y_1, \\dots, y_n$, the approximations of $y(x_1), \\dots, y(x_n)$. Each step costs one value of $f$, and the method is of order one: halving $h$ roughly halves the error at a given $x$.",
+  "lab7.method.euler.failure":
+    "If $f$ is undefined at a node, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
+  "lab7.method.euler.chart":
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
+  "lab7.method.modified.tab": "7b · Modified Euler",
+  "lab7.method.modified.title": "The modified Euler method (midpoint method)",
+  "lab7.method.modified.name": "Modified Euler method",
+  "lab7.method.modified.idea":
+    "Euler's method uses only the slope at the start of the step. The modified method first takes half a step along that slope, to the midpoint $x_{i-1} + h/2$, and then uses the slope $U$ found there for the whole step:",
+  "lab7.method.modified.steps":
+    "As in Euler's method, the interval $[x_0, x_0 + T]$ is split into $n$ equal steps, and the step runs for $i = 1, \\dots, n$, starting from $y_0 = y(x_0)$. Each step costs two values of $f$, and the method is of order two: halving $h$ cuts the error about fourfold.",
+  "lab7.method.modified.failure":
+    "If $f$ is undefined at a node or at the midpoint $(x_{i-1} + h/2, y_{i-1} + (h/2)K)$, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
+  "lab7.method.modified.chart":
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
+  "lab7.method.heun.tab": "7c · Euler–Heun",
+  "lab7.method.heun.title": "The Euler–Heun method",
+  "lab7.method.heun.name": "Euler–Heun method",
+  "lab7.method.heun.idea":
+    "An Euler step first predicts the value at the end of the step, and the slope $K_2$ is computed there. The step then uses the mean of the two slopes, $K_1$ at the start and $K_2$ at the end, as the trapezoidal rule does:",
+  "lab7.method.heun.steps":
+    "As in Euler's method, the interval $[x_0, x_0 + T]$ is split into $n$ equal steps, and the step runs for $i = 1, \\dots, n$, starting from $y_0 = y(x_0)$. Each step costs two values of $f$, and the method is of order two: halving $h$ cuts the error about fourfold.",
+  "lab7.method.heun.failure":
+    "If $f$ is undefined at a node or at the predicted point $(x_{i-1} + h, y_{i-1} + hK_1)$, such as a square root of a negative number, the method stops with an error and keeps the nodes computed so far. If $|y_i|$ passes $10^{100}$, the approximation has blown up, and the method stops as well.",
+  "lab7.method.heun.chart":
+    "The first chart shows the computed values $y_i$ at each node. If you enter the exact solution $y(x)$, it is drawn on the same chart, so you can see how close the points stay to the curve. A second chart then shows the error $|y(x_i) - y_i|$ at each node. Its vertical axis is logarithmic, so even very small errors stay visible.",
+  "lab7.preset.ex1H4": "Ex. 1: y′ = x² − y, h = 1/4",
+  "lab7.preset.ex1H8": "Ex. 1: y′ = x² − y, h = 1/8",
+  "lab7.preset.ex1H16": "Ex. 1: y′ = x² − y, h = 1/16",
+  "lab7.preset.ex2": "Ex. 2: y′ = y + x, h = 0.1",
+  "lab7.preset.exampleModified": "Numerical example: y′ = y + x, h = 0.1",
+  "lab7.preset.exampleHeun": "Numerical example: y′ = y + x, h = 0.1",
+  "lab7.compare.ex1": "Ex. 1: y′ = x² − y with h = 1/4, 1/8 and 1/16",
+  "lab7.compare.ex1.task":
+    "Solve y′ = x² − y, y(0) = 1 on [0, 4] with Euler's method for h = 1/4, 1/8 and 1/16, and show the exact value y = x² − 2x + 2 − e⁻ˣ, the approximation and the error at each node. The table lists the nodes all three steps share, x = 0.25, 0.5, …, 4.",
+  "lab7.compare.ex1.note":
+    "The error halves each time h is halved: at x = 4 it is about 0.239 for h = 1/4, 0.119 for h = 1/8 and 0.059 for h = 1/16. This is what an order-one method does. In all three runs the error is largest at the last node, x = 4.",
+  "lab7.compare.example": "Numerical example: Euler, modified Euler and Euler–Heun on y′ = y + x",
+  "lab7.compare.example.task":
+    "Solve y′ = y + x, y(0) = 1 on [0, 1] with h = 0.1 by Euler's method, the modified Euler method and the Euler–Heun method, and compare the three approximations with the exact solution y = 2eˣ − x − 1 at each node.",
+  "lab7.compare.example.note":
+    "The modified Euler and Euler–Heun columns match, as they should: for a linear f such as y + x, both methods multiply y + x + 1 by 1 + h + h²/2 at every step, so they give the same yᵢ.",
 } as const;
 
 export type MessageKey = keyof typeof en;

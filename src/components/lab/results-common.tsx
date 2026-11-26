@@ -43,6 +43,9 @@ export function useChartLabels(): ChartLabels {
       componentX: t("chart.trace.componentX"),
       componentY: t("chart.trace.componentY"),
       componentZ: t("chart.trace.componentZ"),
+      approximation: t("chart.trace.approximation"),
+      exactSolution: t("chart.trace.exactSolution"),
+      nodeError: t("chart.trace.nodeError"),
     }),
     [t],
   );

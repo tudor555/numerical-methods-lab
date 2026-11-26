@@ -196,7 +196,8 @@ export default function PlotlyInner({ title, spec }: { title: string; spec: Char
           ))}
         </div>
       </div>
-      <div ref={ref} className="h-80 w-full" />
+      {/* Plotly redraws a beat after a resize; clipping keeps the old, wider SVG from widening the page meanwhile. */}
+      <div ref={ref} className="h-80 w-full min-w-0 overflow-hidden" />
     </>
   );
 }

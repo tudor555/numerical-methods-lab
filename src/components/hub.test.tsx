@@ -59,16 +59,24 @@ describe("Hub", () => {
     expect(sixth).not.toContain("Coming soon");
   });
 
-  it("shows labs 7–13 as coming soon, without a link", () => {
-    const rest = cards("en").slice(6);
-    expect(rest).toHaveLength(7);
+  it("links Lab 7 to /labs/euler", () => {
+    const seventh = cards("en")[6];
+    expect(seventh).toContain('href="/labs/euler"');
+    expect(seventh).toContain('aria-label="Lab 7: Euler-type methods. Open lab"');
+    expect(textOf(seventh)).toContain("Euler, modified Euler and Euler–Heun for y′ = f(x, y)");
+    expect(seventh).not.toContain("Coming soon");
+  });
+
+  it("shows labs 8–13 as coming soon, without a link", () => {
+    const rest = cards("en").slice(7);
+    expect(rest).toHaveLength(6);
     rest.forEach((card, i) => {
-      expect(textOf(card)).toContain(`Lab ${i + 7}`);
+      expect(textOf(card)).toContain(`Lab ${i + 8}`);
       expect(card).toContain("Coming soon");
       expect(card).toContain('aria-disabled="true"');
       expect(card).not.toContain("<a ");
     });
-    expect(count(render(<Hub />), "href=")).toBe(6);
+    expect(count(render(<Hub />), "href=")).toBe(7);
   });
 
   it("renders in Romanian", () => {
@@ -84,7 +92,8 @@ describe("Hub", () => {
       "Metoda combinată a tangentei și calculul radicalilor cu metoda de ordinul 3",
     );
     expect(textOf(html)).toContain("Aproximații succesive și metoda Gauss–Seidel");
-    expect(count(html, "În curând")).toBe(7);
+    expect(textOf(html)).toContain("Metode de tip Euler");
+    expect(count(html, "În curând")).toBe(6);
     expect(html).not.toContain("Coming soon");
   });
 });

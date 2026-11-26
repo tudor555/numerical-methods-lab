@@ -62,7 +62,7 @@ describe("Lab 2 presets", () => {
     if (!p) throw new Error(id);
     const prepared = method(p.methodId).prepare(p.values);
     if (!prepared.ok) throw new Error("invalid");
-    const r = prepared.prepared.run();
+    const r = scalarRun(prepared.prepared).run();
     expect(r.status).toBe("converged");
     expect(r.n).toBe(n);
     expect(Math.abs((r.result as number) - root)).toBeLessThan(1e-4);

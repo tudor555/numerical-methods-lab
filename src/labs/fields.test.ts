@@ -48,6 +48,24 @@ describe("isVisible", () => {
 });
 
 describe("parseFields", () => {
+  it("skips a blank optional expression instead of rejecting it", () => {
+    const optional: ExpressionField = { ...expression("exact"), optional: true };
+    for (const raw of ["", "   ", undefined]) {
+      const parsed = parseFields([optional], raw === undefined ? {} : { exact: raw });
+      expect(parsed.errors).toEqual({});
+      expect(parsed.functions.exact).toBeUndefined();
+    }
+  });
+
+  it("compiles a filled optional expression and still rejects an invalid one", () => {
+    const optional: ExpressionField = { ...expression("exact"), optional: true };
+    expect(parseFields([optional], { exact: "2x" }).functions.exact(3)).toBe(6);
+    expect(parseFields([optional], { exact: "x + z" }).errors.exact?.key).toBe(
+      "field.error.unknown-symbol",
+    );
+    expect(parseFields([expression("f")], { f: " " }).errors.f?.key).toBe("field.error.empty");
+  });
+
   it("evaluates number fields as constant expressions", () => {
     expect(parseFields([number("a")], { a: "3*pi/8" }).numbers.a).toBeCloseTo(
       (3 * Math.PI) / 8,

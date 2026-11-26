@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { scalarRun } from "@/test/runs";
 import { en } from "@/i18n/en";
 import { ro } from "@/i18n/ro";
 import { findComparisonMethod, findComparisonPreset, runComparison } from "./compare";
@@ -21,7 +22,7 @@ const prepare = (id: string, patch: FieldValues = {}) => {
   const m = method(id);
   const prepared = m.prepare({ ...m.defaults, ...patch });
   if (!prepared.ok) throw new Error(JSON.stringify(prepared.errors));
-  return prepared.prepared;
+  return scalarRun(prepared.prepared);
 };
 
 const lab4Texts = (messages: Record<string, string>) =>
@@ -142,7 +143,7 @@ describe("Lab 4 presets", () => {
     if (!p) throw new Error(id);
     const prepared = method(p.methodId).prepare(p.values);
     if (!prepared.ok) throw new Error("invalid");
-    const r = prepared.prepared.run();
+    const r = scalarRun(prepared.prepared).run();
     expect(r.status).toBe("converged");
     expect(r.n).toBe(n);
     expect(Math.abs((r.result as number) - root)).toBeLessThan(1e-4);

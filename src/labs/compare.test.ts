@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { comparisonInputs, findComparisonPreset } from "./compare";
+import {
+  comparisonInputs,
+  findComparisonPreset,
+  runComparison,
+  runNodeComparison,
+} from "./compare";
 import { lab1, newtonMethod } from "./lab-1";
 import { lab4 } from "./lab-4";
 import { lab6 } from "./lab-6";
+import { lab7 } from "./lab-7";
 import type { MethodDefinition } from "./types";
 
 const method = (id: string): MethodDefinition => {
@@ -76,5 +82,54 @@ describe("comparisonInputs", () => {
 
   it("shows an empty value for a field the preset leaves out", () => {
     expect(comparisonInputs(method("4b"), {})).toEqual([{ kind: "tex", tex: "a = " }]);
+  });
+});
+
+describe("runNodeComparison", () => {
+  const nodes = lab7.comparisons[0];
+  if (nodes.kind !== "nodes") throw new Error("expected a node comparison");
+
+  it("runs each row from its preset as it is, with the preset's exact solution", () => {
+    const cells = runNodeComparison(lab7, nodes);
+    expect(cells).toHaveLength(3);
+    expect(cells.map((cell) => cell?.result.status)).toEqual([
+      "completed",
+      "completed",
+      "completed",
+    ]);
+    expect(cells[0]?.exact?.(0)).toBeCloseTo(1, 15);
+  });
+
+  it("gives null for an unknown method or preset, an invalid preset, or a run of another kind", () => {
+    const lab = {
+      ...lab7,
+      presets: [...lab7.presets, { ...lab7.presets[0], id: "broken", values: { f: "x +" } }],
+      methods: [...lab7.methods, ...lab6.methods],
+    };
+    const cells = runNodeComparison(lab, {
+      ...nodes,
+      rows: [
+        { methodId: "nope", presetId: "ex1-h-1-4" },
+        { methodId: "7a", presetId: "nope" },
+        { methodId: "7a", presetId: "broken" },
+        { methodId: "6a", presetId: "ex1-h-1-4" },
+      ],
+    });
+    expect(cells).toEqual([null, null, null, null]);
+  });
+
+  it("is the only way to run a node comparison: runComparison refuses it", () => {
+    expect(() => runComparison(lab7, nodes)).toThrow("node comparison");
+  });
+
+  it("gives null cells when a precision comparison names a Cauchy method", () => {
+    const cells = runComparison(lab7, {
+      id: "mixed",
+      titleKey: nodes.titleKey,
+      taskKey: nodes.taskKey,
+      eps: [1e-4],
+      rows: [{ methodId: "7a", presetId: "ex2" }],
+    });
+    expect(cells).toEqual([[null]]);
   });
 });

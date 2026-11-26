@@ -1,4 +1,4 @@
-import type { ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
+import type { CauchyRunResult, ScalarRunResult, SystemRunResult } from "@/lib/methods/types";
 import type {
   ExactSolution,
   FieldValues,
@@ -10,7 +10,10 @@ import type {
   SystemPlot,
 } from "./types";
 
-/** A finished run as the results panel shows it: a scalar run (`kind` optional) or a system run. */
+/**
+ * A finished run as the results panel shows it: a scalar run (`kind` optional), a system run, or
+ * the nodes of a Cauchy problem.
+ */
 export type RunView =
   | {
       kind?: "scalar";
@@ -25,10 +28,18 @@ export type RunView =
       plot: SystemPlot;
       eps: number;
       exact?: SystemExactSolution;
+    }
+  | {
+      kind: "cauchy";
+      result: CauchyRunResult;
+      exact?: (x: number) => number;
     };
 
 /** Runs a prepared method and keeps what the results panel needs, with its kind. */
 export function toRunView(prepared: PreparedRun): RunView {
+  if (prepared.kind === "cauchy") {
+    return { kind: "cauchy", result: prepared.run(), exact: prepared.exact };
+  }
   if (prepared.kind === "system") {
     const { plot, eps, exact } = prepared;
     return { kind: "system", result: prepared.run(), plot, eps, exact };

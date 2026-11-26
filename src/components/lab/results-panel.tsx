@@ -13,6 +13,7 @@ import { IterationTable } from "./iteration-table";
 import { PlotlyChart } from "./plotly-chart";
 import { Stat, useChartLabels } from "./results-common";
 import { runErrorKey, STATUS_STYLE, StatusBadge } from "./status";
+import { CauchyResultsPanel } from "./cauchy-results-panel";
 import { SystemResultsPanel } from "./system-results-panel";
 
 export type { RunView };
@@ -27,7 +28,7 @@ const CHART_TITLE = {
   cobweb: "chart.cobweb",
 } as const satisfies Record<FunctionPlot["kind"], MessageKey>;
 
-type ScalarRunView = Exclude<RunView, { kind: "system" }>;
+type ScalarRunView = Exclude<RunView, { kind: "system" | "cauchy" }>;
 
 /** Picks the panel for the run's kind before any hook runs, so each panel keeps its own hooks. */
 export function ResultsPanel({
@@ -40,6 +41,7 @@ export function ResultsPanel({
   errorKeys?: MethodDefinition["errorKeys"];
 }) {
   if (view.kind === "system") return <SystemResultsPanel view={view} />;
+  if (view.kind === "cauchy") return <CauchyResultsPanel view={view} />;
   return <ScalarResultsPanel view={view} valueColumn={valueColumn} errorKeys={errorKeys} />;
 }
 

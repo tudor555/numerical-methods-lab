@@ -18,7 +18,7 @@ const preset = (id: string) => {
 };
 
 describe("registry", () => {
-  it("lists all 13 labs, Labs 1–6 ready, Lab 1 at /labs/newton", () => {
+  it("lists all 13 labs, Labs 1–7 ready, Lab 1 at /labs/newton", () => {
     expect(labs.map((l) => l.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
     expect(labs.filter((l) => l.status === "ready").map((l) => l.slug)).toEqual([
       "newton",
@@ -27,9 +27,10 @@ describe("registry", () => {
       "third-order",
       "newton-systems",
       "nonlinear-systems",
+      "euler",
     ]);
     expect(findReadyLab("newton")).toBe(lab1);
-    expect(findReadyLab("euler")).toBeUndefined();
+    expect(findReadyLab("runge-kutta-2-3")).toBeUndefined();
     expect(new Set(labs.map((l) => l.slug)).size).toBe(13);
   });
 });
@@ -62,7 +63,7 @@ describe("Lab 1 presets", () => {
   it("Kepler preset starts at 3π/8 and converges to ≈ 1.17122", () => {
     const prepared = method("1a").prepare(preset("kepler").values);
     if (!prepared.ok) throw new Error("invalid");
-    const r = prepared.prepared.run();
+    const r = scalarRun(prepared.prepared).run();
     expect(r.iterations[0].x).toBeCloseTo((3 * Math.PI) / 8, 15);
     expect(r.result).toBeCloseTo(1.171229652501666, 4);
   });
@@ -72,7 +73,7 @@ describe("Lab 1 plots", () => {
   it("1b plots f(x) = xᵏ − c", () => {
     const prepared = method("1b").prepare({ c: "2", k: "3", eps: "1e-4", maxIter: "1000" });
     if (!prepared.ok) throw new Error("invalid");
-    const plot = prepared.prepared.plot;
+    const plot = scalarRun(prepared.prepared).plot;
     expect(plot?.kind).toBe("tangent");
     if (plot?.kind !== "tangent") return;
     expect(plot.f(2)).toBe(6);

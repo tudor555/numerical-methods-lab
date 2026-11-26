@@ -4,11 +4,17 @@ import { CircleCheck, OctagonX, TriangleAlert, type LucideIcon } from "lucide-re
 import type { MessageKey } from "@/i18n/en";
 import { useI18n } from "@/i18n/provider";
 import type { MethodDefinition } from "@/labs/types";
-import type { RunStatus, ScalarErrorCode, SystemErrorCode } from "@/lib/methods/types";
+import type {
+  CauchyErrorCode,
+  RunStatus,
+  ScalarErrorCode,
+  SystemErrorCode,
+} from "@/lib/methods/types";
 import { cn } from "@/lib/utils";
 
 export const STATUS_STYLE: Record<RunStatus, { icon: LucideIcon; text: string; tint: string }> = {
   converged: { icon: CircleCheck, text: "text-success", tint: "border-success/40 bg-success/10" },
+  completed: { icon: CircleCheck, text: "text-success", tint: "border-success/40 bg-success/10" },
   "max-iterations": {
     icon: TriangleAlert,
     text: "text-warning",
@@ -39,6 +45,11 @@ export function systemErrorKey(
     return `run.system3Error.${shared}` satisfies MessageKey;
   }
   return `run.systemError.${shared}` satisfies MessageKey;
+}
+
+/** The message key for a Cauchy run error; its params are `i`, `x` and `y`, the node it names. */
+export function cauchyErrorKey(code: CauchyErrorCode | undefined): MessageKey {
+  return `run.cauchyError.${code ?? "undefined-value"}` satisfies MessageKey;
 }
 
 /** Status pill: color, icon and text, so it never relies on color alone. */
